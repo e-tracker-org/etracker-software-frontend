@@ -1,0 +1,93 @@
+.timeline {
+    width: fit-content;
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    &-point {
+        .mark {
+            height: 28px;
+            aspect-ratio: 1;
+            display: none;
+            transition: opacity 70ms ease-in 10ms;
+        }
+
+        .current-state {
+            transition: opacity 70ms ease-in 10ms;
+            display: none;
+        }
+
+        .wrapper {
+            padding: 0;
+            height: 28px;
+            aspect-ratio: 1;
+            border: 3px solid #e3e5e5;
+            transition: all 70ms ease-in 30ms;
+        }
+
+        .line {
+            min-width: 217px;
+            transition: all 150ms ease-in 50ms;
+        }
+
+        &[data-completed='true'] {
+            .line {
+                border-color: #2f42ed;
+            }
+        }
+
+        &[data-current='false'] {
+            .wrapper {
+                box-shadow: none;
+            }
+        }
+
+        &[data-completed='true'] {
+            .mark {
+                display: block;
+            }
+
+            .wrapper {
+                box-shadow: none;
+                padding: 0;
+                border: none;
+            }
+        }
+
+        &[data-current='true'] {
+            .wrapper {
+                width: fit-content;
+                border: none;
+                padding: 8px;
+            }
+
+            .current-state {
+                display: block;
+            }
+
+            .text {
+                color: #2f42ed;
+            }
+        }
+    }
+
+    & div:last-child {
+        div {
+            .line {
+                display: none;
+            }
+        }
+        .text {
+            left: -70%;
+        }
+    }
+
+    .text {
+        position: absolute;
+        margin-top: 10px;
+        color: #00000054;
+        font-size: 14px;
+        min-width: 120px;
+        left: -20%;
+        text-align: center;
+    }
+}
