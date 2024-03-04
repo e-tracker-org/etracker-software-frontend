@@ -107,7 +107,7 @@ const TenantTable = ({ tenants }: { tenants: User[] }) => {
                                                 className="cursor-pointer"
                                                 type="checkbox"
                                                 checked={
-                                                    tenants.length ===
+                                                    tenants?.length ===
                                                     states?.selectedTenants
                                                         .length
                                                 }

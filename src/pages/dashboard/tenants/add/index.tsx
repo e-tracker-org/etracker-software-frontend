@@ -112,7 +112,7 @@ export default function AddTenant() {
 
                 setSelectedTenants((prevItems: any) => {
                     const newItems = response?.data.filter((item: any) => {
-                        // Check if the item with the same id already exists in the selectedItems array
+                        // Check if the tenant with the same id already exists in the selectedItems array
                         return !prevItems.some(
                             (selectedTenant: any) =>
                                 selectedTenant.id === item.id

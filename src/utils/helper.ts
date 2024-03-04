@@ -88,13 +88,15 @@ export const goBackToKyc2 = (states: any, router?: NextRouter) => {
             return false;
         }
     } else if (
-        states?.activeKyc &&
-        states?.activeKyc?.status === KycStatus.COMPLETE
+        states?.activeKyc && // come back here
+        states?.activeKyc?.status === KycStatus.COMPLETE && states?.isNotApprovedOrPending === false
     ) {
         if (router) {
             states?.setScreen('awaitApproval');
+            return false;
         }
-        return false;
+        return true;
+        
     } else {
         if (router) {
             states?.setScreen('');

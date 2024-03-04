@@ -18,6 +18,7 @@ import { Role } from 'utils/enums';
 import SideBarIcon from './SideBarIcon';
 import Link from 'next/link';
 import Dropdown from 'components/base/Dropdown';
+import { KycStatus } from 'interfaces';
 
 interface SidebarProps {
     role: Role;
@@ -84,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <ul className="grid gap-y-[60px] mt-[60px] ">
-                {states?.activeKyc && urlParam !== 'kyc' ? (
+                {states?.activeKyc?.status === KycStatus.INCOMPLETE && urlParam !== 'kyc' ? (
                     // states?.activeKyc?.status === KycStatus.INCOMPLETE
                     <li className="mb-[-15px] mt-[-36px]">
                         <ActiveLink

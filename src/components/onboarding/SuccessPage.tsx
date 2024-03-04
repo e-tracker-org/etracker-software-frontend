@@ -25,7 +25,7 @@ const SuccessPage: FC<SuccessProps> = ({
     const router = useRouter();
 
     const onContinue = () => {
-        // states?.toggleCompleted();
+        states?.toggleCompleted(); // this had to update everything to complete
         states?.setScreen('');
         router.push('/dashboard');
     };
