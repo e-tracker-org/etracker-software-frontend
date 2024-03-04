@@ -8,7 +8,7 @@ export const KycServices = {
             const accounttype = reqObj?.get('accountType');
             const kycStage = reqObj?.get('kycStage');
             const { data } = await http.post(
-                `/kyc/${accounttype}/${kycStage}`,
+                `/api/v1/kyc/${accounttype}/${kycStage}`,
                 reqObj,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },

@@ -15,7 +15,7 @@ interface confirmTenantProp {
 export const LandlordService = {
     async getAllTenants(): Promise<AxiosResponse<GenericResponse<User[]>>> {
         try {
-            const { data } = await http.get('/landlord/tenant');
+            const { data } = await http.get('/api/v1/landlord/tenant');
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -27,7 +27,7 @@ export const LandlordService = {
     ): Promise<AxiosResponse<GenericResponse<User[]>>> {
         try {
             const { data } = await http.get(
-                `/landlord/search/tenant?q=${searchTerm}`
+                `/api/v1/landlord/search/tenant?q=${searchTerm}`
             );
             return Promise.resolve(data);
         } catch (error: any) {
@@ -39,7 +39,7 @@ export const LandlordService = {
         reqObj: createTenantProp[]
     ): Promise<AxiosResponse<GenericResponse<string>>> {
         try {
-            const { data } = await http.post(`/landlord/addProperty`, reqObj);
+            const { data } = await http.post(`/api/v1/landlord/addProperty`, reqObj);
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -51,7 +51,7 @@ export const LandlordService = {
     ): Promise<AxiosResponse<GenericResponse<User[]>>> {
         try {
             const { data } = await http.patch(
-                `/landlord/confirmTenant`,
+                `/api/v1/landlord/confirmTenant`,
                 reqObj
             );
             return Promise.resolve(data);
@@ -64,7 +64,7 @@ export const LandlordService = {
         reqObj: Partial<User>
     ): Promise<AxiosResponse<GenericResponse<User>>> {
         try {
-            const { data } = await http.patch('/user', reqObj);
+            const { data } = await http.patch('/api/v1/user', reqObj);
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);

@@ -6,10 +6,10 @@ export const FileUploadServices = {
     async createFileType(
         data: Partial<FileType>
     ): Promise<AxiosResponse<GenericResponse<FileType>>> {
-        return http.post('/docs/filetypes', data);
+        return http.post('/api/v1/docs/filetypes', data);
     },
     async getFileTypes(): Promise<AxiosResponse<GenericResponse<FileType[]>>> {
-        return http.get('/docs/filetypes');
+        return http.get('/api/v1/docs/filetypes');
     },
     async getFileTypesByTypeAndCategory(
         type: string,
@@ -17,12 +17,12 @@ export const FileUploadServices = {
         accountType: number | undefined
     ): Promise<AxiosResponse<GenericResponse<FileType[]>>> {
         return http.get(
-            `/docs/filetypes/type/${type}/category/${category}/${accountType}`
+            `/api/v1/docs/filetypes/type/${type}/category/${category}/${accountType}`
         );
     },
     async uploadFiles(data: FormData) {
         console.log('formDataImg', data.get);
-        return http.post('/docs/upload', data, {
+        return http.post('/api/v1/docs/upload', data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -32,6 +32,6 @@ export const FileUploadServices = {
         category: string,
         type: string
     ): Promise<AxiosResponse<GenericResponse<UploadedFile[]>>> {
-        return http.get(`/docs/upload/userFiles/${category}/${type}`);
+        return http.get(`/api/v1/docs/upload/userFiles/${category}/${type}`);
     },
 };
