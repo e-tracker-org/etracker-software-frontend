@@ -10,7 +10,7 @@ interface notifyTenantProp {
 export const TenantService = {
     async getAllTenants(): Promise<AxiosResponse<GenericResponse<User[]>>> {
         try {
-            const { data } = await http.get('/landlord/tenant');
+            const { data } = await http.get('/api/v1/landlord/tenant');
 
             return Promise.resolve(data);
         } catch (error: any) {
@@ -22,7 +22,7 @@ export const TenantService = {
     ): Promise<AxiosResponse<GenericResponse<User[]>>> {
         try {
             const { data } = await http.get(
-                `/landlord/tenant/search?q=${searchTerm}`
+                `/api/v1/landlord/tenant/search?q=${searchTerm}`
             );
             return Promise.resolve(data);
         } catch (error: any) {
@@ -36,7 +36,7 @@ export const TenantService = {
         const { propertyId, searchParam } = queryKey[1];
         try {
             const { data } = await http.get(
-                `/landlord/tenant/search?q=${propertyId}&q1=${searchParam}`
+                `/api/v1/landlord/tenant/search?q=${propertyId}&q1=${searchParam}`
             );
             return Promise.resolve(data);
         } catch (error: any) {
@@ -47,7 +47,7 @@ export const TenantService = {
         reqObj: notifyTenantProp
     ): Promise<AxiosResponse<GenericResponse<string>>> {
         try {
-            const { data } = await http.post(`/landlord/notify/tenant`, reqObj);
+            const { data } = await http.post(`/api/v1/landlord/notify/tenant`, reqObj);
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -57,7 +57,7 @@ export const TenantService = {
         AxiosResponse<GenericResponse<User[]>>
     > {
         try {
-            const { data } = await http.get('/receipt/category');
+            const { data } = await http.get('/api/v1/receipt/category');
 
             return Promise.resolve(data);
         } catch (error: any) {
@@ -72,7 +72,7 @@ export const TenantService = {
     }): Promise<AxiosResponse<GenericResponse<string>>> {
         try {
             const { data } = await http.post(
-                `/transaction/create-transaction`,
+                `/api/v1/transaction/create-transaction`,
                 reqObj
             );
             return Promise.resolve(data);

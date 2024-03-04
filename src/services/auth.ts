@@ -16,7 +16,7 @@ export const AuthService = {
         reqObj: LoginRequestProp
     ): Promise<AxiosResponse<GenericResponse<LoginResponse>>> {
         try {
-            const { data } = await http.post('/auth/login', reqObj);
+            const { data } = await http.post('/api/v1/auth/login', reqObj);
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -26,7 +26,7 @@ export const AuthService = {
         reqObj: SignupRequestProp
     ): Promise<AxiosResponse<GenericResponse<User>>> {
         try {
-            const { data } = await http.post('/auth/register', reqObj);
+            const { data } = await http.post('/api/v1/auth/register', reqObj);
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -34,7 +34,7 @@ export const AuthService = {
     },
     async requestPasswordReset(reqObj: OTPRequestProp) {
         try {
-            const { data } = await http.post('/auth/forgot-password', reqObj);
+            const { data } = await http.post('/api/v1/auth/forgot-password', reqObj);
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -43,7 +43,7 @@ export const AuthService = {
     async changePassword() {},
     async resetPassword(reqObj: ResetPasswordProp) {
         try {
-            const { data } = await http.post('/auth/reset-password', reqObj);
+            const { data } = await http.post('/api/v1/auth/reset-password', reqObj);
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -51,7 +51,7 @@ export const AuthService = {
     },
     async verifyOTP(reqObj: VerifyOtpProp) {
         try {
-            const { data } = await http.post('/auth/verify-otp', reqObj);
+            const { data } = await http.post('/api/v1/auth/verify-otp', reqObj);
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -62,7 +62,7 @@ export const AuthService = {
     }): Promise<AxiosResponse<GenericResponse<null>>> {
         try {
             const { data } = await http.post(
-                '/auth/token/verify-token',
+                '/api/v1/auth/token/verify-token',
                 reqObj
             );
             return Promise.resolve(data);

@@ -6,40 +6,40 @@ export const PropertyService = {
     async createProperty(
         data: FormData
     ): Promise<AxiosResponse<GenericResponse<Property>>> {
-        return await http.post('/properties', data, {
+        return await http.post('/api/v1/properties', data, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
     },
     async getProperties(): Promise<AxiosResponse<GenericResponse<Property[]>>> {
-        return await http.get('/properties');
+        return await http.get('/api/v1/properties');
     },
     async getMyProperties(): Promise<
         AxiosResponse<GenericResponse<Property[]>>
     > {
-        return await http.get('/properties/me');
+        return await http.get('/api/v1/properties/me');
     },
     async getPropertyById(
         id: string
     ): Promise<AxiosResponse<GenericResponse<Property>>> {
-        return await http.get(`/properties/${id}`);
+        return await http.get(`/api/v1/properties/${id}`);
     },
     async getPropertyByStatus(
         status: string
     ): Promise<AxiosResponse<GenericResponse<Property>>> {
-        return await http.get(`/properties/status?status=${status}`);
+        return await http.get(`/api/v1/properties/status?status=${status}`);
     },
 
     async updatePropertyById(
         property: Partial<PropertySchema>
     ): Promise<AxiosResponse<GenericResponse<Property>>> {
-        return await http.patch(`/properties/${property.id}`, property);
+        return await http.patch(`/api/v1/properties/${property.id}`, property);
     },
     async deletePropertyById(
         id: string
     ): Promise<AxiosResponse<GenericResponse<null>>> {
-        return await http.delete(`/properties/${id}`);
+        return await http.delete(`/api/v1/properties/${id}`);
     },
 
     async propertyKycDocument(reqObj: FormData): Promise<AxiosResponse<User>> {
@@ -47,7 +47,7 @@ export const PropertyService = {
             const accounttype = reqObj?.get('accountType');
             const kycStage = reqObj?.get('kycStage');
             const { data } = await http.post(
-                `/kyc/${accounttype}/${kycStage}`,
+                `/api/v1/kyc/${accounttype}/${kycStage}`,
                 reqObj,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
