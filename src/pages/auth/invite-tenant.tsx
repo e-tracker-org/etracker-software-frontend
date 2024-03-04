@@ -10,9 +10,10 @@ import Image from 'next/image';
 import { useMutation, useQueryClient } from 'react-query';
 import { AuthService } from 'services';
 import { AxiosError } from 'axios';
-import { ReactElement, useState, useRef } from 'react';
+import { ReactElement, useState, useRef, useEffect } from 'react';
 import HomeLayout from 'layouts/home';
 import { MutationKey } from 'react-query';
+import { useRouter } from 'next/router';
 
 const schema = yup.object({
     email: yup
@@ -42,6 +43,10 @@ function SignUp() {
         AuthService.signup,
         { onSuccess: () => queryClient.invalidateQueries('getUserData') }
     );
+    const router = useRouter();
+    const [invitedByName, setInvitedByName] = useState('');
+
+    console.log(invitedByName, 'invitee');
 
     const {
         handleSubmit,
@@ -66,13 +71,19 @@ function SignUp() {
                 if (data.success) {
                     setShowMessage(data?.message);
                     reset({});
-                    console.log('Form reset successfully');
                 }
             })
             .catch((error) => {
                 toast.error(error?.message);
             });
     };
+
+    useEffect(() => {
+        const { invitedBy } = router.query;
+        if (invitedBy) {
+            setInvitedByName(decodeURIComponent(invitedBy as string));
+        }
+    }, [router.query]);
 
     return (
         <section className="">
@@ -130,6 +141,15 @@ function SignUp() {
                             register={{ ...register('phone') }}
                         />
                     </div>
+                    <div className="flex items-start gap-4">
+                        <Input
+                            className="flex-1"
+                            required
+                            register={{ ...register('invitedby') }}
+                            value={invitedByName}
+                            disabled={true}
+                        />
+                    </div>
                     <div className="flex gap-4 mb-10">
                         <Input
                             className="flex-1"
@@ -169,34 +189,6 @@ function SignUp() {
                         isLoading={isLoading}
                         disabled={isLoading}
                     />
-
-                    <div className="flex items-center my-12 gap-3 px-6">
-                        <hr className="w-full border border-gray-300" />
-                        <span className="text-gray-400">Or</span>
-                        <hr className="w-full border border-gray-300" />
-                    </div>
-
-                    {/* <button
-                        onClick={AuthService.OAuthLogin}
-                        type="button"
-                        className="my-5 rounded-md border border-gray-300 flex
-                        justify-between items-center px-6 mx-auto"
-                    >
-                        <Image
-                            src="/google.svg"
-                            alt="google auth"
-                            width={50}
-                            height={50}
-                        />
-                        <span>Continue with Google</span>
-                    </button> */}
-
-                    <p className="text-center text-lg font-medium">
-                        Already have an account?{' '}
-                        <Link href="/auth/signin" className="text-link">
-                            Log In
-                        </Link>
-                    </p>
                 </form>
             </div>
         </section>

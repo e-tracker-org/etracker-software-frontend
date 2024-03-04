@@ -12,10 +12,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { goBackToKyc2 } from 'utils/helper';
 import toast from 'react-hot-toast';
 import useLandlord from 'hooks/useLandlord';
+import { UserService } from 'services';
 // import { string } from 'yup';
 import Select from 'components/base/form/Select';
 import useProperty from 'hooks/useProperty';
 import TenantSearchItem from 'components/dashboard/tenants/add/SearchItem';
+import { useQuery } from 'react-query';
 
 export default function AddTenant() {
     const states = useAppStore();
@@ -27,6 +29,7 @@ export default function AddTenant() {
     const id = router.query.q as string;
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedPropertyId, setSelectedPropertyId] = useState('');
+    const [link, setLink] = useState('');
 
     const [selectedTenants, setSelectedTenants] = useState<User[]>([]);
     const [tenantDropdownItems, setTenantDropdownItems] = useState<User[]>([]);
@@ -42,6 +45,28 @@ export default function AddTenant() {
         value: property.id,
         label: property.name,
     }));
+
+    const { data: userProfile } = useQuery(
+        'getUserProfile',
+        UserService.getUser,
+        {}
+    );
+
+    const createRegistrationLink = (invitedByName: string) => {
+        return `localhost:3000/auth/invite-tenant?invitedBy=${encodeURIComponent(
+            invitedByName
+        )}`;
+    };
+
+    useEffect(() => {
+        const firstname: string = userProfile?.firstname || '';
+        const lastname: string = userProfile?.lastname || '';
+
+        const invitedByName: string = `${firstname} ${lastname}`;
+        const registrationLink = createRegistrationLink(invitedByName);
+
+        setLink(registrationLink);
+    }, [userProfile]);
 
     const handleClickOutside = (event: MouseEvent) => {
         if (
@@ -157,6 +182,17 @@ export default function AddTenant() {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    const handleCopyLink = () => {
+        navigator.clipboard
+            .writeText(link)
+            .then(() => {
+                toast.success('Link copied');
+            })
+            .catch((err) => {
+                toast.error(err.message);
+            });
+    };
 
     return (
         <div className="">
@@ -382,8 +418,11 @@ export default function AddTenant() {
                         <div
                             className={`transparent-bg py-2 px-5  rounded-md text-base  flex justify-between items-center mt-5 mb-10`}
                         >
-                            <span>Property.com/E-tracka</span>
-                            <button className="bg-white py-2 px-4 rounded-md">
+                            <input type="text" value={link} />
+                            <button
+                                className="bg-white py-2 px-4 rounded-md"
+                                onClick={handleCopyLink}
+                            >
                                 Copy link
                             </button>
                         </div>
