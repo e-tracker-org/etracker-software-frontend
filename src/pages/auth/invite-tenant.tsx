@@ -14,6 +14,7 @@ import { ReactElement, useState, useRef, useEffect } from 'react';
 import HomeLayout from 'layouts/home';
 import { MutationKey } from 'react-query';
 import { useRouter } from 'next/router';
+import useLandlord from 'hooks/useLandlord';
 
 const schema = yup.object({
     email: yup
@@ -45,6 +46,7 @@ function SignUp() {
     );
     const router = useRouter();
     const [invitedByName, setInvitedByName] = useState('');
+    const [propertyId, setPropertyId] = useState('');
 
     console.log(invitedByName, 'invitee');
 
@@ -57,6 +59,10 @@ function SignUp() {
         resolver: yupResolver(schema),
     });
 
+    const {
+        addLandlordTenant,
+    } = useLandlord();
+
     const onSubmit = async (values: any) => {
         const userObj = {
             firstname: values.firstName,
@@ -65,10 +71,23 @@ function SignUp() {
             phone: values.phone,
             email: values.email,
             password: values.password,
+            propertyId: propertyId
         };
         registerAsync(userObj)
             .then((data: any) => {
                 if (data.success) {
+                    if(propertyId){
+                        addLandlordTenant([{
+                            email: userObj?.email,
+                            propertyId,
+                        }])
+                        .then((res: any) => {
+                            if (res) toast.success(res?.message);
+                        })
+                        .catch((error) => {
+                            toast.error(error.message);
+                        });
+                    }
                     setShowMessage(data?.message);
                     reset({});
                 }
@@ -79,9 +98,12 @@ function SignUp() {
     };
 
     useEffect(() => {
-        const { invitedBy } = router.query;
+        const { invitedBy, propertyId } = router.query;
         if (invitedBy) {
             setInvitedByName(decodeURIComponent(invitedBy as string));
+        }
+        if(propertyId){
+            setPropertyId(propertyId as string);
         }
     }, [router.query]);
 
@@ -145,6 +167,7 @@ function SignUp() {
                         <Input
                             className="flex-1"
                             required
+                            label={"Landlord:"}
                             register={{ ...register('invitedby') }}
                             value={invitedByName}
                             disabled={true}
