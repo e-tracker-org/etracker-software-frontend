@@ -24,7 +24,7 @@ const SwitchAccountCard: FC<SwitchAccountProps> = ({ handleSwitchAccount }) => {
 
     const { data: accountTypes, isLoading } = useQuery(
         'getAccountTypes',
-        UserService.getAccountTypes
+        UserService.getAccountTypes,
     );
 
     const closeModal = () => {

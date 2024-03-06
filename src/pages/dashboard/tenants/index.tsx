@@ -4,26 +4,35 @@ import TenantsList from 'components/dashboard/tenants';
 import useTenant from 'hooks/useTenant';
 import Loader from 'components/base/Loader';
 import { User } from 'interfaces';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppStore } from 'hooks/useAppStore';
+import { getLandlordTenant } from 'services/newServices/tenant';
 // import { GenericResponse } from 'services';
 
 export default function Tenants() {
     const states = useAppStore();
+    const [tenants, setTenants] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const { getTenantsByProperty, getTenantsByPropertyLoading } = useTenant({
-        propertyId: states?.propertyId,
-        searchParam: states?.searchParam,
-    });
+    useEffect(() => {
+        setLoading(true);
 
-    const tenants = getTenantsByProperty?.data;
+        async function fetchData() {
+          const tenantData = await getLandlordTenant(states?.user?.id);
+          setTenants(tenantData);
+          setLoading(false); 
+        }
+        if(states?.user?.id){
+        fetchData();
+        }
+      }, [states]);
 
     return (
         <div className="">
             <DashboardHeader title="Tenants" />
 
-            {getTenantsByPropertyLoading ? (
-                <Loader loading={getTenantsByPropertyLoading} />
+            {loading ? (
+                <Loader loading={loading} />
             ) : (
                 <TenantsList tenants={tenants} />
             )}

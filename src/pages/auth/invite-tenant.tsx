@@ -71,23 +71,23 @@ function SignUp() {
             phone: values.phone,
             email: values.email,
             password: values.password,
-            propertyId: propertyId
+            propertyId: propertyId,
         };
         registerAsync(userObj)
             .then((data: any) => {
                 if (data.success) {
-                    if(propertyId){
-                        addLandlordTenant([{
-                            email: userObj?.email,
-                            propertyId,
-                        }])
-                        .then((res: any) => {
-                            if (res) toast.success(res?.message);
-                        })
-                        .catch((error) => {
-                            toast.error(error.message);
-                        });
-                    }
+                    // if(propertyId){
+                    //     addLandlordTenant([{
+                    //         email: userObj?.email,
+                    //         propertyId,
+                    //     }])
+                    //     .then((res: any) => {
+                    //         if (res) toast.success(res?.message);
+                    //     })
+                    //     .catch((error) => {
+                    //         toast.error(error.message);
+                    //     });
+                    // }
                     setShowMessage(data?.message);
                     reset({});
                 }

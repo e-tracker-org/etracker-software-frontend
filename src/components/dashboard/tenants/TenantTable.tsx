@@ -7,8 +7,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import SendReceipt from './SendReceipt';
+import { getFormattedDate } from 'services/config/config';
 
-const TenantTable = ({ tenants }: { tenants: User[] }) => {
+
+
+const TenantTable = ({ tenants }: { tenants: any }) => {
     const states = useAppStore();
     const router = useRouter();
     const modalRef = useRef<any>(null);
@@ -36,7 +39,7 @@ const TenantTable = ({ tenants }: { tenants: User[] }) => {
         e.stopPropagation();
         const id = e.currentTarget.dataset.id as string;
         if (id === '' && tenants.length !== states?.selectedTenants.length) {
-            tenants.map((tenant) =>
+            tenants.map((tenant: any) =>
                 states?.setSelectedTenants(tenant.id, 'all')
             );
         } else if (
@@ -123,19 +126,19 @@ const TenantTable = ({ tenants }: { tenants: User[] }) => {
                                     <th className="px-6 ">Date Created</th>
                                     <th className="px-6 ">Email</th>
                                     <th className="px-6 ">Phone Number</th>
-                                    <th className="px-6 ">
+                                    {/* <th className="px-6 ">
                                         Agreement Start Date
                                     </th>
                                     <th className="px-6 ">
                                         Agreement End Date
-                                    </th>
+                                    </th> */}
                                 </tr>
                             </thead>
 
                             <tbody>
-                                {tenants?.map((tenant) => (
+                                {tenants?.map((tenant: any) => (
                                     <tr
-                                        key={tenant.id}
+                                        key={tenant?.userData?.id}
                                         className="cursor-pointer tr-hover "
                                         onClick={() => {
                                             router.push(
@@ -153,7 +156,7 @@ const TenantTable = ({ tenants }: { tenants: User[] }) => {
                                                 <input
                                                     type="checkbox"
                                                     className="cursor-pointer"
-                                                    data-id={tenant.id}
+                                                    data-id={tenant?.id}
                                                     checked={states?.selectedTenants.includes(
                                                         tenant.id
                                                     )}
@@ -165,34 +168,34 @@ const TenantTable = ({ tenants }: { tenants: User[] }) => {
                                         )}
 
                                         <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max ">
-                                            <Image
+                                            {/* <Image
                                                 src="https://i.pravatar.cc/300"
                                                 alt="user avatar"
                                                 width={30}
                                                 height={30}
                                                 className="rounded-full inline-block"
-                                            />
+                                            /> */}
 
                                             <span className="inline-block">
-                                                {tenant.firstname}{' '}
-                                                {tenant.lastname}
+                                                {tenant?.userData?.firstname}{' '}
+                                                {tenant?.userData?.lastname}
                                             </span>
                                         </td>
                                         <td className="py-6 px-14 ">
-                                            {tenant.createdAt}
+                                            {getFormattedDate(tenant?.tenantData?.createdAt)}
                                         </td>
                                         <td className="py-6 px-14  ">
-                                            {tenant.email}
+                                            {tenant?.userData?.email}
                                         </td>
                                         <td className="py-6 px-14 ">
-                                            {tenant.phone}
+                                            {tenant?.userData?.phone}
                                         </td>
-                                        <td className="py-6 px-14 ">
-                                            {tenant.createdAt}
+                                        {/* <td className="py-6 px-14 ">
+                                            {tenant?.userData?.createdAt}
                                         </td>
                                         <td className="py-6 pr-6 pl-14  ">
-                                            {tenant.createdAt}
-                                        </td>
+                                            {tenant?.userData?.createdAt}
+                                        </td> */}
                                     </tr>
                                 ))}
                             </tbody>
