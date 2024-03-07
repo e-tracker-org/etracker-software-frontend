@@ -68,6 +68,11 @@ export interface ResetPasswordProp {
     confirmPassword: string;
 }
 
+export interface UpdateAccountType {
+    email: string;
+    accountType: number;
+}
+
 export interface LoginResponse {
     tokens: string;
 }

@@ -58,6 +58,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         }
     }, [urlParam]);
 
+
+    console.log('states', states)
+
     return (
         <aside
             className={`${
