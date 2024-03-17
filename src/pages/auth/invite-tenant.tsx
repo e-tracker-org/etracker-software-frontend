@@ -65,6 +65,7 @@ function SignUp() {
             phone: values.phone,
             email: values.email,
             password: values.password,
+            propertyId: invitedByName,
         };
         registerAsync(userObj)
             .then((data: any) => {

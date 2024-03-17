@@ -80,6 +80,13 @@ export default function NotifyTenants() {
         }
     };
 
+    const handleGenerateReceipt = (tenant) => {
+        router.push({
+            pathname: '/bill-receipt',
+            query: tenant, // Pass tenant information as query parameters
+        });
+    };
+
     return (
         <div>
             <DashboardHeader
@@ -182,6 +189,9 @@ export default function NotifyTenants() {
                         </Button>
                     </div>
                 </div>
+                <Button onClick={() => handleGenerateReceipt(tenant)}>
+                    Generate Bill Receipt
+                </Button>
             </section>
         </div>
     );
