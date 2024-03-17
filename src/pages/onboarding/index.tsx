@@ -29,7 +29,7 @@ export default function Onboarding() {
                     Choose your account Type
                 </h1>
                 <p className="text-center my-10 max-w-md mx-auto">
-                    Click on the account type that suits your need to proceed.
+                    Click on the account type that suits your need to proceed
                 </p>
                 <div className="mx-auto lg:w-1/2 flex flex-col">
                     {isLoading ? (
@@ -54,6 +54,7 @@ export default function Onboarding() {
                                         states?.setActiveAccount(
                                             account?.typeID
                                         );
+                                        // update user with accountype
                                         router.replace('/onboarding/kyc');
                                     }}
                                 >

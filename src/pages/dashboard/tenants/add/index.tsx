@@ -4,7 +4,7 @@ import { DialogModal } from 'components/base/DialogModal';
 import SearchResult from 'components/base/SearchResult';
 import useAccountType from 'hooks/useAccountType';
 import { useAppStore } from 'hooks/useAppStore';
-import { User } from 'interfaces';
+import { Property, User } from 'interfaces';
 // import Image from 'next/image';
 import { useRouter } from 'next/router';
 import Dashboard from '..';
@@ -53,7 +53,8 @@ export default function AddTenant() {
     );
 
     const createRegistrationLink = (invitedByName: string) => {
-        return `localhost:3000/auth/invite-tenant?invitedBy=${encodeURIComponent(
+        const propertyId = id ? id : selectedPropertyId;
+        return `localhost:3000/auth/invite-tenant?propertyId=${propertyId}&invitedBy=${encodeURIComponent(
             invitedByName
         )}`;
     };
@@ -116,7 +117,7 @@ export default function AddTenant() {
 
                 setSelectedTenants((prevItems: any) => {
                     const newItems = response?.data.filter((item: any) => {
-                        // Check if the item with the same id already exists in the selectedItems array
+                        // Check if the tenant with the same id already exists in the selectedItems array
                         return !prevItems.some(
                             (selectedTenant: any) =>
                                 selectedTenant.id === item.id

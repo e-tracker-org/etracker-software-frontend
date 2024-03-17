@@ -79,6 +79,7 @@ export default function PropertyDetails() {
                                     states,
                                     router
                                 );
+
                                 if (isUserVerify) {
                                     router.push(
                                         `/dashboard/tenants/add?q=${id}`
@@ -124,6 +125,23 @@ export default function PropertyDetails() {
                                     width={400}
                                     height={200}
                                 />
+
+                                {/* {property?.image_list?.map((image:any) => (
+                                <Image
+                                    src={image?.urls[0]}
+                                    alt="property placeholder 1"
+                                    className="rounded-md"
+                                    width={400}
+                                    height={180}
+                                />
+                                // <Image
+                                //     src={property?.image_list[2]?.urls[0]}
+                                //     alt="property placeholder 2"
+                                //     className="rounded-md"
+                                //     width={400}
+                                //     height={200}
+                                // />
+                                ))} */}
                             </div>
                         </div>
                     </DetailsRowCard>
