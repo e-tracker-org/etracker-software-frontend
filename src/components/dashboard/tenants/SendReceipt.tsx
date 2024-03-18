@@ -38,7 +38,6 @@ export default function SendReceipt({
     } = useTenant();
     // const receiptCategories = getReceiptCategories?.data;
     const receiptCategories = ['Rent', 'Water Bill', 'Light Bill'];
-    console.log(receiptCategories);
 
     const {
         handleSubmit,
