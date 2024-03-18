@@ -111,7 +111,6 @@ export default function PropertyDetails() {
                                 />
                             </div>
                             <div className="flex flex-col  w-2/5">
-
                                 <Image
                                     src={property?.image_list[0]?.urls[0]}
                                     alt="property placeholder 1"
@@ -127,7 +126,7 @@ export default function PropertyDetails() {
                                     height={200}
                                 />
 
-                            {/* {property?.image_list?.map((image:any) => (
+                                {/* {property?.image_list?.map((image:any) => (
                                 <Image
                                     src={image?.urls[0]}
                                     alt="property placeholder 1"

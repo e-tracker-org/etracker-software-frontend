@@ -98,7 +98,7 @@ function Signin() {
                         isAuthenticated: true,
                     });
                     // ongoing Kyc active
-                   
+
                     if (
                         data?.data?.user?.currentKyc &&
                         data?.data?.user?.currentKyc?.status ===
@@ -138,7 +138,6 @@ function Signin() {
                         data?.data?.user?.currentKyc?.status ===
                             KycStatus.COMPLETE
                     ) {
-                        
                         states?.setActiveKyc(data?.data?.user?.currentKyc);
                         states?.setScreen('');
                         states?.setActiveAccount(

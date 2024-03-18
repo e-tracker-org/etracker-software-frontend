@@ -22,23 +22,21 @@ export default function VeriifyTenants() {
         setLoading(true);
 
         async function fetchData() {
-          const tenantData = await getLandlordTenant(states?.user?.id);
-          setTenants(tenantData);
-          setLoading(false); 
+            const tenantData = await getLandlordTenant(states?.user?.id);
+            setTenants(tenantData);
+            setLoading(false);
         }
-        if(states?.user?.id){
-        fetchData();
+        if (states?.user?.id) {
+            fetchData();
         }
-      }, [states]);
-
+    }, [states]);
 
     return (
         <div className="">
             <DashboardHeader title="Verify Tenants">
                 <div className="flex justify-between">
                     <p className="pt-4 w-2/5 text-[18px] font-medium">
-                        Review tenants profile
-                        before lease approval.
+                        Review tenants profile before lease approval.
                     </p>
 
                     <div className="flex justify-end items-center gap-x-8">

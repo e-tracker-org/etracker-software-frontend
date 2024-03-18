@@ -9,8 +9,6 @@ import { toast } from 'react-hot-toast';
 import SendReceipt from './SendReceipt';
 import { getFormattedDate } from 'services/config/config';
 
-
-
 const TenantTable = ({ tenants }: { tenants: any }) => {
     const states = useAppStore();
     const router = useRouter();
@@ -182,7 +180,9 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                                             </span>
                                         </td>
                                         <td className="py-6 px-14 ">
-                                            {getFormattedDate(tenant?.tenantData?.createdAt)}
+                                            {getFormattedDate(
+                                                tenant?.tenantData?.createdAt
+                                            )}
                                         </td>
                                         <td className="py-6 px-14  ">
                                             {tenant?.userData?.email}

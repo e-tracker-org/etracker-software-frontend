@@ -85,7 +85,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <ul className="grid gap-y-[60px] mt-[60px] ">
-                {states?.activeKyc?.status === KycStatus.INCOMPLETE && urlParam !== 'kyc' ? (
+                {states?.activeKyc?.status === KycStatus.INCOMPLETE &&
+                urlParam !== 'kyc' ? (
                     // states?.activeKyc?.status === KycStatus.INCOMPLETE
                     <li className="mb-[-15px] mt-[-36px]">
                         <ActiveLink

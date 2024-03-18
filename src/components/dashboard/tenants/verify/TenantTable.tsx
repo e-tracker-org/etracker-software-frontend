@@ -15,7 +15,7 @@ const TenantTable = ({ tenants }: { tenants: { [key: string]: string }[] }) => {
                 </thead>
 
                 <tbody>
-                    {tenants.map((t:any, i:any) => (
+                    {tenants.map((t: any, i: any) => (
                         <tr key={i} className="cursor-pointer tr-hover ">
                             <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max ">
                                 {/* <Image
@@ -27,17 +27,23 @@ const TenantTable = ({ tenants }: { tenants: { [key: string]: string }[] }) => {
                                 /> */}
 
                                 <span className="inline-block">
-                                    {t?.userData?.firstname} {" "} {t?.userData?.lastname} 
+                                    {t?.userData?.firstname}{' '}
+                                    {t?.userData?.lastname}
                                 </span>
                             </td>
-                            <td className="py-6 px-14 ">{t?.userData?.email}</td>
-                            <td className="py-6 px-14  ">{t?.userData?.phone}</td>
+                            <td className="py-6 px-14 ">
+                                {t?.userData?.email}
+                            </td>
+                            <td className="py-6 px-14  ">
+                                {t?.userData?.phone}
+                            </td>
 
                             <td className="py-6 pr-6 pl-14  ">
                                 {' '}
                                 <span
                                     className={`py-1 px-[10px] rounded-lg capitalize ${
-                                        (t?.tenantData?.status === 'INCOMPLETE' &&
+                                        (t?.tenantData?.status ===
+                                            'INCOMPLETE' &&
                                             'text-[#FA0F0F] bg-[#FFE9E9]') ||
                                         (t?.tenantData?.status === 'COMPLETE' &&
                                             'text-[#31AA06] bg-[#ECFFE9]') ||
