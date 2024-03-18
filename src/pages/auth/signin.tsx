@@ -94,7 +94,7 @@ function Signin() {
 
                     states?.setUser({
                         token: data?.data?.tokens,
-                        user: data.data.user,
+                        user: data?.data.user,
                         isAuthenticated: true,
                     });
                     // ongoing Kyc active

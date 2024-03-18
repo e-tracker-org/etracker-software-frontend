@@ -24,7 +24,7 @@ const SwitchAccountCard: FC<SwitchAccountProps> = ({ handleSwitchAccount }) => {
 
     const { data: accountTypes, isLoading } = useQuery(
         'getAccountTypes',
-        UserService.getAccountTypes,
+        UserService.getAccountTypes
     );
 
     const closeModal = () => {
@@ -69,7 +69,6 @@ const SwitchAccountCard: FC<SwitchAccountProps> = ({ handleSwitchAccount }) => {
                                     if (
                                         states?.startKycScreen === 'onboarding'
                                     ) {
-
                                         states?.setActiveKyc({
                                             status: KycStatus?.INCOMPLETE,
                                             nextStage: 2,
@@ -82,7 +81,8 @@ const SwitchAccountCard: FC<SwitchAccountProps> = ({ handleSwitchAccount }) => {
                                         );
                                         setOpenModal(false);
                                         states?.setScreen('kyc');
-                                        window.location = '/onboarding/kyc' as any; 
+                                        window.location =
+                                            '/onboarding/kyc' as any;
                                     } else {
                                         setSwitchAccountId(accountType?.typeID);
                                         states?.setActiveKyc({
@@ -95,10 +95,11 @@ const SwitchAccountCard: FC<SwitchAccountProps> = ({ handleSwitchAccount }) => {
                                         states?.setActiveAccount(
                                             accountType?.typeID
                                         );
-                                        
+
                                         states?.setScreen('kyc');
                                         setOpenModal(false);
-                                        window.location = '/onboarding/kyc' as any; 
+                                        window.location =
+                                            '/onboarding/kyc' as any;
                                     }
                                 } else {
                                     switchAccount(
@@ -192,7 +193,7 @@ const SwitchAccountCard: FC<SwitchAccountProps> = ({ handleSwitchAccount }) => {
                             states?.setScreen('');
                             route.push('/onboarding/kyc');
                             closeModal();
-                            console.log('not closed')
+                            console.log('not closed');
                         }}
                     />
                 </div>

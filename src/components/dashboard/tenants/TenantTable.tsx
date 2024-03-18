@@ -9,8 +9,6 @@ import { toast } from 'react-hot-toast';
 import SendReceipt from './SendReceipt';
 import { getFormattedDate } from 'services/config/config';
 
-
-
 const TenantTable = ({ tenants }: { tenants: any }) => {
     const states = useAppStore();
     const router = useRouter();
@@ -63,6 +61,14 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
             setOpenModal(true);
         }
     };
+
+    const handleTenantClick = (tenant: any) => {
+
+      localStorage.setItem('selectedTenant', JSON.stringify(tenant));
+  
+      router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
+    };
+
 
     return (
         <div className="relative">
@@ -144,7 +150,8 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                                     key={tenant?.userData?.id}
                                     className="cursor-pointer tr-hover"
                                     onClick={() => {
-                                    router.push(`/dashboard/tenants/${tenant.id}`);
+                                    handleTenantClick(tenant)
+                                    // router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
                                     }}
                                 >
                                     {states?.selectMultiple && (
@@ -155,8 +162,8 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                                         <input
                                         type="checkbox"
                                         className="cursor-pointer"
-                                        data-id={tenant?.id}
-                                        checked={states?.selectedTenants.includes(tenant.id)}
+                                        data-id={tenant?.userData?.id}
+                                        checked={states?.selectedTenants.includes(tenant?.userData?.id)}
                                         onChange={(e) => handleChange(e)}
                                         ></input>
                                     </td>

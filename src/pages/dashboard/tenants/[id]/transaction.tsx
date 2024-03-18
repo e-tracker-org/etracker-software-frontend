@@ -1,3 +1,4 @@
+import Button from 'components/base/Button';
 import { useState } from 'react';
 
 const TransactionHistory = () => {
@@ -65,6 +66,19 @@ const TransactionHistory = () => {
     ]);
     return (
         <div className="w-full h-[400px] hidden-thin-scrollbar">
+            <header className="flex justify-between items-center mb-5">
+                <div className="flex items-center">
+
+                </div>
+                {/* <div className="flex">
+                    <Button
+                        title="Add Payment"
+                        onClick={() => {
+                            console.log('Add payment modal');
+                        }}
+                    />
+                </div> */}
+            </header>
             <table className="w-full whitespace-nowrap text-gray-700 border-separate font-[700]  text-center">
                 <thead className="text-[#727070]">
                     <tr>

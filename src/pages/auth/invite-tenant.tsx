@@ -59,9 +59,7 @@ function SignUp() {
         resolver: yupResolver(schema),
     });
 
-    const {
-        addLandlordTenant,
-    } = useLandlord();
+    const { addLandlordTenant } = useLandlord();
 
     const onSubmit = async (values: any) => {
         const userObj = {
@@ -102,7 +100,7 @@ function SignUp() {
         if (invitedBy) {
             setInvitedByName(decodeURIComponent(invitedBy as string));
         }
-        if(propertyId){
+        if (propertyId) {
             setPropertyId(propertyId as string);
         }
     }, [router.query]);
@@ -167,7 +165,7 @@ function SignUp() {
                         <Input
                             className="flex-1"
                             required
-                            label={"Landlord:"}
+                            label={'Landlord:'}
                             register={{ ...register('invitedby') }}
                             value={invitedByName}
                             disabled={true}

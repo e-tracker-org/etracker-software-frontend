@@ -60,11 +60,15 @@ export default function AddTenant() {
     };
 
     useEffect(() => {
-        const firstname: string = userProfile?.firstname || '';
-        const lastname: string = userProfile?.lastname || '';
+        let propId;
+        if (id) {
+            propId = id;
+        } else if (selectedPropertyId) {
+            propId = selectedPropertyId;
+        }
 
-        const invitedByName: string = `${firstname} ${lastname}`;
-        const registrationLink = createRegistrationLink(invitedByName);
+        const propertyId: string = propId;
+        const registrationLink = createRegistrationLink(propertyId);
 
         setLink(registrationLink);
     }, [userProfile]);

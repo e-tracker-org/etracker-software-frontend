@@ -23,10 +23,10 @@ export default function Tenants() {
           setTenants(tenantData);
           setLoading(false); 
         }
-        if(states?.user?.id){
-        fetchData();
+        if (states?.user?.id) {
+            fetchData();
         }
-      }, [states]);
+    }, [states]);
 
     return (
         <div className="">
