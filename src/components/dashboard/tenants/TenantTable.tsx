@@ -67,6 +67,12 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
         }
     };
 
+    const handleTenantClick = (tenant: any) => {
+        localStorage.setItem('selectedTenant', JSON.stringify(tenant));
+
+        router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
+    };
+
     return (
         <div className="relative">
             {states?.selectMultiple && (
@@ -139,72 +145,79 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                             </thead>
 
                             <tbody>
-                                {tenants?.map((tenant: any) => (
-                                    <tr
-                                        key={tenant?.userData?.id}
-                                        className="cursor-pointer tr-hover "
-                                        onClick={() => {
-                                            router.push(
-                                                `/dashboard/tenants/${tenant.userData?.id}`
-                                            );
-                                        }}
-                                    >
-                                        {states?.selectMultiple && (
-                                            <td
-                                                className="pl-6 cursor-default"
-                                                onClick={(e) =>
-                                                    e.stopPropagation()
-                                                }
+                                {tenants?.map(
+                                    (tenant: any) =>
+                                        tenant?.userData?.email &&
+                                        tenant?.userData?.firstname &&
+                                        tenant?.userData?.phone && (
+                                            <tr
+                                                key={tenant?.userData?.id}
+                                                className="cursor-pointer tr-hover"
+                                                onClick={() => {
+                                                    handleTenantClick(tenant);
+                                                    // router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
+                                                }}
                                             >
-                                                <input
-                                                    type="checkbox"
-                                                    className="cursor-pointer"
-                                                    data-id={
-                                                        tenant.userData?.id
-                                                    }
-                                                    checked={states?.selectedTenants.includes(
-                                                        tenant.userData?.id
+                                                {states?.selectMultiple && (
+                                                    <td
+                                                        className="pl-6 cursor-default"
+                                                        onClick={(e) =>
+                                                            e.stopPropagation()
+                                                        }
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            className="cursor-pointer"
+                                                            data-id={
+                                                                tenant?.userData
+                                                                    ?.id
+                                                            }
+                                                            checked={states?.selectedTenants.includes(
+                                                                tenant?.userData
+                                                                    ?.id
+                                                            )}
+                                                            onChange={(e) =>
+                                                                handleChange(e)
+                                                            }
+                                                        ></input>
+                                                    </td>
+                                                )}
+
+                                                <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max ">
+                                                    {/* <Image
+                                        src="https://i.pravatar.cc/300"
+                                        alt="user avatar"
+                                        width={30}
+                                        height={30}
+                                        className="rounded-full inline-block"
+                                    /> */}
+                                                    <span className="inline-block">
+                                                        {
+                                                            tenant?.userData
+                                                                ?.firstname
+                                                        }{' '}
+                                                        {
+                                                            tenant?.userData
+                                                                ?.lastname
+                                                        }
+                                                    </span>
+                                                </td>
+                                                <td className="py-6 px-14 ">
+                                                    {getFormattedDate(
+                                                        tenant?.tenantData
+                                                            ?.createdAt
                                                     )}
-                                                    onChange={(e) =>
-                                                        handleChange(e)
-                                                    }
-                                                ></input>
-                                            </td>
-                                        )}
-
-                                        <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max ">
-                                            {/* <Image
-                                                src="https://i.pravatar.cc/300"
-                                                alt="user avatar"
-                                                width={30}
-                                                height={30}
-                                                className="rounded-full inline-block"
-                                            /> */}
-
-                                            <span className="inline-block">
-                                                {tenant?.userData?.firstname}{' '}
-                                                {tenant?.userData?.lastname}
-                                            </span>
-                                        </td>
-                                        <td className="py-6 px-14 ">
-                                            {getFormattedDate(
-                                                tenant?.tenantData?.createdAt
-                                            )}
-                                        </td>
-                                        <td className="py-6 px-14  ">
-                                            {tenant?.userData?.email}
-                                        </td>
-                                        <td className="py-6 px-14 ">
-                                            {tenant?.userData?.phone}
-                                        </td>
-                                        {/* <td className="py-6 px-14 ">
-                                            {tenant?.userData?.createdAt}
-                                        </td>
-                                        <td className="py-6 pr-6 pl-14  ">
-                                            {tenant?.userData?.createdAt}
-                                        </td> */}
-                                    </tr>
-                                ))}
+                                                </td>
+                                                <td className="py-6 px-14  ">
+                                                    {tenant?.userData?.email}
+                                                </td>
+                                                <td className="py-6 px-14 ">
+                                                    {tenant?.userData?.phone}
+                                                </td>
+                                                {/* Add more columns as needed */}
+                                            </tr>
+                                        )
+                                )}
                             </tbody>
                         </table>
                         {states?.selectMultiple && (

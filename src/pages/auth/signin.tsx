@@ -94,11 +94,10 @@ function Signin() {
 
                     states?.setUser({
                         token: data?.data?.tokens,
-                        user: data.data.user,
+                        user: data?.data.user,
                         isAuthenticated: true,
                     });
                     // ongoing Kyc active
-
                     if (
                         data?.data?.user?.currentKyc &&
                         data?.data?.user?.currentKyc?.status ===

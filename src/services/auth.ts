@@ -9,6 +9,7 @@ import {
     SignupRequestProp,
     User,
     VerifyOtpProp,
+    UpdateAccountType,
 } from 'interfaces';
 
 export const AuthService = {
@@ -34,7 +35,10 @@ export const AuthService = {
     },
     async requestPasswordReset(reqObj: OTPRequestProp) {
         try {
-            const { data } = await http.post('/api/v1/auth/forgot-password', reqObj);
+            const { data } = await http.post(
+                '/api/v1/auth/forgot-password',
+                reqObj
+            );
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -43,12 +47,28 @@ export const AuthService = {
     async changePassword() {},
     async resetPassword(reqObj: ResetPasswordProp) {
         try {
-            const { data } = await http.post('/api/v1/auth/reset-password', reqObj);
+            const { data } = await http.post(
+                '/api/v1/auth/reset-password',
+                reqObj
+            );
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
         }
     },
+
+    async updateUserAccountType(reqObj: UpdateAccountType) {
+        try {
+            const { data } = await http.post(
+                '/api/v1/auth/register/update-user-account-type',
+                reqObj
+            );
+            return Promise.resolve(data);
+        } catch (error: any) {
+            return Promise.reject(error?.response.data);
+        }
+    },
+
     async verifyOTP(reqObj: VerifyOtpProp) {
         try {
             const { data } = await http.post('/api/v1/auth/verify-otp', reqObj);
