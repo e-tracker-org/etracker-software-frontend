@@ -36,17 +36,22 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.stopPropagation();
         const id = e.currentTarget.dataset.id as string;
-        if (id === '' && tenants.length !== states?.selectedTenants.length) {
-            tenants.map((tenant: any) =>
-                states?.setSelectedTenants(tenant.id, 'all')
-            );
-        } else if (
-            id === '' &&
-            tenants.length === states?.selectedTenants.length
-        ) {
-            states?.clearSelectedTenants();
+        const isChecked = e.currentTarget.checked;
+
+        if (id === '') {
+            if (isChecked) {
+                tenants.forEach((tenant: any) => {
+                    states?.setSelectedTenants(tenant.id, 'all');
+                });
+            } else {
+                states?.clearSelectedTenants();
+            }
         } else {
-            states?.setSelectedTenants(id, 'single');
+            if (isChecked) {
+                states?.setSelectedTenants(id, 'single');
+            } else {
+                states?.setSelectedTenants(id, 'none');
+            }
         }
     };
 
@@ -140,7 +145,7 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                                         className="cursor-pointer tr-hover "
                                         onClick={() => {
                                             router.push(
-                                                `/dashboard/tenants/${tenant.id}`
+                                                `/dashboard/tenants/${tenant.userData?.id}`
                                             );
                                         }}
                                     >
@@ -154,9 +159,11 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                                                 <input
                                                     type="checkbox"
                                                     className="cursor-pointer"
-                                                    data-id={tenant?.id}
+                                                    data-id={
+                                                        tenant.userData?.id
+                                                    }
                                                     checked={states?.selectedTenants.includes(
-                                                        tenant.id
+                                                        tenant.userData?.id
                                                     )}
                                                     onChange={(e) =>
                                                         handleChange(e)
@@ -219,7 +226,10 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                 className="rounded-md sm:ml-[40%] lg:ml-[10%] px-[3%] lg:!top-[10%]"
             >
                 <div ref={modalRef}>
-                    <SendReceipt setOpenModal={setOpenModal} />
+                    <SendReceipt
+                        setOpenModal={setOpenModal}
+                        selectedTenants={states?.selectedTenants}
+                    />
                 </div>
             </DialogModal>
         </div>
