@@ -1,69 +1,32 @@
 import Button from 'components/base/Button';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import renderEmptyState from 'pages/elements/EmptyState';
+import { useEffect, useState } from 'react';
+import { formatMoney, getFormattedDate } from 'services/config/config';
+import { getTenantTransactions } from 'services/newServices/tenant';
 
-const TransactionHistory = () => {
-    const [tenantTransactions, setTenantTransactions] = useState([
-        {
-            id: 111,
-            status: 'overdue',
-            category: 'rent',
-            dueDate: '22/08/2034',
-        },
-        {
-            id: 112,
-            status: 'paid',
-            category: 'water bill',
-            dueDate: '22/08/2034',
-            totalPaid: '2000',
-        },
-        {
-            id: 113,
-            status: 'due',
-            category: 'light bill',
-            dueDate: '22/08/2034',
-            totalPaid: '3000',
-        },
-        {
-            id: 114,
-            status: 'overdue',
-            category: 'rent',
-            dueDate: '22/08/2034',
-        },
-        {
-            id: 10989,
-            status: 'overdue',
-            category: 'water bill',
-            dueDate: '22/08/2034',
-            totalPaid: '2000',
-        },
-        {
-            id: 163,
-            status: 'due',
-            category: 'light bill',
-            dueDate: '22/08/2034',
-            totalPaid: '3000',
-        },
-        {
-            id: 191,
-            status: 'overdue',
-            category: 'rent',
-            dueDate: '22/08/2034',
-        },
-        {
-            id: 117,
-            status: 'paid',
-            category: 'water bill',
-            dueDate: '22/08/2034',
-            totalPaid: '2000',
-        },
-        {
-            id: 119,
-            status: 'due',
-            category: 'light bill',
-            dueDate: '22/08/2034',
-            totalPaid: '3000',
-        },
-    ]);
+function TransactionHistory() {
+    const { query } = useRouter();
+    const id = query?.id as string;
+
+    const [tenantTransaction, setTenantTransaction] = useState([]);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const transactions = await getTenantTransactions(id);
+                setTenantTransaction(transactions);
+            } catch (error) {
+                console.error('Error fetching tenant transactions:', error);
+            }
+        }
+        
+        if (id) {
+            fetchData();
+        }
+    }, [id]);
+
+    console.log('cool', tenantTransaction)
     return (
         <div className="w-full h-[400px] hidden-thin-scrollbar">
             <header className="flex justify-between items-center mb-5">
@@ -87,7 +50,8 @@ const TransactionHistory = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tenantTransactions.map((t) => (
+                {tenantTransaction.length > 0 ? (
+                    tenantTransaction.map((t:any) => (
                         <tr key={t.id} className="capitalize">
                             <td className="p-6 pl-0">
                                 <span
@@ -100,11 +64,17 @@ const TransactionHistory = () => {
                                     {t.status}
                                 </span>
                             </td>
-                            <td className="p-6 ">{t.dueDate}</td>
+                            <td className="p-6 ">{getFormattedDate(t.dueDate)}</td>
                             <td className="p-6 ">{t.category}</td>
-                            <td className="p-6 pr-0">{t.totalPaid || 'N/A'}</td>
+                            <td className="p-6 pr-0">{formatMoney(t.amount) || 'N/A'}</td>
                         </tr>
-                    ))}
+                    ))
+                    ) : (
+                        
+
+                        renderEmptyState()
+
+                    )}
                 </tbody>
             </table>
         </div>

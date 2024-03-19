@@ -6,9 +6,11 @@ import { FC, ReactNode, useEffect, useState } from 'react';
 import Image from 'next/image';
 import TransactionHistory from './transaction';
 import useTenant from 'hooks/useTenant';
-import { User } from 'interfaces';
+import { Transaction, User } from 'interfaces';
 import useFileUploadHandler from 'hooks/useFileUploadHandler';
 import Spinner from 'components/base/Spinner';
+import { getTenantTransactions } from 'services/newServices/tenant';
+import { useAppStore } from 'hooks/useAppStore';
 
 interface DetailsProps {
     label?: string;
@@ -45,16 +47,19 @@ const DetailsRowCard: FC<DetailsRowProps> = ({ title, children }) => {
 
 export default function TenantDetails() {
     const { query } = useRouter();
+    const states = useAppStore();
+
     const id = query?.id as string | undefined;
     const [tenant, setTenant] = useState({} as User);
     const { getTenants, getTenantLoading } = useTenant();
+    const { tenantTransactions, setTenantTransaction } = useState([]) as any;
 
     const { uploadedFiles, loadinguploadFiles } = useFileUploadHandler(
         'PROFILE',
         'profile_image'
     );
 
-    useEffect(() => {
+    useEffect( () => {
         const storedTenant = localStorage.getItem('selectedTenant');
         // const tenants = getTenants?.data;
         const tenant = JSON.parse(storedTenant as any);
@@ -68,8 +73,8 @@ export default function TenantDetails() {
         // eslint-disable-next-line
     }, [id]);
 
-    console.log('tenant', tenant);
 
+    console.log('states?.user?.id', states?.user?.id)
     return (
         <div>
             <header className="flex justify-between items-center mb-5">
@@ -159,14 +164,6 @@ export default function TenantDetails() {
                 </DetailsRowCard>
 
                 <DetailsRowCard title="Transaction History">
-                    <div className="flex">
-                        <Button
-                            title="Add Payment"
-                            onClick={() => {
-                                console.log('Add payment modal');
-                            }}
-                        />
-                    </div>
                     <TransactionHistory />
                 </DetailsRowCard>
             </section>

@@ -23,6 +23,17 @@ export async function getLandlordTenant(landordId) {
     });
 }
 
+export async function getTenantTransactions(tenantId) {
+    return request(`${API_URL}/tenants/transactions/${tenantId}`, {
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: USER_TOKEN,
+        },
+    });
+}
+
+
 export async function getPropertyTenant(propertyId) {
     return request(`${API_URL}/tenants/property/${propertyId}`, {
         method: 'get',

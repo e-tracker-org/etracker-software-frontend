@@ -48,8 +48,6 @@ function SignUp() {
     const [invitedByName, setInvitedByName] = useState('');
     const [propertyId, setPropertyId] = useState('');
 
-    console.log(invitedByName, 'invitee');
-
     const {
         handleSubmit,
         register,
