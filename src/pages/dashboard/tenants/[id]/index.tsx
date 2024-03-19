@@ -11,6 +11,8 @@ import useFileUploadHandler from 'hooks/useFileUploadHandler';
 import Spinner from 'components/base/Spinner';
 import { getTenantTransactions } from 'services/newServices/tenant';
 import { useAppStore } from 'hooks/useAppStore';
+import { getFormattedDate } from 'services/config/config';
+import TenantRating from './rating';
 
 interface DetailsProps {
     label?: string;
@@ -147,7 +149,7 @@ export default function TenantDetails() {
                             <DetailsCard label="Gender" content="Male" />
                             <DetailsCard
                                 label="Date of Birth"
-                                content={tenant.dob}
+                                content={getFormattedDate(tenant.dob)}
                             />
                         </div>
                         <div className="flex gap-4">
@@ -161,6 +163,10 @@ export default function TenantDetails() {
                             />
                         </div>
                     </div>
+                </DetailsRowCard>
+
+                <DetailsRowCard title="Tenant Rating">
+                    <TenantRating/>
                 </DetailsRowCard>
 
                 <DetailsRowCard title="Transaction History">
