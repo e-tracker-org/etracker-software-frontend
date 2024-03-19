@@ -36,17 +36,22 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.stopPropagation();
         const id = e.currentTarget.dataset.id as string;
-        if (id === '' && tenants.length !== states?.selectedTenants.length) {
-            tenants.map((tenant: any) =>
-                states?.setSelectedTenants(tenant.id, 'all')
-            );
-        } else if (
-            id === '' &&
-            tenants.length === states?.selectedTenants.length
-        ) {
-            states?.clearSelectedTenants();
+        const isChecked = e.currentTarget.checked;
+
+        if (id === '') {
+            if (isChecked) {
+                tenants.forEach((tenant: any) => {
+                    states?.setSelectedTenants(tenant.id, 'all');
+                });
+            } else {
+                states?.clearSelectedTenants();
+            }
         } else {
-            states?.setSelectedTenants(id, 'single');
+            if (isChecked) {
+                states?.setSelectedTenants(id, 'single');
+            } else {
+                states?.setSelectedTenants(id, 'none');
+            }
         }
     };
 
@@ -63,12 +68,10 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
     };
 
     const handleTenantClick = (tenant: any) => {
+        localStorage.setItem('selectedTenant', JSON.stringify(tenant));
 
-      localStorage.setItem('selectedTenant', JSON.stringify(tenant));
-  
-      router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
+        router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
     };
-
 
     return (
         <div className="relative">
@@ -142,56 +145,80 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                             </thead>
 
                             <tbody>
-                            {tenants?.map((tenant: any) => (
-                                tenant?.userData?.email &&
-                                tenant?.userData?.firstname &&
-                                tenant?.userData?.phone && (
-                                <tr
-                                    key={tenant?.userData?.id}
-                                    className="cursor-pointer tr-hover"
-                                    onClick={() => {
-                                    handleTenantClick(tenant)
-                                    // router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
-                                    }}
-                                >
-                                    {states?.selectMultiple && (
-                                    <td
-                                        className="pl-6 cursor-default"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <input
-                                        type="checkbox"
-                                        className="cursor-pointer"
-                                        data-id={tenant?.userData?.id}
-                                        checked={states?.selectedTenants.includes(tenant?.userData?.id)}
-                                        onChange={(e) => handleChange(e)}
-                                        ></input>
-                                    </td>
-                                    )}
+                                {tenants?.map(
+                                    (tenant: any) =>
+                                        tenant?.userData?.email &&
+                                        tenant?.userData?.firstname &&
+                                        tenant?.userData?.phone && (
+                                            <tr
+                                                key={tenant?.userData?.id}
+                                                className="cursor-pointer tr-hover"
+                                                onClick={() => {
+                                                    handleTenantClick(tenant);
+                                                    // router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
+                                                }}
+                                            >
+                                                {states?.selectMultiple && (
+                                                    <td
+                                                        className="pl-6 cursor-default"
+                                                        onClick={(e) =>
+                                                            e.stopPropagation()
+                                                        }
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            className="cursor-pointer"
+                                                            data-id={
+                                                                tenant?.userData
+                                                                    ?.id
+                                                            }
+                                                            checked={states?.selectedTenants.includes(
+                                                                tenant?.userData
+                                                                    ?.id
+                                                            )}
+                                                            onChange={(e) =>
+                                                                handleChange(e)
+                                                            }
+                                                        ></input>
+                                                    </td>
+                                                )}
 
-                                    <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max ">
-                                    {/* <Image
+                                                <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max ">
+                                                    {/* <Image
                                         src="https://i.pravatar.cc/300"
                                         alt="user avatar"
                                         width={30}
                                         height={30}
                                         className="rounded-full inline-block"
                                     /> */}
-                                    <span className="inline-block">
-                                        {tenant?.userData?.firstname} {tenant?.userData?.lastname}
-                                    </span>
-                                    </td>
-                                    <td className="py-6 px-14 ">
-                                    {getFormattedDate(tenant?.tenantData?.createdAt)}
-                                    </td>
-                                    <td className="py-6 px-14  ">{tenant?.userData?.email}</td>
-                                    <td className="py-6 px-14 ">{tenant?.userData?.phone}</td>
-                                    {/* Add more columns as needed */}
-                                </tr>
-                                )
-                            ))}
+                                                    <span className="inline-block">
+                                                        {
+                                                            tenant?.userData
+                                                                ?.firstname
+                                                        }{' '}
+                                                        {
+                                                            tenant?.userData
+                                                                ?.lastname
+                                                        }
+                                                    </span>
+                                                </td>
+                                                <td className="py-6 px-14 ">
+                                                    {getFormattedDate(
+                                                        tenant?.tenantData
+                                                            ?.createdAt
+                                                    )}
+                                                </td>
+                                                <td className="py-6 px-14  ">
+                                                    {tenant?.userData?.email}
+                                                </td>
+                                                <td className="py-6 px-14 ">
+                                                    {tenant?.userData?.phone}
+                                                </td>
+                                                {/* Add more columns as needed */}
+                                            </tr>
+                                        )
+                                )}
                             </tbody>
-
                         </table>
                         {states?.selectMultiple && (
                             <div className="text-center">
@@ -212,7 +239,10 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                 className="rounded-md sm:ml-[40%] lg:ml-[10%] px-[3%] lg:!top-[10%]"
             >
                 <div ref={modalRef}>
-                    <SendReceipt setOpenModal={setOpenModal} />
+                    <SendReceipt
+                        setOpenModal={setOpenModal}
+                        selectedTenants={states?.selectedTenants}
+                    />
                 </div>
             </DialogModal>
         </div>

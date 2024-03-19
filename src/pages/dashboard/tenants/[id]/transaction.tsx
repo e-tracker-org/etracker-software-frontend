@@ -67,9 +67,7 @@ const TransactionHistory = () => {
     return (
         <div className="w-full h-[400px] hidden-thin-scrollbar">
             <header className="flex justify-between items-center mb-5">
-                <div className="flex items-center">
-
-                </div>
+                <div className="flex items-center"></div>
                 {/* <div className="flex">
                     <Button
                         title="Add Payment"

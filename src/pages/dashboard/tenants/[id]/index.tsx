@@ -54,16 +54,12 @@ export default function TenantDetails() {
         'profile_image'
     );
 
-   
-
-   
-
     useEffect(() => {
         const storedTenant = localStorage.getItem('selectedTenant');
         // const tenants = getTenants?.data;
         const tenant = JSON.parse(storedTenant as any);
 
-        setTenant(tenant?.userData)
+        setTenant(tenant?.userData);
         // console.log('tenants', tenants)
         // Array.isArray(tenants) &&
         //     tenants.filter((tenant: User) => {
@@ -72,7 +68,7 @@ export default function TenantDetails() {
         // eslint-disable-next-line
     }, [id]);
 
-    console.log('tenant', tenant)
+    console.log('tenant', tenant);
 
     return (
         <div>
@@ -163,14 +159,14 @@ export default function TenantDetails() {
                 </DetailsRowCard>
 
                 <DetailsRowCard title="Transaction History">
-                <div className="flex">
-                    <Button
-                        title="Add Payment"
-                        onClick={() => {
-                            console.log('Add payment modal');
-                        }}
-                    />
-                </div>
+                    <div className="flex">
+                        <Button
+                            title="Add Payment"
+                            onClick={() => {
+                                console.log('Add payment modal');
+                            }}
+                        />
+                    </div>
                     <TransactionHistory />
                 </DetailsRowCard>
             </section>

@@ -15,10 +15,9 @@ interface receiptData {
     tenants: string[];
 }
 
-interface formDataType {
-    receipt: string;
-    date: string;
-    price: string;
+interface SendReceiptProps {
+    setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedTenants: string;
 }
 
 const schema = yup.object({
@@ -29,16 +28,16 @@ const schema = yup.object({
 
 export default function SendReceipt({
     setOpenModal,
-}: {
-    setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+    selectedTenants,
+}: SendReceiptProps) {
     const states = useAppStore();
     const {
-        getReceiptCategories,
+        // getReceiptCategories,
         createTransaction,
         createTransactionLoading,
     } = useTenant();
-    const receiptCategories = getReceiptCategories?.data;
+    // const receiptCategories = getReceiptCategories?.data;
+    const receiptCategories = ['Rent', 'Water Bill', 'Light Bill'];
 
     const {
         handleSubmit,
@@ -83,6 +82,7 @@ export default function SendReceipt({
         }
     };
 
+    console.log(selectedTenants);
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Input
@@ -108,13 +108,21 @@ export default function SendReceipt({
             >
                 <option value="">Choose receipt</option>
                 {Array.isArray(receiptCategories) &&
-                    receiptCategories?.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                            {cat.name}
+                    receiptCategories?.map((cat, index) => (
+                        <option key={index} value={cat}>
+                            {cat}
                         </option>
                     ))}
             </Select>
-
+            {/* <Input
+                label="Receipt"
+                required
+                placeholder="Receipt"
+                asterisk
+                register={{ ...register('receipt') }}
+                error={errors.receipt}
+                inputClassName="bg-white"
+            /> */}
             <Input
                 label="Price"
                 required
