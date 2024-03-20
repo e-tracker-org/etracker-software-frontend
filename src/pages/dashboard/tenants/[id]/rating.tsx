@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Button from 'components/base/Button';
+
 import { getTenantFiles } from 'services/newServices/tenant';
 import {
     createRating,
@@ -10,12 +11,13 @@ import {
 } from '../../../../services/ratingService'; // Import the rating service
 import RatingModal from '../../../../components/dashboard/tenants/RatingModal';
 
+
 function TenantRating({ tenant }: any) {
     const { query } = useRouter();
-    const id = query?.id as string;
     const [rating, setRating] = useState(0);
 
-    console.log(tenant, 'tenant');
+    const fileCount = Number(localStorage.getItem('selectedTenantFilesCount'));
+
 
     useEffect(() => {
         if (tenant) {
@@ -33,9 +35,15 @@ function TenantRating({ tenant }: any) {
                 ratingValue = 20;
             }
 
+            }
+            if(fileCount>0){
+                ratingValue += 10;
+            }
+
             setRating(ratingValue);
         }
     }, [tenant]);
+
 
     return (
         <div>
