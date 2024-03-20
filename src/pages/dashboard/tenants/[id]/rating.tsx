@@ -1,51 +1,51 @@
-
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { getTenantTransactions } from 'services/newServices/tenant';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Button from 'components/base/Button';
 
-function TenantRating() {
+function TenantRating({ tenant }) {
     const { query } = useRouter();
     const id = query?.id as string;
+    const [rating, setRating] = useState(0);
 
-    const [tenantTransaction, setTenantTransaction] = useState([]);
+    console.log(tenant, 'tenant');
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const transactions = await getTenantTransactions(id);
-                setTenantTransaction(transactions);
-            } catch (error) {
-                console.error('Error fetching tenant transactions:', error);
+        if (tenant) {
+            let ratingValue = 0;
+
+            if (tenant?.profileImage == '' && tenant?.isUserVerified == false) {
+                ratingValue = 10;
+            } else if (
+                tenant.profileImage &&
+                tenant.profileImage !== '' &&
+                tenant.isUserVerified
+            ) {
+                ratingValue = 30;
+            } else if (tenant.profileImage && tenant.profileImage !== '') {
+                ratingValue = 20;
             }
-        }
-        
-        if (id) {
-            fetchData();
-        }
-    }, [id]);
 
-    const percentage = 66;
-
+            setRating(ratingValue);
+        }
+    }, [tenant]);
 
     return (
-        <div >
-            <main className='flex justify-between items-center mb-5'>
-            <CircularProgressbar value={percentage} text={`${percentage}%`} />
-            <div>
-            <Button
+        <div>
+            <main className="flex justify-between items-center mb-5">
+                <CircularProgressbar value={rating} text={`${rating}%`} />
+                <div>
+                    <Button
                         title="Modify Rating"
                         onClick={() => {
                             console.log('modify rating modal');
                         }}
                     />
-                    </div>
-            
+                </div>
             </main>
         </div>
     );
-};
+}
 
 export default TenantRating;

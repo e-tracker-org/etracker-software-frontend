@@ -13,6 +13,7 @@ import { getTenantTransactions } from 'services/newServices/tenant';
 import { useAppStore } from 'hooks/useAppStore';
 import { getFormattedDate } from 'services/config/config';
 import TenantRating from './rating';
+import { extractAndCapitalizeWords } from 'utils/helper';
 
 interface DetailsProps {
     label?: string;
@@ -61,7 +62,7 @@ export default function TenantDetails() {
         'profile_image'
     );
 
-    useEffect( () => {
+    useEffect(() => {
         const storedTenant = localStorage.getItem('selectedTenant');
         // const tenants = getTenants?.data;
         const tenant = JSON.parse(storedTenant as any);
@@ -75,8 +76,6 @@ export default function TenantDetails() {
         // eslint-disable-next-line
     }, [id]);
 
-
-    console.log('states?.user?.id', states?.user?.id)
     return (
         <div>
             <header className="flex justify-between items-center mb-5">
@@ -97,14 +96,25 @@ export default function TenantDetails() {
             <section className="py-5 px-8 bg-white rounded-md">
                 <DetailsRowCard title="Personal Information">
                     <div className="">
-                        <Image
-                            src="https://i.pravatar.cc/300"
-                            alt="image placeholder"
-                            width={146}
-                            height={146}
-                            className="rounded-full mr-4"
-                        />
+                        {tenant.profileImage ? (
+                            <Image
+                                src={tenant.profileImage}
+                                alt="image placeholder"
+                                width={146}
+                                height={146}
+                                className="rounded-full mr-4"
+                            />
+                        ) : (
+                            <div className="flex justify-center items-center bg-primary-600 py-7 px-8 rounded-full text-white w-[80px] h-[80px]">
+                                <span className="text-xl font-semibold">
+                                    {extractAndCapitalizeWords(
+                                        tenant.firstname + ' ' + tenant.lastname
+                                    )}
+                                </span>
+                            </div>
+                        )}
                     </div>
+
                     {/* {uploadedFiles?.data?.data[0]
                         ?.urls[0] ? (
                         loadinguploadFiles ? (
@@ -166,7 +176,7 @@ export default function TenantDetails() {
                 </DetailsRowCard>
 
                 <DetailsRowCard title="Tenant Rating">
-                    <TenantRating/>
+                    <TenantRating tenant={tenant} />
                 </DetailsRowCard>
 
                 <DetailsRowCard title="Transaction History">

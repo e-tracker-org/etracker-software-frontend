@@ -20,6 +20,7 @@ import {
     generateRandomAlphanumeric,
 } from 'utils/helper';
 import Spinner from 'components/base/Spinner';
+import { uploadImage } from '../../services/newServices/image';
 
 const schema = yup.object({
     firstname: yup.string().required('Enter your first name'),
@@ -144,10 +145,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
     const onSubmit = async (data: any) => {
         data.dob = new Date(data.dob).toUTCString();
 
+        // Add user image to the data
+        if (profileImage) {
+            data.profileImage = profileImage;
+        }
+
         if (page && page === 'kyc') {
             data.accounttype = states?.activeKyc?.accountType;
-
             data.kycStage = 1;
+
             const formData = new FormData();
             for (const key in data) {
                 formData.append(key, data[key]);
@@ -159,8 +165,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
                 .then((res) => {
                     const newKycStage =
                         res?.data?.currentKyc?.kycStage + 1 ?? 1;
-
-                    // states?.setUser({ user: res?.data });
                     states?.setActiveKyc(res?.data?.currentKyc);
                     states?.setStep(newKycStage);
                     states?.setScreen('');
@@ -175,7 +179,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
         } else {
             updateUser(data)
                 .then((res) => {
-                    // states?.setUser({ user: res?.data?.data });
                     toast.success('Profile updated.');
                 })
                 .catch((error) => {
@@ -189,9 +192,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
     const setImgProfile = async () => {
         if (uploadedFiles?.data?.data[0]?.urls.length) {
             const dataUrl = uploadedFiles?.data?.data[0]?.urls[0];
+            console.log(dataUrl, 'dataUrl');
+
             // Update the state with the  image URL
-            const profileImg = await base64ToURL(dataUrl);
-            setProfileImage(profileImg);
+            // const profileImg = await base64ToURL(dataUrl);
+            setProfileImage(dataUrl);
         }
     };
 
