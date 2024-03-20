@@ -1,23 +1,24 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Button from 'components/base/Button';
 
-import { getTenantFiles } from 'services/newServices/tenant';
 import {
     createRating,
     getTenantRating,
-} from '../../../../services/ratingService'; // Import the rating service
+} from 'services/newServices/rating'; 
 import RatingModal from '../../../../components/dashboard/tenants/RatingModal';
 
 
 function TenantRating({ tenant }: any) {
     const { query } = useRouter();
+    const id = query?.id as string;
     const [rating, setRating] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [comment, setComment] = useState('');
 
     const fileCount = Number(localStorage.getItem('selectedTenantFilesCount'));
-
 
     useEffect(() => {
         if (tenant) {
@@ -33,7 +34,6 @@ function TenantRating({ tenant }: any) {
                 ratingValue = 30;
             } else if (tenant.profileImage && tenant.profileImage !== '') {
                 ratingValue = 20;
-            }
 
             }
             if(fileCount>0){
@@ -44,6 +44,35 @@ function TenantRating({ tenant }: any) {
         }
     }, [tenant]);
 
+    const handleRating = async (ratingType: string) => {
+        try {
+            await createRating({
+                tenantId: id,
+                landlordId: 'sampleLandlordId', // Replace with actual landlord ID
+                rating: ratingType,
+                comment: comment,
+            });
+            // Update the tenant rating
+            const response = await getTenantRating(id);
+            const totalRating = rating + response.rating.rating;
+            setRating(totalRating);
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error('Error creating/fetching rating:', error);
+        }
+    };
+
+    const handleCommentChange = (event: { target: { value: SetStateAction<string>; }; }) => {
+        setComment(event.target.value);
+    };
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
     return (
         <div>
