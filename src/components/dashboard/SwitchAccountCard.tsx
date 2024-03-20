@@ -41,11 +41,11 @@ const SwitchAccountCard: FC<SwitchAccountProps> = ({ handleSwitchAccount }) => {
         }
     }, [states?.activeAccount, account]);
 
-    useEffect(() => {
-        if (!openModal) {
-            handleSwitchAccount(switchAccountId);
-        }
-    }, [openModal]);
+    // useEffect(() => {
+    //     if (!openModal) {
+    //         handleSwitchAccount(switchAccountId);
+    //     }
+    // }, [openModal]);
 
     const renderAccountTypeCards = () => {
         if (Array.isArray(accountTypes?.data)) {
@@ -142,14 +142,14 @@ const SwitchAccountCard: FC<SwitchAccountProps> = ({ handleSwitchAccount }) => {
                 </div>
             </section>
 
-            <section>
+            {/* <section>
                 <div className=" border-b pb-7 w-full text-left">
                     <h3 className="text-gray-700 font-bold text-sm md:text-xl mb-5">
                         Switch Roles
                     </h3>
                     {renderAccountTypeCards()}
                 </div>
-            </section>
+            </section> */}
             <section>
                 <button
                     className="flex gap-5 mt-8 pl-5"

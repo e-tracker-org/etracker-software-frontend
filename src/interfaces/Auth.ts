@@ -16,6 +16,7 @@ export interface User {
     id: string;
     accountTypes: any[];
     currentKyc: CurrentKyc;
+    profileImage: string;
 }
 
 export interface User2 {
