@@ -33,6 +33,16 @@ export async function getTenantTransactions(tenantId) {
     });
 }
 
+export async function getTenantFiles(tenantId) {
+    return request(`${API_URL}/tenants/files/${tenantId}`, {
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: USER_TOKEN,
+        },
+    });
+}
+
 
 export async function getPropertyTenant(propertyId) {
     return request(`${API_URL}/tenants/property/${propertyId}`, {

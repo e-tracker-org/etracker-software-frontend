@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Button from 'components/base/Button';
+import { getTenantFiles } from 'services/newServices/tenant';
 import {
     createRating,
     getTenantRating,
@@ -13,12 +14,13 @@ function TenantRating({ tenant }: any) {
     const { query } = useRouter();
     const id = query?.id as string;
     const [rating, setRating] = useState(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [comment, setComment] = useState('');
+
+    console.log(tenant, 'tenant');
 
     useEffect(() => {
         if (tenant) {
             let ratingValue = 0;
+
             if (tenant?.profileImage == '' && tenant?.isUserVerified == false) {
                 ratingValue = 10;
             } else if (
@@ -30,39 +32,10 @@ function TenantRating({ tenant }: any) {
             } else if (tenant.profileImage && tenant.profileImage !== '') {
                 ratingValue = 20;
             }
+
             setRating(ratingValue);
         }
     }, [tenant]);
-
-    const handleRating = async (ratingType) => {
-        try {
-            await createRating({
-                tenantId: id,
-                landlordId: 'sampleLandlordId', // Replace with actual landlord ID
-                rating: ratingType,
-                comment: comment,
-            });
-            // Update the tenant rating
-            const response = await getTenantRating(id);
-            const totalRating = rating + response.rating.rating;
-            setRating(totalRating);
-            setIsModalOpen(false);
-        } catch (error) {
-            console.error('Error creating/fetching rating:', error);
-        }
-    };
-
-    const handleCommentChange = (event) => {
-        setComment(event.target.value);
-    };
-
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
 
     return (
         <div>

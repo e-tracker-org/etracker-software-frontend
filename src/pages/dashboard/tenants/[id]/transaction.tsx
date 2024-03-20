@@ -26,7 +26,6 @@ function TransactionHistory() {
         }
     }, [id]);
 
-    console.log('cool', tenantTransaction)
     return (
         <div className="w-full h-[400px] hidden-thin-scrollbar">
             <header className="flex justify-between items-center mb-5">
