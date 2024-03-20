@@ -2,7 +2,11 @@ import DashboardLayout from 'layouts/dashboard';
 import { ReactElement } from 'react';
 
 export default function Dashboard() {
-    return <section>Dashboard!!!</section>;
+    return (
+         <section>
+            Dashboard!!!
+        </section>
+    )
 }
 
 Dashboard.auth = true;

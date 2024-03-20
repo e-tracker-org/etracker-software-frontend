@@ -3,55 +3,39 @@ import { useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Button from 'components/base/Button';
-import { getTenantFiles } from 'services/newServices/tenant';
 
 function TenantRating({ tenant }:any) {
     const { query } = useRouter();
-    const id = query?.id as string;
     const [rating, setRating] = useState(0);
 
 
+    const fileCount = Number(localStorage.getItem('selectedTenantFilesCount'));
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-               
-                if (tenant) {
-                    const tenantFilesCount = await getTenantFiles(id);
-                    let ratingValue = 0;
-                
-                    // Add 10 to rating if tenantFilesCount is more than 0
-                    if (tenantFilesCount.length > 0) {
-                        ratingValue += 10;
-                       
-                    }
-                
-                    if (tenant?.profileImage === '' && tenant?.isUserVerified === false) {
-                        ratingValue += 10;
-                        
-                    } else if (
-                        tenant.profileImage &&
-                        tenant.profileImage !== '' &&
-                        tenant.isUserVerified
-                    ) {
-                        ratingValue += 30;
-                        
-                    } else if (tenant.profileImage && tenant.profileImage !== '') {
-                        ratingValue += 20;
-                    }
-                
-                    setRating(ratingValue);
-                }
-                
-            } catch (error) {
-                console.error('Error fetching tenant transactions:', error);
+        if (tenant) {
+            let ratingValue = 0;
+
+            if (tenant?.profileImage == '' && tenant?.isUserVerified == false) {
+                ratingValue = 10;
+            } else if (
+                tenant.profileImage &&
+                tenant.profileImage !== '' &&
+                tenant.isUserVerified
+            ) {
+                ratingValue = 30;
+            } else if (tenant.profileImage && tenant.profileImage !== '') {
+                ratingValue = 20;
+
             }
+            if(fileCount>0){
+                ratingValue += 10;
+            }
+
+            setRating(ratingValue);
         }
-        
-        if (id) {
-            fetchData();
-        }
-    }, [id]);
+    }, [tenant]);
+
+
 
     return (
         <div>
