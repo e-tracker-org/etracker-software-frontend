@@ -9,7 +9,7 @@ import useTenant from 'hooks/useTenant';
 import { Transaction, User } from 'interfaces';
 import useFileUploadHandler from 'hooks/useFileUploadHandler';
 import Spinner from 'components/base/Spinner';
-import { getTenantTransactions } from 'services/newServices/tenant';
+import { getTenantFiles, getTenantTransactions } from 'services/newServices/tenant';
 import { useAppStore } from 'hooks/useAppStore';
 import { getFormattedDate } from 'services/config/config';
 import TenantRating from './rating';
@@ -54,8 +54,6 @@ export default function TenantDetails() {
 
     const id = query?.id as string | undefined;
     const [tenant, setTenant] = useState({} as User);
-    const { getTenants, getTenantLoading } = useTenant();
-    const { tenantTransactions, setTenantTransaction } = useState([]) as any;
 
     const { uploadedFiles, loadinguploadFiles } = useFileUploadHandler(
         'PROFILE',
@@ -63,18 +61,35 @@ export default function TenantDetails() {
     );
 
     useEffect(() => {
-        const storedTenant = localStorage.getItem('selectedTenant');
-        // const tenants = getTenants?.data;
-        const tenant = JSON.parse(storedTenant as any);
+        async function fetchData() {
+            try {
+                const storedTenant = localStorage.getItem('selectedTenant');
+                const tenant = JSON.parse(storedTenant || '');
+    
+                if (tenant) {
+                    setTenant(tenant.userData);
+                }
+    
+                const tenantFilesCount = await getTenantFiles(id);
+                
 
-        setTenant(tenant?.userData);
-        // console.log('tenants', tenants)
-        // Array.isArray(tenants) &&
-        //     tenants.filter((tenant: User) => {
-        //         tenant?.id === id && setTenant(tenant);
-        //     });
-        // eslint-disable-next-line
+                localStorage.setItem('selectedTenantFilesCount', tenantFilesCount.length || 0);
+    
+                // if (tenantFilesCount.length > 0) {
+                //     setFiles(10);
+                // } else {
+                //     setFiles(0); // Set files to 0 if tenantFilesCount is empty
+                // }
+            } catch (error) {
+                console.error('Error fetching tenant transactions:', error);
+            }
+        }
+    
+        if (id) {
+            fetchData();
+        }
     }, [id]);
+
 
     return (
         <div>
