@@ -4,16 +4,21 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Button from 'components/base/Button';
 import { getTenantFiles } from 'services/newServices/tenant';
-import {
-    createRating,
-    getTenantRating,
-} from '../../../../services/ratingService'; // Import the rating service
-import RatingModal from '../../../../components/dashboard/tenants/RatingModal';
+import RatingModal from 'components/dashboard/tenants/RatingModal';
+import { createRating, getTenantRating } from 'services/newServices/rating';
+import { DialogModal } from 'components/base/DialogModal';
+import Input from 'components/base/form/Input';
+import { useAppStore } from 'hooks/useAppStore';
 
 function TenantRating({ tenant }: any) {
+    const states = useAppStore();
+    const landlordId = states?.user?.id;
     const { query } = useRouter();
     const id = query?.id as string;
-    const [rating, setRating] = useState(0);
+    const [rating, setRating] = useState(0) as Number;
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [comment, setComment] = useState('');
+    const [selectedRatingType, setSelectedRatingType] = useState('');
 
     console.log(tenant, 'tenant');
 
@@ -37,9 +42,60 @@ function TenantRating({ tenant }: any) {
         }
     }, [tenant]);
 
+    const handleRating = async () => {
+        console.log('loading....');
+        try {
+            await createRating({
+                tenantId: id,
+                landlordId: landlordId,
+                rating: selectedRatingType,
+                comment: comment,
+            });
+            const response = await getTenantRating(id);
+            const newRating = rating + response.rating.rating;
+
+            setRating(newRating);
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error('Error creating/fetching rating:', error);
+        }
+    };
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const response = await getTenantRating(id);
+                const fetchedRating = response.rating.rating;
+
+                if (rating && rating > 0) {
+                    const totalRating = rating + fetchedRating;
+                    setRating(totalRating);
+                }
+
+                // Set the total rating
+            } catch (error) {
+                console.error('Error fetching tenant rating:', error);
+            }
+        }
+
+        fetchData();
+    }, []);
+
+    const handleCommentChange = (event) => {
+        setComment(event.target.value);
+    };
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     return (
         <div>
-            <main className="flex justify-between items-center mb-5">
+            <main className="flex flex-col gap-5 items-center justify-center mb-5">
                 <CircularProgressbar
                     value={rating}
                     text={`${rating}%`}
@@ -57,49 +113,63 @@ function TenantRating({ tenant }: any) {
                 <div>
                     <Button title="Modify Rating" onClick={openModal} />
                 </div>
-                <RatingModal
-                    isOpen={isModalOpen}
-                    onClose={closeModal}
-                    title="Modify Rating"
+                <DialogModal
+                    openModal={isModalOpen}
+                    closeModal={closeModal}
+                    title="Rate Tenant"
+                    contentClass="w-full !py-10"
+                    className="rounded-md sm:ml-[40%] lg:ml-[10%] px-[3%] lg:!top-[10%]"
                 >
                     <div>
-                        <button onClick={() => handleRating('good')}>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                        <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-12 mb-5 justify-center">
+                            {' '}
+                            <button
+                                onClick={() => setSelectedRatingType('good')}
+                                className="bg-green-500 text-white px-4 py-2 rounded"
                             >
-                                <path d="M5 12L9 16L19 6" />
-                            </svg>
-                        </button>
-                        <button onClick={() => handleRating('bad')}>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                                Good
+                            </button>
+                            <button
+                                onClick={() => setSelectedRatingType('bad')}
+                                className="bg-red-500 text-white px-4 py-2 rounded ml-2"
                             >
-                                <path d="M19 12L15 16L5 6" />
-                            </svg>
-                        </button>
-                        <textarea
-                            placeholder="Enter your comment"
-                            value={comment}
+                                Bad
+                            </button>
+                        </div>
+
+                        <Input
+                            label="Enter Comment"
+                            required
+                            placeholder="Comment"
+                            asterisk
+                            inputClassName="bg-white h-20"
                             onChange={handleCommentChange}
-                        ></textarea>
+                            aria-multiline={true}
+                        />
+                        <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-16 mb-2">
+                            <Button
+                                type="button"
+                                onClick={() => {
+                                    closeModal();
+                                }}
+                                variant="default"
+                                className="w-full py-4"
+                            >
+                                Cancel
+                            </Button>
+
+                            <Button
+                                className="w-full py-4"
+                                type="submit"
+                                onClick={() => {
+                                    handleRating();
+                                }}
+                            >
+                                Send
+                            </Button>
+                        </div>
                     </div>
-                </RatingModal>
+                </DialogModal>
             </main>
         </div>
     );
