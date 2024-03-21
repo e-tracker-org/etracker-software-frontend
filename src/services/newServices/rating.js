@@ -1,4 +1,3 @@
-
 import request from 'umi-request';
 import { API_URL, USER_TOKEN } from '../config/config';
 
@@ -20,12 +19,15 @@ export async function createRating(data) {
 
 export async function getTenantRating(tenantId) {
     try {
-        const response = await request(`${API_URL}/tenant-rating/ratings/${tenantId}`, {
-            method: 'get',
-            headers: {
-                Authorization: USER_TOKEN,
-            },
-        });
+        const response = await request(
+            `${API_URL}/tenant-rating/ratings/${tenantId}`,
+            {
+                method: 'get',
+                headers: {
+                    Authorization: USER_TOKEN,
+                },
+            }
+        );
         return response;
     } catch (error) {
         console.error('Error getting tenant rating:', error);
