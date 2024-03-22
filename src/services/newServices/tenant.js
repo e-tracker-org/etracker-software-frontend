@@ -67,8 +67,8 @@ export async function createTenant(body) {
     });
 }
 
-export async function updateTask(body, tenantId) {
-    return request(`${API_URL}/tenants/update/${tenantId}`, {
+export async function updateTenantRating(body, tenantId) {
+    return request(`${API_URL}/tenants/update-rating/${tenantId}`, {
         method: 'put',
         headers: {
             'Content-Type': 'application/json',

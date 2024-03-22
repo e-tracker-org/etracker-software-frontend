@@ -17,6 +17,7 @@ export interface User {
     accountTypes: any[];
     currentKyc: CurrentKyc;
     profileImage: string;
+    rating: number;
 }
 
 export interface User2 {

@@ -3,12 +3,14 @@ import { SetStateAction, useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Button from 'components/base/Button';
-import { getTenantFiles } from 'services/newServices/tenant';
+import { getTenantFiles, updateTenantRating } from 'services/newServices/tenant';
 import RatingModal from 'components/dashboard/tenants/RatingModal';
 import { createRating, getTenantRating } from 'services/newServices/rating';
 import { DialogModal } from 'components/base/DialogModal';
 import Input from 'components/base/form/Input';
 import { useAppStore } from 'hooks/useAppStore';
+import toast from 'react-hot-toast';
+// import { UserService } from 'services';
 
 function TenantRating({ tenant }: any) {
     const states = useAppStore();
@@ -17,10 +19,14 @@ function TenantRating({ tenant }: any) {
     const id = query?.id as string;
     const [rating, setRating] = useState(0) as any;
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [comment, setComment] = useState('');
-    const [selectedRatingType, setSelectedRatingType] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [value, setValue] = useState(5);
 
     const fileCount = Number(localStorage.getItem('selectedTenantFilesCount'));
+    // const updateUser = UserService.updateUser;
+    const tenantRating = tenant.rating ?? 0;
+
+    console.log('tenant', tenant)
 
     useEffect(() => {
         if (tenant) {
@@ -41,51 +47,47 @@ function TenantRating({ tenant }: any) {
                 ratingValue += 10;
             }
 
-            setRating(ratingValue);
+            setRating(ratingValue + tenantRating);
         }
     }, [tenant]);
 
     const handleRating = async () => {
-        console.log('loading....');
+        setIsLoading(true);
+        const updatedRating = value;  // removing this bevause we still need other calculations from frontend
+        // const updatedRating = value + tenantRating;
+
+        console.log('value', value)
         try {
-            await createRating({
-                tenantId: id,
-                landlordId: landlordId,
-                rating: selectedRatingType,
-                comment: comment,
-            });
-            const response = await getTenantRating(id);
-            const newRating = rating + response.rating.rating;
+            const payload = {
+                ratingUpdate: updatedRating,
+            };
+            const response = await updateTenantRating(payload, id);
 
-            setRating(newRating);
-            setIsModalOpen(false);
-        } catch (error) {
-            console.error('Error creating/fetching rating:', error);
-        }
-    };
+            if (response.status === 200) {
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await getTenantRating(id);
-                const fetchedRating = response.rating.rating;
+                const storedTenant = localStorage.getItem('selectedTenant');
 
-                if (rating && rating > 0) {
-                    const totalRating = rating + fetchedRating;
-                    setRating(totalRating);
+                if (storedTenant) {
+
+                    const tenant = JSON.parse(storedTenant);
+                    
+                    tenant.userData.rating = tenant.userData.rating + updatedRating;
+
+                    localStorage.setItem('selectedTenant', JSON.stringify(tenant));
                 }
+                setIsLoading(false);
+                setIsModalOpen(false);
+                toast.success('Tenant rating updated successfully')
+                window.location.reload();
 
-                // Set the total rating
-            } catch (error) {
-                console.error('Error fetching tenant rating:', error);
+            } else {
+                toast.error('User profile update failed:')
+                console.error('User profile update failed:', response.message);
             }
+        } catch (error) {
+            console.error('Error updating user:', error);
+            // Handle error
         }
-
-        fetchData();
-    }, []);
-
-    const handleCommentChange = (event: { target: { value: SetStateAction<string>; }; }) => {
-        setComment(event.target.value);
     };
 
     const openModal = () => {
@@ -95,6 +97,19 @@ function TenantRating({ tenant }: any) {
     const closeModal = () => {
         setIsModalOpen(false);
     };
+
+    const increment = () => {
+        if (value < 10) {
+            setValue(value + 1);
+        }
+    };
+
+    const decrement = () => {
+        if (value > 1) {
+            setValue(value - 1);
+        }
+    };
+
 
     return (
         <div>
@@ -124,23 +139,23 @@ function TenantRating({ tenant }: any) {
                     className="rounded-md sm:ml-[40%] lg:ml-[10%] px-[3%] lg:!top-[10%]"
                 >
                     <div>
-                        <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-12 mb-5 justify-center">
-                            {' '}
+                        <div className="flex items-center justify-center">
                             <button
-                                onClick={() => setSelectedRatingType('good')}
-                                className="bg-green-500 text-white px-4 py-2 rounded"
+                                className="bg-gray-200 px-3 py-1 rounded-l"
+                                onClick={decrement}
                             >
-                                Good
+                                -
                             </button>
+                            <div className="bg-gray-100 px-3 py-1">{value}</div>
                             <button
-                                onClick={() => setSelectedRatingType('bad')}
-                                className="bg-red-500 text-white px-4 py-2 rounded ml-2"
+                                className="bg-gray-200 px-3 py-1 rounded-r"
+                                onClick={increment}
                             >
-                                Bad
+                                +
                             </button>
                         </div>
 
-                        <Input
+                        {/* <Input
                             label="Enter Comment"
                             required
                             placeholder="Comment"
@@ -148,7 +163,7 @@ function TenantRating({ tenant }: any) {
                             inputClassName="bg-white h-20"
                             onChange={handleCommentChange}
                             aria-multiline={true}
-                        />
+                        /> */}
                         <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-16 mb-2">
                             <Button
                                 type="button"
@@ -164,11 +179,12 @@ function TenantRating({ tenant }: any) {
                             <Button
                                 className="w-full py-4"
                                 type="submit"
+                                isLoading={isLoading}
                                 onClick={() => {
                                     handleRating();
                                 }}
                             >
-                                Send
+                                Rate
                             </Button>
                         </div>
                     </div>

@@ -72,7 +72,6 @@ export default function TenantDetails() {
     
                 const tenantFilesCount = await getTenantFiles(id);
                 
-
                 localStorage.setItem('selectedTenantFilesCount', tenantFilesCount.length || 0);
     
                 // if (tenantFilesCount.length > 0) {
