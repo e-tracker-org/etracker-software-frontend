@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Button from 'components/base/Button';
@@ -15,12 +15,12 @@ function TenantRating({ tenant }: any) {
     const landlordId = states?.user?.id;
     const { query } = useRouter();
     const id = query?.id as string;
-    const [rating, setRating] = useState(0) as Number;
+    const [rating, setRating] = useState(0) as any;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [comment, setComment] = useState('');
     const [selectedRatingType, setSelectedRatingType] = useState('');
 
-    console.log(tenant, 'tenant');
+    const fileCount = Number(localStorage.getItem('selectedTenantFilesCount'));
 
     useEffect(() => {
         if (tenant) {
@@ -36,6 +36,9 @@ function TenantRating({ tenant }: any) {
                 ratingValue = 30;
             } else if (tenant.profileImage && tenant.profileImage !== '') {
                 ratingValue = 20;
+            }
+            if(fileCount>0){
+                ratingValue += 10;
             }
 
             setRating(ratingValue);
@@ -81,7 +84,7 @@ function TenantRating({ tenant }: any) {
         fetchData();
     }, []);
 
-    const handleCommentChange = (event) => {
+    const handleCommentChange = (event: { target: { value: SetStateAction<string>; }; }) => {
         setComment(event.target.value);
     };
 
