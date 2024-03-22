@@ -9,6 +9,7 @@ import { createRating, getTenantRating } from 'services/newServices/rating';
 import { DialogModal } from 'components/base/DialogModal';
 import Input from 'components/base/form/Input';
 import { useAppStore } from 'hooks/useAppStore';
+import { UserService } from 'services';
 
 function TenantRating({ tenant }: any) {
     const states = useAppStore();
@@ -17,10 +18,11 @@ function TenantRating({ tenant }: any) {
     const id = query?.id as string;
     const [rating, setRating] = useState(0) as Number;
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [comment, setComment] = useState('');
-    const [selectedRatingType, setSelectedRatingType] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [value, setValue] = useState(5);
 
-    console.log(tenant, 'tenant');
+    const updateUser = UserService.updateUser;
+    const tenantRating = tenant.rating;
 
     useEffect(() => {
         if (tenant) {
@@ -38,51 +40,42 @@ function TenantRating({ tenant }: any) {
                 ratingValue = 20;
             }
 
-            setRating(ratingValue);
+            setRating(ratingValue + tenantRating);
         }
     }, [tenant]);
 
     const handleRating = async () => {
-        console.log('loading....');
+        setIsLoading(true);
+        const updatedRating = value + tenantRating;
         try {
-            await createRating({
-                tenantId: id,
-                landlordId: landlordId,
-                rating: selectedRatingType,
-                comment: comment,
-            });
-            const response = await getTenantRating(id);
-            const newRating = rating + response.rating.rating;
+            const payload = {
+                id: tenant.id,
+                rating: updatedRating,
+                firstname: tenant.firstname,
+                lastname: tenant.lastname,
+                email: tenant.email,
+                state: tenant.state,
+                phone: tenant.phone,
+                gender: tenant.gender,
+                dob: tenant.dob,
+                country: tenant.country,
+                area: tenant.area,
+                fullAddress: tenant.fullAddress,
+            };
 
-            setRating(newRating);
-            setIsModalOpen(false);
-        } catch (error) {
-            console.error('Error creating/fetching rating:', error);
-        }
-    };
-
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await getTenantRating(id);
-                const fetchedRating = response.rating.rating;
-
-                if (rating && rating > 0) {
-                    const totalRating = rating + fetchedRating;
-                    setRating(totalRating);
-                }
-
-                // Set the total rating
-            } catch (error) {
-                console.error('Error fetching tenant rating:', error);
+            const response = await updateUser(payload);
+            console.log('Update User Response:', response);
+            if (response.success) {
+                setIsLoading(false);
+                setIsModalOpen(false);
+                console.log('User profile updated successfully');
+            } else {
+                console.error('User profile update failed:', response.message);
             }
+        } catch (error) {
+            console.error('Error updating user:', error);
+            // Handle error
         }
-
-        fetchData();
-    }, []);
-
-    const handleCommentChange = (event) => {
-        setComment(event.target.value);
     };
 
     const openModal = () => {
@@ -91,6 +84,18 @@ function TenantRating({ tenant }: any) {
 
     const closeModal = () => {
         setIsModalOpen(false);
+    };
+
+    const increment = () => {
+        if (value < 10) {
+            setValue(value + 1);
+        }
+    };
+
+    const decrement = () => {
+        if (value > 1) {
+            setValue(value - 1);
+        }
     };
 
     return (
@@ -121,23 +126,23 @@ function TenantRating({ tenant }: any) {
                     className="rounded-md sm:ml-[40%] lg:ml-[10%] px-[3%] lg:!top-[10%]"
                 >
                     <div>
-                        <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-12 mb-5 justify-center">
-                            {' '}
+                        <div className="flex items-center justify-center">
                             <button
-                                onClick={() => setSelectedRatingType('good')}
-                                className="bg-green-500 text-white px-4 py-2 rounded"
+                                className="bg-gray-200 px-3 py-1 rounded-l"
+                                onClick={decrement}
                             >
-                                Good
+                                -
                             </button>
+                            <div className="bg-gray-100 px-3 py-1">{value}</div>
                             <button
-                                onClick={() => setSelectedRatingType('bad')}
-                                className="bg-red-500 text-white px-4 py-2 rounded ml-2"
+                                className="bg-gray-200 px-3 py-1 rounded-r"
+                                onClick={increment}
                             >
-                                Bad
+                                +
                             </button>
                         </div>
 
-                        <Input
+                        {/* <Input
                             label="Enter Comment"
                             required
                             placeholder="Comment"
@@ -145,7 +150,7 @@ function TenantRating({ tenant }: any) {
                             inputClassName="bg-white h-20"
                             onChange={handleCommentChange}
                             aria-multiline={true}
-                        />
+                        /> */}
                         <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-16 mb-2">
                             <Button
                                 type="button"
@@ -161,11 +166,12 @@ function TenantRating({ tenant }: any) {
                             <Button
                                 className="w-full py-4"
                                 type="submit"
+                                isLoading={isLoading}
                                 onClick={() => {
                                     handleRating();
                                 }}
                             >
-                                Send
+                                Rate
                             </Button>
                         </div>
                     </div>
