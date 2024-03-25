@@ -69,8 +69,6 @@ const LandlordDash: FC = () => {
     const [occupiedCount, setOccupiedCount] = useState(0);
     const [vacantCount, setVacantCount] = useState(0);
 
-    console.log(states?.propertyId, 'property id');
-
     const {
         getMyProperties,
         getMyPropertiesLoading,
@@ -109,9 +107,6 @@ const LandlordDash: FC = () => {
 
     const totalProperties = occupiedCount + vacantCount;
     const occupiedPercentage = (occupiedCount / totalProperties) * 100;
-
-    console.log(occupiedPercentage, 'percentage');
-    console.log(occupiedCount, 'count');
 
     const propertie = getMyProperties?.data.data.map((property) => ({
         value: property.id,
