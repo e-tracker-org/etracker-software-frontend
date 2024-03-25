@@ -182,6 +182,24 @@ const Sidebar: React.FC<SidebarProps> = ({
                                             e.preventDefault();
                                             setTenantTabOpen(false);
                                             router.push(
+                                                '/dashboard/tenants/find'
+                                            );
+                                        }}
+                                    >
+                                        Find Tenant
+                                    </button>
+                                </li>
+                                <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
+                                    <button
+                                        onClick={(
+                                            e: React.MouseEvent<
+                                                HTMLButtonElement,
+                                                MouseEvent
+                                            >
+                                        ) => {
+                                            e.preventDefault();
+                                            setTenantTabOpen(false);
+                                            router.push(
                                                 '/dashboard/tenants/verify'
                                             );
                                         }}

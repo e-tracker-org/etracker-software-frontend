@@ -11,3 +11,20 @@ export async function updateUserAccountType(body, userId) {
         body: JSON.stringify(body),
     });
 }
+
+export async function fetchAllUsers() {
+    return request(`${API_URL}/user-profile`, {
+        method: 'get',
+        headers: {
+            Authorization: USER_TOKEN,
+        },
+    });
+}
+
+export async function fetchAndFilterUsersByAccountType() {
+    const allUsersResponse = await fetchAllUsers();
+    const filteredUsers = allUsersResponse.filter((user) =>
+        user.accountTypes.includes(1)
+    );
+    return filteredUsers;
+}

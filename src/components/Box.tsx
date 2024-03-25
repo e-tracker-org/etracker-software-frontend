@@ -13,7 +13,10 @@ const Box: FC<BoxProps> = ({ title, icon, onClick, route }) => {
     };
 
     return (
-        <div className="bg-[#F3F4FD] rounded-lg p-4">
+        <div
+            style={{ cursor: 'pointer' }}
+            className="bg-[#F3F4FD] rounded-lg p-4"
+        >
             <a className="flex flex-col items-center" onClick={handleClick}>
                 {/* Render the icon directly */}
                 {icon}

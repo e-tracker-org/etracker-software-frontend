@@ -11,9 +11,9 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import TenantTable from 'components/dashboard/tenants/TenantTable';
 import { useAppStore } from 'hooks/useAppStore';
 import { getLandlordTenant } from 'services/newServices/tenant';
-import Link from 'next/link';
 import { ReceiptSvg, MoneySvg, VerifySvg } from 'assets/svgIcons/svgIcons';
 import { useRouter } from 'next/router';
+import Dropdown from 'components/base/Dropdown';
 
 interface DetailsRowProps {
     children?: ReactNode;
@@ -21,6 +21,8 @@ interface DetailsRowProps {
     subheader?: string;
     linkHref?: string;
     linkText?: string;
+    Route?: string;
+    dropdown?: ReactNode;
 }
 
 const DetailsRowCard: FC<DetailsRowProps> = ({
@@ -29,7 +31,13 @@ const DetailsRowCard: FC<DetailsRowProps> = ({
     linkHref,
     linkText,
     children,
+    Route,
+    dropdown,
 }) => {
+    const router = useRouter();
+    const handleNavigate = (route: string) => {
+        router.push(route);
+    };
     return (
         <div className="flex flex-col mb-8">
             <div className="flex justify-between mb-2">
@@ -37,11 +45,14 @@ const DetailsRowCard: FC<DetailsRowProps> = ({
                     <h3 className="font-bold text-xl">{title}</h3>
                     {subheader && <p className="text-sm">{subheader}</p>}{' '}
                 </div>
-                {linkHref && (
-                    <Link href={linkHref}>
-                        <a className="text-blue-500">{linkText}</a>
-                    </Link>
-                )}
+                <a
+                    style={{ cursor: 'pointer' }}
+                    className="text-blue-500"
+                    onClick={() => handleNavigate(Route)}
+                >
+                    {linkText}
+                </a>
+                {dropdown}
             </div>
             <div className="flex gap-4 my-5 w-full overflow-x-auto">
                 {children}
@@ -75,7 +86,7 @@ const LandlordDash: FC = () => {
             : getMyPropertiesLoading;
 
     useEffect(() => {
-        const allProperties = getProperties?.data.data;
+        const allProperties = getMyProperties?.data.data;
 
         let occupied = 0;
         let vacant = 0;
@@ -97,9 +108,15 @@ const LandlordDash: FC = () => {
     const totalProperties = occupiedCount + vacantCount;
     const occupiedPercentage = (occupiedCount / totalProperties) * 100;
 
-    console.log(occupiedPercentage, 'percentage');
-    console.log(occupiedCount, 'count');
+    const propertie = getMyProperties?.data.data.map((property) => ({
+        value: property.id,
+        label: property.name,
+    }));
 
+    const getPropertyName = (id: string) => {
+        const property = propertie?.find((p) => p.value === id);
+        return property?.label;
+    };
     useEffect(() => {
         async function fetchData() {
             const tenantData = await getLandlordTenant(states?.user?.id);
@@ -124,7 +141,7 @@ const LandlordDash: FC = () => {
                 <section className="py-10 px-8">
                     <div className="flex flex-col lg:flex-row justify-between lg:mb-5">
                         <div className="lg:w-1/2 lg:mr-5 mb-5 lg:mb-0">
-                            <div className="px-8 bg-white rounded-md">
+                            <div className="px-8 bg-white rounded-md pt-5">
                                 <DetailsRowCard title="Property Management">
                                     <div className="flex ml-3 gap-5">
                                         <Box
@@ -150,67 +167,121 @@ const LandlordDash: FC = () => {
                             </div>
                         </div>
                         <div className="lg:w-1/2 lg:ml-5">
-                            <div className="px-8 bg-white rounded-md ">
-                                <DetailsRowCard title="Properties">
-                                    <div className="flex flex-col lg:flex-row justify-between lg:mb-5">
-                                        <div className="flex items-center">
-                                            <CircularProgressbar
-                                                value={occupiedPercentage}
-                                                text={totalProperties}
-                                                className="mb-4 lg:mb-0"
-                                                styles={buildStyles({
-                                                    rotation: 0.25,
-                                                    // strokeLinecap: 'butt',
-                                                    textSize: '16px',
-                                                    pathTransitionDuration: 0.5,
-                                                    pathColor: `rgba(222, 80, 0, 1), ${
-                                                        occupiedPercentage / 100
-                                                    })`,
-                                                    trailColor: '#8D03CE',
-                                                })}
-                                            />
+                            <div className="px-8 bg-white rounded-md pt-5">
+                                <DetailsRowCard
+                                    title="Properties"
+                                    linkText="View Properties"
+                                    Route="/dashboard/properties"
+                                >
+                                    {/* <div className="flex flex-col lg:flex-row justify-between lg:mb-5"> */}
+                                    {/* <div className="flex items-center"> */}
+                                    <CircularProgressbar
+                                        value={occupiedPercentage}
+                                        text={totalProperties}
+                                        className="mb-4 lg:mb-0"
+                                        styles={buildStyles({
+                                            rotation: 0.25,
+                                            // strokeLinecap: 'butt',
+                                            textSize: '16px',
+                                            pathTransitionDuration: 0.5,
+                                            pathColor: `rgba(222, 80, 0, 1), ${
+                                                occupiedPercentage / 100
+                                            })`,
+                                            trailColor: '#8D03CE',
+                                        })}
+                                    />
+                                    {/* </div> */}
+                                    <div className="flex flex-col justify-center mt-2">
+                                        {' '}
+                                        <div className="mb-4 lg:mb-0 flex gap-2 ">
+                                            <div
+                                                className="w-4 h-4"
+                                                style={{
+                                                    backgroundColor: '#8D03CE',
+                                                }}
+                                            ></div>
+                                            <p className="text-sm">
+                                                {vacantCount} Vacant
+                                            </p>
                                         </div>
-                                        <div className="flex flex-col justify-center mt-2 ml-2">
-                                            {' '}
-                                            <div className="mb-4 lg:mb-0 flex gap-2 ">
-                                                <div
-                                                    className="w-4 h-4"
-                                                    style={{
-                                                        backgroundColor:
-                                                            '#8D03CE',
-                                                    }}
-                                                ></div>
-                                                <p className="text-sm">
-                                                    {vacantCount} Vacant
-                                                </p>
-                                            </div>
-                                            <div className="mb-4 lg:mb-0 flex gap-1 ">
-                                                <div
-                                                    className="w-4 h-4  mr-2"
-                                                    style={{
-                                                        backgroundColor:
-                                                            'rgba(222, 80, 0, 1)',
-                                                    }}
-                                                ></div>
-                                                <p className="text-sm">
-                                                    {occupiedCount} Occupied
-                                                </p>
-                                            </div>
+                                        <div className="mb-4 lg:mb-0 flex gap-2 ">
+                                            <div
+                                                className="w-4 h-4"
+                                                style={{
+                                                    backgroundColor:
+                                                        'rgba(222, 80, 0, 1)',
+                                                }}
+                                            ></div>
+                                            <p className="text-sm">
+                                                {occupiedCount} Occupied
+                                            </p>
                                         </div>
                                     </div>
+                                    {/* </div> */}
                                 </DetailsRowCard>
                             </div>
                         </div>
                     </div>
-                    <div className="mt-5 bg-white rounded-md">
+                    <div className="mt-5 bg-white rounded-md pt-5 px-8">
                         <DetailsRowCard
                             title="Tenants"
                             subheader="List of your tenants"
+                            dropdown={
+                                <Dropdown
+                                    title={
+                                        getPropertyName(
+                                            states?.propertyId as string
+                                        ) || 'All Properties'
+                                    }
+                                    className="border border-[#BEBCBC] rounded-lg text-[18px] text-black"
+                                    ulClassName="bg-white drop-shadow-t-xs"
+                                    btnClasssName="py-4 px-3"
+                                >
+                                    <li
+                                        key="all"
+                                        className={`py-4 px-3 text-black border-b border-[#E7E5E5] last:border:0 cursor-pointer hover:bg-slate-50 ${
+                                            states?.propertyId === '' &&
+                                            'bg-slate-50'
+                                        }`}
+                                    >
+                                        <button
+                                            onClick={(e) => {
+                                                states?.setPropertyId('');
+                                            }}
+                                        >
+                                            All Properties
+                                        </button>
+                                    </li>
+                                    {propertie?.map((property) => (
+                                        <li
+                                            key={property.value}
+                                            className={`py-4 px-3 text-black border-b border-[#E7E5E5] last:border:0 cursor-pointer hover:bg-slate-50 ${
+                                                states?.propertyId ===
+                                                    property.value &&
+                                                'bg-slate-50'
+                                            }`}
+                                        >
+                                            <button
+                                                data-id={property.value}
+                                                onClick={(e) => {
+                                                    states?.setPropertyId(
+                                                        e.currentTarget.dataset
+                                                            .id as string
+                                                    );
+                                                }}
+                                                className="whitespace-nowrap"
+                                            >
+                                                {property.label}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </Dropdown>
+                            }
                         >
                             <TenantTable tenants={tenants} />
                         </DetailsRowCard>
                     </div>
-                    <div className="mt-5 bg-white rounded-md">
+                    <div className="mt-5 bg-white rounded-md pt-5 px-8">
                         <DetailsRowCard title="My Units">
                             {Array.isArray(properties) && properties.length ? (
                                 properties.map((property) => (

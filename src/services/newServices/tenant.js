@@ -43,7 +43,6 @@ export async function getTenantFiles(tenantId) {
     });
 }
 
-
 export async function getPropertyTenant(propertyId) {
     return request(`${API_URL}/tenants/property/${propertyId}`, {
         method: 'get',
