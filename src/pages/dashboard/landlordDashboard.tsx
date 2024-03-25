@@ -31,7 +31,7 @@ const DetailsRowCard: FC<DetailsRowProps> = ({
     children,
 }) => {
     return (
-        <div className="flex flex-col mb-8">
+        <div className="flex flex-col mb-8 p-8">
             <div className="flex justify-between mb-2">
                 <div>
                     <h3 className="font-bold text-xl">{title}</h3>
@@ -97,8 +97,6 @@ const LandlordDash: FC = () => {
     const totalProperties = occupiedCount + vacantCount;
     const occupiedPercentage = (occupiedCount / totalProperties) * 100;
 
-    console.log(occupiedPercentage, 'percentage');
-    console.log(occupiedCount, 'count');
 
     useEffect(() => {
         async function fetchData() {
