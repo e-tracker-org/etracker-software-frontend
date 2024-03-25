@@ -37,7 +37,14 @@ export default function SendReceipt({
         createTransactionLoading,
     } = useTenant();
     // const receiptCategories = getReceiptCategories?.data;
-    const receiptCategories = ['Rent', 'Water Bill', 'Light Bill'];
+    const receiptCategories = [
+        'Rent',
+        'Water Bill',
+        'Light Bill',
+        'Waste Bill',
+        'Security Bill',
+        'Service Charge',
+    ];
 
     const {
         handleSubmit,
