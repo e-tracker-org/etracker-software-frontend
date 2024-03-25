@@ -12,6 +12,8 @@ import { useMutation } from '@tanstack/react-query';
 import { AuthService } from 'services';
 import { toast } from 'react-hot-toast';
 import { useAppStore } from 'hooks/useAppStore';
+import PropertyListingCard from 'components/dashboard/properties/property-listing/PropertyListingCard';
+import { getAllGeneralProperties } from 'services/newServices/properties';
 
 const SERVICES = [
     {
@@ -34,7 +36,32 @@ const SERVICES = [
     },
 ];
 
+
+
+
 export default function Home() {
+
+    const [properties, setProperties] = useState([]);
+
+    useEffect(() => {
+        const storedProperty = localStorage.getItem('filteredProperties');
+
+        const property = JSON.parse(storedProperty as any);
+
+        if (property) {
+
+            setProperties(property);
+
+            return;
+        }
+
+        async function fetchData() {
+            const propertyData = await getAllGeneralProperties();
+            setProperties(propertyData);
+        }
+        fetchData();
+    }, []);
+
     return (
         <>
             <section className="py-[39px]">
@@ -110,6 +137,21 @@ export default function Home() {
                     </section>
                     <PropertySearch />
                 </section>
+                {/* <section className="flex flex-col items-center gap-10 my-20"> */}
+                <section className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 w-full mb-10 min-h-[300px] ">
+                    {Array.isArray(properties) && properties.length ? (
+                        properties.map((property) => (
+                            <div key={property?.id} className="w-full">
+                                <PropertyListingCard property={property} />
+                            </div>
+                        ))
+                    ) : (
+                        <p className="flex justify-center items-center text-center text-xl w-full">
+                            No property record found
+                        </p>
+                    )}
+                </section>
+                {/* <PropertyListingCard properties={properties} /> */}
                 <section
                     id="aboutus"
                     className="flex flex-col items-center gap-10 my-20"

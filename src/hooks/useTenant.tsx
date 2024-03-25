@@ -7,6 +7,7 @@ const useTenant = (
     reqObj?: {
         propertyId?: string | undefined;
         searchParam?: string | undefined;
+        email?: string | undefined;
     },
     id?: string | undefined
 ) => {

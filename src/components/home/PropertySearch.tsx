@@ -11,11 +11,7 @@ export default function PropertySearch() {
     const [city, setCity] = useState('');
     const [type, setType] = useState('');
     const [price, setPrice] = useState('');
-    const [properties, setProperties] = useState('');
-
-    const handleSearch = () => {
-        alert('searching for... ' + " "+ city + type + price)
-    } 
+    const [properties, setProperties] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -25,26 +21,83 @@ export default function PropertySearch() {
         fetchData();
     }, []);
 
-    // function extractPropertyInfoFromArray(properties: any) {
-    //     return properties.map((property: { number_of_bedrooms: any; location: any; apartmentType: any; }) => {
-    //         const { number_of_bedrooms, location, apartmentType } = property;
-    //         const city = location.city;
-    //         const state = location.state;
+    function extractPropertyInfoFromArray(properties: any) {
+        if(properties){
+        return properties.map((property: { number_of_bedrooms: any; location: any; apartmentType: any; }) => {
+            const { number_of_bedrooms, location, apartmentType } = property;
+            const city = location.city;
+            const state = location.state;
             
-    //         return {
-    //             number_of_bedrooms,
-    //             location: `${city}, ${state}`,
-    //             apartmentType
-    //         };
-    //     });
-    // }
+            return {
+                number_of_bedrooms,
+                location: `${city}`,
+                apartmentType
+            };
+        });
+    }
+    }
 
+    const parsePriceRange = (range: any) => {
+        const [min, max] = range.split('-').map((value: string) => {
+            value = value.trim().toLowerCase();
+            if (value.endsWith('k')) {
+                return parseInt(value) * 1000;
+            } else if (value.endsWith('m')) {
+                return parseInt(value) * 1000000;
+            } else {
+                return parseInt(value);
+            }
+        });
+    
+        return [min, max];
+    };
 
-    // const extractedInfoArray = extractPropertyInfoFromArray(properties);
+    const handleSearch = () => {
 
+        const searchQuery = {
+            city,
+            type,
+            price
+        };
 
+        if (!searchQuery || Object.keys(searchQuery).length === 0) {
+            return properties;
+        }
 
-    // console.log('properties', extractedInfoArray)
+        const [minPrice, maxPrice] = parsePriceRange(price);
+
+        const filteredProperties = properties.filter(property => {
+            // @ts-ignore
+            const cityMatch = !city || property.location.city.toLowerCase() === city.toLowerCase();
+            // @ts-ignore
+            const typeMatch = !type || property.apartmentType.toLowerCase() === type.toLowerCase();
+            // @ts-ignore
+            const priceMatch = property.price >= minPrice && property.price <= maxPrice;
+
+            return cityMatch && typeMatch && priceMatch;
+    
+        });
+
+        if (filteredProperties.length > 0) {
+
+            localStorage.setItem('filteredProperties', JSON.stringify(filteredProperties));
+
+            window.location.reload()
+    
+        } else {
+
+            localStorage.setItem('filteredProperties', JSON.stringify(properties));
+
+            alert("No properties found matching the search criteria.");
+
+            window.location.reload()
+        }
+    
+        return filteredProperties;
+    };
+
+    const extractedInfoArray = extractPropertyInfoFromArray(properties);
+
 
     return (
         <nav
@@ -101,8 +154,9 @@ export default function PropertySearch() {
                                 className="text-black bg-transparent font-medium mx-auto py-2 pr-1 focus:outline-none md:min-w-[90px] w-full"
                             >
                                 <option value="">Select</option>
-                                <option value="Lagos">Lagos</option>
-                                <option value="Abuja">Abuja</option>
+                                {extractedInfoArray?.map((state: any, i: any) => (
+                                <option key={i} value={state?.location}>{state?.location}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -122,6 +176,7 @@ export default function PropertySearch() {
                                 className="text-black bg-transparent font-medium mx-auto py-2 pr-1 focus:outline-none md:min-w-[90px] w-full"
                             >
                                 <option value="">Select</option>
+                                <option value="flat">Flat</option>
                                 <option value="mini-flat">Mini Flat</option>
                                 <option value="one-bed">One Bedroom</option>
                                 <option value="two-bed">Two Bedroom</option>
@@ -149,7 +204,7 @@ export default function PropertySearch() {
                                 className="text-black bg-transparent mx-auto font-medium py-2 pr-1 focus:outline-none md:min-w-[90px] w-full"
                             >
                                 <option value="">Select</option>
-                                <option value="100-1M">100-1M</option>
+                                <option value="100k-1M">100-1M</option>
                                 <option value="1M - 500M">1M - 500M</option>
                             </select>
                         </div>
