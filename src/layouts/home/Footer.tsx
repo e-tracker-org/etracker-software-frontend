@@ -210,7 +210,7 @@ const Footer = () => {
                     </Link>
                 </div>
                 <div className="py-4 my-6 md:my-10 md:text-right font-normal text-sm self-start">
-                    &copy; 2022 E-Tracka Limited. All rights reserved.
+                &copy; {1900 + new Date().getYear()} E-Tracka Limited. All rights reserved.
                 </div>
             </div>
             <p className="text-xs mb-10 lg:w-5/6">
