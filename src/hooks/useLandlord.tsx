@@ -1,40 +1,46 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { TenantService } from 'services';
-import { LandlordService } from 'services/landlord';
+import { LandlordService, endAgreementTenantProp } from 'services/landlord';
 import { PropertyService } from 'services/property';
 
 const useLandlord = (id?: string | undefined) => {
     const queryClient = useQueryClient();
-    // const { data: getTenants, isLoading: getTenantLoading } = useQuery(
-    //     'getTenants',
-    //     LandlordService.getAllTenants
-    // );
 
-    const { mutateAsync: getLandlordTenants, isLoading } = useMutation({
+    const {
+        mutateAsync: getLandlordTenants,
+        isLoading: getLandlordTenantsLoading,
+    } = useMutation({
         mutationFn: LandlordService.searchLandlordTenant,
-        // onSuccess: () => {},
     });
 
     const { mutateAsync: addLandlordTenant, isLoading: isAddTenantLoading } =
         useMutation({
             mutationFn: LandlordService.createLandlordTenant,
-            // onSuccess: () => {},
         });
 
     const { mutateAsync: confirmTenant, isLoading: isConfirmTenantLoading } =
         useMutation({
             mutationFn: LandlordService.confirmTenant,
-            // onSuccess: () => {},
         });
+
+    const {
+        mutateAsync: endTenantAgreement,
+        isLoading: isEndTenantAgreementLoading,
+    } = useMutation<unknown, unknown, endAgreementTenantProp>(
+        (props: endAgreementTenantProp) =>
+            LandlordService.endTenantAgreement(props)
+    );
 
     return {
         getLandlordTenants,
-        isLoading,
+        getLandlordTenantsLoading,
         addLandlordTenant,
         isAddTenantLoading,
         confirmTenant,
         isConfirmTenantLoading,
+        endTenantAgreement,
+        isEndTenantAgreementLoading,
     };
 };
 

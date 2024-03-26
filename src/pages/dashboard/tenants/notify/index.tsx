@@ -4,10 +4,12 @@ import { useAppStore } from 'hooks/useAppStore';
 import useTenant from 'hooks/useTenant';
 import { useEffect, useState } from 'react';
 import { User } from 'interfaces';
-
+import { notifyTenant } from 'services/newServices/notify';
 import Button from 'components/base/Button';
 import { toast } from 'react-hot-toast';
 import { Router, useRouter } from 'next/router';
+import { getLandlordTenant } from 'services/newServices/tenant';
+import { getAllTenants } from 'services/newServices/tenant';
 
 interface NotifyTenantType {
     id: string;
@@ -19,6 +21,7 @@ interface NotifyTenantType {
 export default function NotifyTenants() {
     const states = useAppStore();
     const router = useRouter();
+    const tenantIds = states?.selectedTenants as string | undefined;
     const {
         getTenants,
         getTenantLoading,
@@ -26,28 +29,46 @@ export default function NotifyTenants() {
         isNotifyTenantLoading,
     } = useTenant();
     const [tenants, setTenants] = useState<NotifyTenantType[]>([]);
-    const tenantIds = states?.selectedTenants;
+    const [landlordTenants, setLandlordTenants] = useState([]);
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState<'email' | 'phone'>('email');
 
-    const landlordTenants = getTenants?.data;
+    useEffect(() => {
+        // setLoading(true);
+
+        async function fetchData() {
+            const tenantData = await getLandlordTenant(states?.user?.id);
+            console.log('okay', tenantData);
+            setLandlordTenants(tenantData);
+            // setLoading(false);
+        }
+        if (states?.user?.id) {
+            fetchData();
+        }
+    }, [states]);
 
     useEffect(() => {
-        const arr = [] as NotifyTenantType[];
-        Array.isArray(landlordTenants) &&
-            landlordTenants?.forEach(
-                (tenant: User) =>
-                    tenantIds?.includes(tenant.id) &&
-                    arr.push({
-                        id: tenant.id,
-                        email: tenant.email,
-                        phone: tenant.phone,
-                        name: tenant.firstname + ' ' + tenant.lastname,
-                    })
-            );
-        setTenants(arr);
+        if (!Array.isArray(tenantIds)) return;
 
-        // eslint-disable-next-line
+        const arr = [] as NotifyTenantType[];
+
+        const filteredTenants = landlordTenants.filter((tenant: any) =>
+            tenantIds.includes(tenant.tenantData.userId)
+        );
+
+        filteredTenants.forEach(({ tenantData, userData }: any) => {
+            const { userId } = tenantData;
+            const { firstname, email, phone } = userData;
+
+            arr.push({
+                id: userId,
+                email,
+                phone,
+                name: firstname,
+            });
+        });
+
+        setTenants(arr);
     }, [tenantIds, landlordTenants]);
 
     const handleSendMessage = async () => {
@@ -80,13 +101,6 @@ export default function NotifyTenants() {
         }
     };
 
-    const handleGenerateReceipt = (tenant) => {
-        router.push({
-            pathname: '/bill-receipt',
-            query: tenant, // Pass tenant information as query parameters
-        });
-    };
-
     return (
         <div>
             <DashboardHeader
@@ -105,7 +119,7 @@ export default function NotifyTenants() {
                         >
                             <span
                                 role="button"
-                                onClick={() => setMessageType('phone')}
+                                // onClick={() => setMessageType('phone')}
                             >
                                 Phonenumber
                             </span>
@@ -189,9 +203,6 @@ export default function NotifyTenants() {
                         </Button>
                     </div>
                 </div>
-                <Button onClick={() => handleGenerateReceipt(tenant)}>
-                    Generate Bill Receipt
-                </Button>
             </section>
         </div>
     );

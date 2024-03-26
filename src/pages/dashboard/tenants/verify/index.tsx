@@ -59,7 +59,7 @@ export default function VeriifyTenants() {
                             </li>
                         </Dropdown>
 
-                        {/* <Button
+                        <Button
                             className="flex items-center max-h-[47px] !text-base !font-bold px-8 py-3"
                             onClick={() => {
                                 router.push(
@@ -68,7 +68,7 @@ export default function VeriifyTenants() {
                             }}
                         >
                             Verify Tenants
-                        </Button> */}
+                        </Button>
                     </div>
                 </div>
             </DashboardHeader>
