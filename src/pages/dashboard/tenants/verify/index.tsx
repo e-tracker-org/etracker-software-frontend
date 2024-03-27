@@ -8,6 +8,7 @@ import DashboardHeader from 'components/dashboard/Header';
 import { useAppStore } from 'hooks/useAppStore';
 import useTenant from 'hooks/useTenant';
 import { getLandlordTenant } from '../../../../services/newServices/tenant';
+import { completeTask } from '../../../../services/newServices/tenant';
 
 export default function VeriifyTenants() {
     const router = useRouter();
@@ -15,21 +16,32 @@ export default function VeriifyTenants() {
     const states = useAppStore();
 
     const [tenants, setTenants] = useState([]);
-
+    const [shouldRemount, setShouldRemount] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [filter, setFilter] = useState('all');
 
-    useEffect(() => {
+    console.log(tenants, 'tenantData');
+
+    const fetchData = async () => {
         setLoading(true);
-
-        async function fetchData() {
+        try {
             const tenantData = await getLandlordTenant(states?.user?.id);
             setTenants(tenantData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
             setLoading(false);
         }
-        if (states?.user?.id) {
-            fetchData();
-        }
+    };
+
+    useEffect(() => {
+        fetchData();
     }, [states]);
+
+    const handleRemount = async () => {
+        setShouldRemount((prevState) => !prevState);
+        fetchData(); // Call fetchData again to refresh data
+    };
 
     return (
         <div className="">
@@ -45,16 +57,28 @@ export default function VeriifyTenants() {
                             className="bg-white"
                             ulClassName="bg-white rounded-lg dropdown-shadow min-w-[220px] text-gray-700 font-medium"
                         >
-                            <li className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer">
+                            <li
+                                className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer"
+                                onClick={() => setFilter('all')}
+                            >
                                 All Request
                             </li>
-                            <li className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer">
+                            <li
+                                className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer"
+                                onClick={() => setFilter('complete')}
+                            >
                                 Complete Request
                             </li>
-                            <li className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer">
+                            <li
+                                className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer"
+                                onClick={() => setFilter('pending')}
+                            >
                                 Pending Request
                             </li>
-                            <li className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer">
+                            <li
+                                className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer"
+                                onClick={() => setFilter('incomplete')}
+                            >
                                 Incomplete Request
                             </li>
                         </Dropdown>
@@ -73,7 +97,12 @@ export default function VeriifyTenants() {
                 </div>
             </DashboardHeader>
 
-            <TenantTable tenants={tenants} />
+            <TenantTable
+                tenants={tenants}
+                shouldRemount={shouldRemount}
+                handleRemount={handleRemount}
+                filter={filter}
+            />
         </div>
     );
 }

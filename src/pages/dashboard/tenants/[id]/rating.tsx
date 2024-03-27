@@ -3,7 +3,10 @@ import { SetStateAction, useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Button from 'components/base/Button';
-import { getTenantFiles, updateTenantRating } from 'services/newServices/tenant';
+import {
+    getTenantFiles,
+    updateTenantRating,
+} from 'services/newServices/tenant';
 import RatingModal from 'components/dashboard/tenants/RatingModal';
 import { createRating, getTenantRating } from 'services/newServices/rating';
 import { DialogModal } from 'components/base/DialogModal';
@@ -12,7 +15,7 @@ import { useAppStore } from 'hooks/useAppStore';
 import toast from 'react-hot-toast';
 // import { UserService } from 'services';
 
-function TenantRating({ tenant }: any) {
+function TenantRating({ tenant, show }: any) {
     const states = useAppStore();
     const landlordId = states?.user?.id;
     const { query } = useRouter();
@@ -26,7 +29,7 @@ function TenantRating({ tenant }: any) {
     // const updateUser = UserService.updateUser;
     const tenantRating = tenant.rating ?? 0;
 
-    console.log('tenant', tenant)
+    console.log('tenant', tenant);
 
     useEffect(() => {
         if (tenant) {
@@ -43,7 +46,7 @@ function TenantRating({ tenant }: any) {
             } else if (tenant.profileImage && tenant.profileImage !== '') {
                 ratingValue = 20;
             }
-            if(fileCount>0){
+            if (fileCount > 0) {
                 ratingValue += 10;
             }
 
@@ -53,10 +56,10 @@ function TenantRating({ tenant }: any) {
 
     const handleRating = async () => {
         setIsLoading(true);
-        const updatedRating = value;  // removing this bevause we still need other calculations from frontend
+        const updatedRating = value; // removing this bevause we still need other calculations from frontend
         // const updatedRating = value + tenantRating;
 
-        console.log('value', value)
+        console.log('value', value);
         try {
             const payload = {
                 ratingUpdate: updatedRating,
@@ -64,24 +67,25 @@ function TenantRating({ tenant }: any) {
             const response = await updateTenantRating(payload, id);
 
             if (response.status === 200) {
-
                 const storedTenant = localStorage.getItem('selectedTenant');
 
                 if (storedTenant) {
-
                     const tenant = JSON.parse(storedTenant);
-                    
-                    tenant.userData.rating = tenant.userData.rating + updatedRating;
 
-                    localStorage.setItem('selectedTenant', JSON.stringify(tenant));
+                    tenant.userData.rating =
+                        tenant.userData.rating + updatedRating;
+
+                    localStorage.setItem(
+                        'selectedTenant',
+                        JSON.stringify(tenant)
+                    );
                 }
                 setIsLoading(false);
                 setIsModalOpen(false);
-                toast.success('Tenant rating updated successfully')
+                toast.success('Tenant rating updated successfully');
                 window.location.reload();
-
             } else {
-                toast.error('User profile update failed:')
+                toast.error('User profile update failed:');
                 console.error('User profile update failed:', response.message);
             }
         } catch (error) {
@@ -110,7 +114,6 @@ function TenantRating({ tenant }: any) {
         }
     };
 
-
     return (
         <div>
             <main className="flex flex-col gap-5 items-center justify-center mb-5">
@@ -129,7 +132,9 @@ function TenantRating({ tenant }: any) {
                     })}
                 />
                 <div>
-                    <Button title="Modify Rating" onClick={openModal} />
+                    {show ? (
+                        <Button title="Modify Rating" onClick={openModal} />
+                    ) : null}
                 </div>
                 <DialogModal
                     openModal={isModalOpen}

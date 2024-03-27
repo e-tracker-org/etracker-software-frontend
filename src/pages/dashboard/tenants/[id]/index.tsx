@@ -9,11 +9,18 @@ import useTenant from 'hooks/useTenant';
 import { Transaction, User } from 'interfaces';
 import useFileUploadHandler from 'hooks/useFileUploadHandler';
 import Spinner from 'components/base/Spinner';
-import { getTenantFiles, getTenantTransactions } from 'services/newServices/tenant';
+import {
+    getTenantFiles,
+    getTenantTransactions,
+} from 'services/newServices/tenant';
 import { useAppStore } from 'hooks/useAppStore';
 import { getFormattedDate } from 'services/config/config';
 import TenantRating from './rating';
 import { extractAndCapitalizeWords } from 'utils/helper';
+import useLandlord from 'hooks/useLandlord';
+import toast from 'react-hot-toast';
+import { string } from 'yup';
+import { getLandlordTenant } from 'services/newServices/tenant';
 
 interface DetailsProps {
     label?: string;
@@ -51,9 +58,16 @@ const DetailsRowCard: FC<DetailsRowProps> = ({ title, children }) => {
 export default function TenantDetails() {
     const { query } = useRouter();
     const states = useAppStore();
+    const { endTenantAgreement, isEndTenantAgreementLoading } = useLandlord();
 
     const id = query?.id as string | undefined;
+    // const propertyId = states?.propertyId as string;
     const [tenant, setTenant] = useState({} as User);
+    const [tenantProperty, setTenantProperty] = useState([]);
+    const [tenantId, setTenantId] = useState('');
+    const [propertyId, setPropertyId] = useState('');
+    console.log(tenantId, 'tenantId');
+    console.log(propertyId, 'propertyId');
 
     const { uploadedFiles, loadinguploadFiles } = useFileUploadHandler(
         'PROFILE',
@@ -65,15 +79,18 @@ export default function TenantDetails() {
             try {
                 const storedTenant = localStorage.getItem('selectedTenant');
                 const tenant = JSON.parse(storedTenant || '');
-    
+
                 if (tenant) {
                     setTenant(tenant.userData);
                 }
-    
+
                 const tenantFilesCount = await getTenantFiles(id);
-                
-                localStorage.setItem('selectedTenantFilesCount', tenantFilesCount.length || 0);
-    
+
+                localStorage.setItem(
+                    'selectedTenantFilesCount',
+                    tenantFilesCount.length || 0
+                );
+
                 // if (tenantFilesCount.length > 0) {
                 //     setFiles(10);
                 // } else {
@@ -83,12 +100,65 @@ export default function TenantDetails() {
                 console.error('Error fetching tenant transactions:', error);
             }
         }
-    
+
         if (id) {
             fetchData();
         }
     }, [id]);
 
+    useEffect(() => {
+        async function fetchData() {
+            const tenantData = await getLandlordTenant(states?.user?.id);
+            console.log('okay', tenantData);
+            setTenantProperty(tenantData);
+        }
+        if (states?.user?.id) {
+            fetchData();
+        }
+    }, [states]);
+
+    useEffect(() => {
+        if (!Array.isArray(tenantProperty) || tenantProperty.length === 0)
+            return;
+
+        const filteredTenants = tenantProperty.filter((tenant: any) =>
+            id?.includes(tenant.tenantData.userId)
+        );
+
+        console.log(filteredTenants, 'filteredTenants');
+
+        // Check if there are filtered tenants and if tenantId is not already set
+        if (filteredTenants.length > 0 && !tenantId) {
+            const firstFilteredTenant = filteredTenants[0]; // Get the first filtered tenant
+            const { userId, propertyId } = firstFilteredTenant.tenantData;
+            setTenantId(userId);
+            setPropertyId(propertyId);
+        }
+
+        // setPropertyIdsAndIds(propertyIdsAndIdsObject);
+    }, [id, tenantProperty]);
+
+    const handleEndAgreement = async (propertyId: string, tenantId: string) => {
+        if (!propertyId) {
+            toast.error('Go back and select a property');
+            console.error('Property id is missing or invalid');
+            return;
+        }
+        console.log('loading....');
+
+        console.log(propertyId, 'propertyId when the function started');
+        console.log(tenantId, 'tenantId when the function started');
+
+        try {
+            const response = await endTenantAgreement({ propertyId, tenantId });
+            console.log(response, 'response');
+
+            toast.success('Tenant agreement successfully ended');
+        } catch (error) {
+            console.error('Error ending tenant agreement:', error);
+            toast.error('Failed to end tenant agreement');
+        }
+    };
 
     return (
         <div>
@@ -98,24 +168,23 @@ export default function TenantDetails() {
                     {/* <h3 className="ml-5">Ref ID-#1FA09123GH</h3> */}
                 </div>
                 {tenant?.isUserVerified && (
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                width="50"
-                                height="50"
-                            >
-                                <path
-                                    fill="#1DA1F2"
-                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.41 15.06l-4.24-4.24 1.41-1.41 2.83 2.83 7.07-7.07 1.41 1.41-8.48 8.48z"
-                                />
-                            </svg>
-                        )}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="50"
+                        height="50"
+                    >
+                        <path
+                            fill="#1DA1F2"
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.41 15.06l-4.24-4.24 1.41-1.41 2.83 2.83 7.07-7.07 1.41 1.41-8.48 8.48z"
+                        />
+                    </svg>
+                )}
                 <div className="flex">
                     <Button
                         title="End Agreement"
-                        onClick={() => {
-                            console.log('end agreement modal');
-                        }}
+                        isLoading={isEndTenantAgreementLoading}
+                        onClick={() => handleEndAgreement(propertyId, tenantId)}
                     />
                 </div>
             </header>
@@ -204,7 +273,7 @@ export default function TenantDetails() {
 
                 <div className="flex items-center justify-center ">
                     <DetailsRowCard title="Tenant Rating">
-                        <TenantRating tenant={tenant} />
+                        <TenantRating tenant={tenant} show={true} />
                     </DetailsRowCard>
                 </div>
 

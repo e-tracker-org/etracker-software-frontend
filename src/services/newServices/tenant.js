@@ -77,14 +77,14 @@ export async function updateTenantRating(body, tenantId) {
     });
 }
 
-export async function completeTask(body, tenantId) {
+export async function completeTask(tenantId) {
     return request(`${API_URL}/tenants/completed/${tenantId}`, {
         method: 'put',
         headers: {
             'Content-Type': 'application/json',
             Authorization: USER_TOKEN,
         },
-        body: JSON.stringify(body),
+        // body: JSON.stringify(body),
     });
 }
 

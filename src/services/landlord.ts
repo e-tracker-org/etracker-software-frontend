@@ -12,6 +12,11 @@ interface confirmTenantProp {
     propertyId: string;
 }
 
+export interface endAgreementTenantProp {
+    propertyId: string;
+    tenantId: string;
+}
+
 export const LandlordService = {
     async getAllTenants(): Promise<AxiosResponse<GenericResponse<User[]>>> {
         try {
@@ -39,7 +44,10 @@ export const LandlordService = {
         reqObj: createTenantProp[]
     ): Promise<AxiosResponse<GenericResponse<string>>> {
         try {
-            const { data } = await http.post(`/api/v1/landlord/addProperty`, reqObj);
+            const { data } = await http.post(
+                `/api/v1/landlord/addProperty`,
+                reqObj
+            );
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
@@ -65,6 +73,20 @@ export const LandlordService = {
     ): Promise<AxiosResponse<GenericResponse<User>>> {
         try {
             const { data } = await http.patch('/api/v1/user', reqObj);
+            return Promise.resolve(data);
+        } catch (error: any) {
+            return Promise.reject(error?.response.data);
+        }
+    },
+
+    async endTenantAgreement(
+        reqObj: endAgreementTenantProp
+    ): Promise<AxiosResponse<GenericResponse<string>>> {
+        try {
+            const { data } = await http.patch(
+                `/api/v1/landlord/end-tenant-agreement`,
+                reqObj
+            );
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);
