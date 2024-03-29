@@ -1,9 +1,18 @@
-// RatingModal.js
-
 import React from 'react';
-import PropTypes from 'prop-types';
 
-const RatingModal = ({ isOpen, onClose, title, children }) => {
+interface RatingModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    title: string;
+    children: React.ReactNode;
+}
+
+const RatingModal: React.FC<RatingModalProps> = ({
+    isOpen,
+    onClose,
+    title,
+    children,
+}) => {
     return (
         <div
             className={`fixed inset-0 flex items-center justify-center ${
@@ -41,13 +50,6 @@ const RatingModal = ({ isOpen, onClose, title, children }) => {
             </div>
         </div>
     );
-};
-
-RatingModal.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
-    children: PropTypes.node.isRequired,
 };
 
 export default RatingModal;
