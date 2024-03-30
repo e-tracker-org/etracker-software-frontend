@@ -21,6 +21,7 @@ import useLandlord from 'hooks/useLandlord';
 import toast from 'react-hot-toast';
 import { string } from 'yup';
 import { getLandlordTenant } from 'services/newServices/tenant';
+import { deleteTask } from 'services/newServices/tenant';
 
 interface DetailsProps {
     label?: string;
@@ -56,7 +57,7 @@ const DetailsRowCard: FC<DetailsRowProps> = ({ title, children }) => {
 };
 
 export default function TenantDetails() {
-    const { query } = useRouter();
+    const { query, router } = useRouter();
     const states = useAppStore();
     const { endTenantAgreement, isEndTenantAgreementLoading } = useLandlord();
 
@@ -130,8 +131,8 @@ export default function TenantDetails() {
         // Check if there are filtered tenants and if tenantId is not already set
         if (filteredTenants.length > 0 && !tenantId) {
             const firstFilteredTenant = filteredTenants[0]; // Get the first filtered tenant
-            const { userId, propertyId } = firstFilteredTenant.tenantData;
-            setTenantId(userId);
+            const { id, propertyId } = firstFilteredTenant.tenantData;
+            setTenantId(id);
             setPropertyId(propertyId);
         }
 
@@ -150,10 +151,10 @@ export default function TenantDetails() {
         console.log(tenantId, 'tenantId when the function started');
 
         try {
-            const response = await endTenantAgreement({ propertyId, tenantId });
-            console.log(response, 'response');
-
+            const deleteTenant = await deleteTask(tenantId);
+            console.log(deleteTenant);
             toast.success('Tenant agreement successfully ended');
+            router.back();
         } catch (error) {
             console.error('Error ending tenant agreement:', error);
             toast.error('Failed to end tenant agreement');

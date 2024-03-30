@@ -14,6 +14,8 @@ import Image from 'next/image';
 import { extractAndCapitalizeWords } from 'utils/helper';
 import { getFormattedDate } from 'services/config/config';
 import TenantRating from '../[id]/rating';
+import toast from 'react-hot-toast';
+import Button from 'components/base/Button';
 
 interface DetailsProps {
     label?: string;
@@ -70,7 +72,12 @@ export default function FindTenants() {
         const filteredTenant = tenants.filter((tenant: User) =>
             tenant.email.toLowerCase().includes(searchTerm.toLowerCase())
         );
-        setSearchedTenant(filteredTenant.length > 0 ? filteredTenant : null); // Update with null if no results found
+
+        if (filteredTenant.length === 0) {
+            toast.error('Email does not belong to a tenant');
+        } else {
+            setSearchedTenant(filteredTenant);
+        }
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -81,8 +88,16 @@ export default function FindTenants() {
     };
 
     const handleSearch = () => {
-        states?.setSearchParam(searchTerm?.trim());
-        searchTenant(searchTerm);
+        setLoading(true);
+        setTimeout(() => {
+            setLoading(false);
+            states?.setSearchParam(searchTerm?.trim());
+            searchTenant(searchTerm);
+        }, 1000);
+    };
+
+    const handleClose = () => {
+        setSearchedTenant(null);
     };
 
     return (
@@ -116,6 +131,7 @@ export default function FindTenants() {
                                         }}
                                         onKeyDown={handleKeyDown}
                                     />
+
                                     <div
                                         onClick={() => {
                                             handleSearch();
@@ -144,7 +160,7 @@ export default function FindTenants() {
                 </section>
             </main>
 
-            <section className="py-5 px-8 bg-white rounded-md">
+            <section className="py-5 px-8 bg-white rounded-md flex flex-col relative">
                 <Loader loading={loading} />
                 {searchedTenant !== null ? (
                     searchedTenant.map((tenant: User) => (
@@ -217,6 +233,17 @@ export default function FindTenants() {
                 ) : (
                     <div className="text-center">Search for tenant</div>
                 )}
+                <div className="absolute top-0 right-0 mt-2 mr-2">
+                    {searchedTenant ? (
+                        <Button
+                            className=" py-4"
+                            type="submit"
+                            onClick={() => handleClose()}
+                        >
+                            Close
+                        </Button>
+                    ) : null}
+                </div>
             </section>
         </div>
     );
