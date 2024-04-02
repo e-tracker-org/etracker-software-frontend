@@ -62,7 +62,7 @@ const TenantTable = ({
     };
 
     return (
-        <div className="p-5 bg-white hidden-x-scrollbar rounded-md">
+        <div style={{borderLeftColor: '#1F32EB', borderLeftWidth: 5 }} className="p-5 bg-white hidden-x-scrollbar rounded-md">
             <table className="w-full table-auto whitespace-nowrap text-gray-700 border-separate border-spacing-x-5 border-spacing-y-8 font-medium text-center">
                 <thead className="text-[#727070] text-xl">
                     <tr>

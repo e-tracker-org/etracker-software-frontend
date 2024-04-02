@@ -134,7 +134,7 @@ export default function Header({
                         />
                     </div>
                     <div className="flex items-center gap-6">
-                        <span role="button">
+                        {/* <span role="button">
                             <svg
                                 width="25"
                                 height="25"
@@ -164,8 +164,8 @@ export default function Header({
                                     strokeMiterlimit="10"
                                 />
                             </svg>
-                        </span>
-                        <span role="button">
+                        </span> */}
+                        {/* <span role="button">
                             <svg
                                 width="25"
                                 height="25"
@@ -182,7 +182,7 @@ export default function Header({
                                     fill="#9C9EA0"
                                 />
                             </svg>
-                        </span>
+                        </span> */}
                         <Dropdown
                             onClick={toggleOpen}
                             title={

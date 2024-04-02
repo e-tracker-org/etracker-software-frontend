@@ -14,6 +14,7 @@ import { getLandlordTenant } from 'services/newServices/tenant';
 import { ReceiptSvg, MoneySvg, VerifySvg } from 'assets/svgIcons/svgIcons';
 import { useRouter } from 'next/router';
 import Dropdown from 'components/base/Dropdown';
+import Image from 'next/image';
 
 interface DetailsRowProps {
     children?: ReactNode;
@@ -42,7 +43,7 @@ const DetailsRowCard: FC<DetailsRowProps> = ({
         <div className="flex flex-col mb-8 p-8">
             <div className="flex justify-between mb-2">
                 <div>
-                    <h3 className="font-bold text-xl">{title}</h3>
+                    <h3 style={{color: 'white'}} className="font-bold text-xl">{title}</h3>
                     {subheader && <p className="text-sm">{subheader}</p>}{' '}
                 </div>
                 <a
@@ -54,7 +55,7 @@ const DetailsRowCard: FC<DetailsRowProps> = ({
                 </a>
                 {dropdown}
             </div>
-            <div className="flex gap-4 my-5 w-full overflow-x-auto">
+            <div className="flex gap-2 my-5 w-full overflow-x-auto">
                 {children}
             </div>
         </div>
@@ -141,7 +142,7 @@ const LandlordDash: FC = () => {
                 <section className="py-10 px-8">
                     <div className="flex flex-col lg:flex-row justify-between lg:mb-5">
                         <div className="lg:w-1/2 lg:mr-5 mb-5 lg:mb-0">
-                            <div className="px-8 bg-white rounded-md pt-5">
+                            <div style={{backgroundColor: '#1F32EB'}} className="px-8 bg-white rounded-md pt-5">
                                 <DetailsRowCard title="Property Management">
                                     <div className="flex ml-3 gap-5">
                                         <Box
@@ -165,6 +166,11 @@ const LandlordDash: FC = () => {
                                     </div>
                                 </DetailsRowCard>
                             </div>
+                            <div  className="px-8 bg-white rounded-md pt-4">
+                                
+                            <Image src="/house.png" width={579} height={350} alt="e-tracka" />
+                               
+                            </div>
                         </div>
                         <div className="lg:w-1/2 lg:ml-5">
                             <div className="px-8 bg-white rounded-md pt-5">
@@ -182,11 +188,12 @@ const LandlordDash: FC = () => {
                                         styles={buildStyles({
                                             rotation: 0.25,
                                             // strokeLinecap: 'butt',
-                                            textSize: '16px',
+                                            textSize: '14px',
                                             pathTransitionDuration: 0.5,
                                             pathColor: `rgba(222, 80, 0, 1), ${
                                                 occupiedPercentage / 100
                                             })`,
+                                            
                                             trailColor: '#8D03CE',
                                         })}
                                     />
@@ -222,7 +229,7 @@ const LandlordDash: FC = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="mt-5 bg-white rounded-md pt-5 px-8">
+                    <div style={{borderLeftColor: '#1F32EB', borderLeftWidth: 5 }} className="mt-5 bg-white rounded-md pt-5 px-8">
                         <DetailsRowCard
                             title="Tenants"
                             subheader="List of your tenants"
@@ -281,7 +288,7 @@ const LandlordDash: FC = () => {
                             <TenantTable tenants={tenants} />
                         </DetailsRowCard>
                     </div>
-                    <div className="mt-5 bg-white rounded-md pt-5 px-8">
+                    <div style={{borderLeftColor: '#1F32EB', borderLeftWidth: 5 }} className="mt-5 bg-white rounded-md pt-5 px-8">
                         <DetailsRowCard title="My Units">
                             {Array.isArray(properties) && properties.length ? (
                                 properties.map((property) => (

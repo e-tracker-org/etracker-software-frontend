@@ -229,7 +229,7 @@ export const convertImageUrlToFile = (imageUrl: string): Promise<File> => {
 export const roleMenus: Record<Role, string[]> = {
     [Role.Landlord]: [
         'Dashboard',
-        'Inbox',
+        // 'Inbox',
         'Properties',
         // 'Maintenance',
         'Tenants',
