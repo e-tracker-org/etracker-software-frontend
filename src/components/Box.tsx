@@ -14,7 +14,7 @@ const Box: FC<BoxProps> = ({ title, icon, onClick, route }) => {
 
     return (
         <div
-            style={{ cursor: 'pointer', minWidth: 150  }}
+            style={{ cursor: 'pointer', minWidth: 130 }}
             className="bg-[#F3F4FD] rounded-lg p-4"
         >
             <a className="flex flex-col items-center" onClick={handleClick}>

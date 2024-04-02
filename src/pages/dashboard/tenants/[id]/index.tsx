@@ -22,6 +22,7 @@ import toast from 'react-hot-toast';
 import { string } from 'yup';
 import { getLandlordTenant } from 'services/newServices/tenant';
 import { deleteTask } from 'services/newServices/tenant';
+import useProperty from 'hooks/useProperty';
 
 interface DetailsProps {
     label?: string;
@@ -65,10 +66,12 @@ export default function TenantDetails() {
     // const propertyId = states?.propertyId as string;
     const [tenant, setTenant] = useState({} as User);
     const [tenantProperty, setTenantProperty] = useState([]);
-    const [tenantId, setTenantId] = useState('');
-    const [propertyId, setPropertyId] = useState('');
-    console.log(tenantId, 'tenantId');
-    console.log(propertyId, 'propertyId');
+    const { getProperty, getPropertyLoading } = useProperty(
+        tenantProperty?.propertyId
+    );
+
+    const property = getProperty?.data;
+    console.log(property?.address, 'property?.address');
 
     const { uploadedFiles, loadinguploadFiles } = useFileUploadHandler(
         'PROFILE',
@@ -80,9 +83,11 @@ export default function TenantDetails() {
             try {
                 const storedTenant = localStorage.getItem('selectedTenant');
                 const tenant = JSON.parse(storedTenant || '');
+                console.log(tenant, 'Tenant stored');
 
                 if (tenant) {
                     setTenant(tenant.userData);
+                    setTenantProperty(tenant.tenantData);
                 }
 
                 const tenantFilesCount = await getTenantFiles(id);
@@ -107,51 +112,14 @@ export default function TenantDetails() {
         }
     }, [id]);
 
-    useEffect(() => {
-        async function fetchData() {
-            const tenantData = await getLandlordTenant(states?.user?.id);
-            console.log('okay', tenantData);
-            setTenantProperty(tenantData);
-        }
-        if (states?.user?.id) {
-            fetchData();
-        }
-    }, [states]);
-
-    useEffect(() => {
-        if (!Array.isArray(tenantProperty) || tenantProperty.length === 0)
-            return;
-
-        const filteredTenants = tenantProperty.filter((tenant: any) =>
-            id?.includes(tenant.tenantData.userId)
-        );
-
-        console.log(filteredTenants, 'filteredTenants');
-
-        // Check if there are filtered tenants and if tenantId is not already set
-        if (filteredTenants.length > 0 && !tenantId) {
-            const firstFilteredTenant = filteredTenants[0]; // Get the first filtered tenant
-            const { id, propertyId } = firstFilteredTenant.tenantData;
-            setTenantId(id);
-            setPropertyId(propertyId);
-        }
-
-        // setPropertyIdsAndIds(propertyIdsAndIdsObject);
-    }, [id, tenantProperty]);
-
-    const handleEndAgreement = async (propertyId: string, tenantId: string) => {
-        if (!propertyId) {
-            toast.error('Go back and select a property');
-            console.error('Property id is missing or invalid');
-            return;
-        }
-        console.log('loading....');
-
-        console.log(propertyId, 'propertyId when the function started');
-        console.log(tenantId, 'tenantId when the function started');
-
+    const handleEndAgreement = async (tenantId: string) => {
+        const body = {
+            propert: property?.address,
+            name: tenant.firstname,
+            email: tenant.email,
+        };
         try {
-            const deleteTenant = await deleteTask(tenantId);
+            const deleteTenant = await deleteTask(tenantId, body);
             console.log(deleteTenant);
             toast.success('Tenant agreement successfully ended');
             router.back();
@@ -185,7 +153,7 @@ export default function TenantDetails() {
                     <Button
                         title="End Agreement"
                         isLoading={isEndTenantAgreementLoading}
-                        onClick={() => handleEndAgreement(propertyId, tenantId)}
+                        onClick={() => handleEndAgreement(tenantProperty?.id)}
                     />
                 </div>
             </header>

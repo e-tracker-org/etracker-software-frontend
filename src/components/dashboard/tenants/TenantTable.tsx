@@ -9,7 +9,7 @@ import { toast } from 'react-hot-toast';
 import SendReceipt from './SendReceipt';
 import { getFormattedDate } from 'services/config/config';
 
-const TenantTable = ({ tenants }: { tenants: any }) => {
+const TenantTable = ({ tenants, borderLeft = false }) => {
     const states = useAppStore();
     const router = useRouter();
     const modalRef = useRef<any>(null);
@@ -73,7 +73,7 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
         router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
     };
 
-    console.log('tenant', tenants)
+    console.log('tenant', tenants);
 
     return (
         <div className="relative">
@@ -102,7 +102,14 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                 </Button>
             )}
 
-            <div style={{borderLeftColor: '#1F32EB', borderLeftWidth: 5 }} className="p-5 bg-white hidden-x-scrollbar rounded-md">
+            <div
+                style={
+                    borderLeft
+                        ? { borderLeftColor: '#1F32EB', borderLeftWidth: 5 }
+                        : null
+                }
+                className="p-5 bg-white hidden-x-scrollbar rounded-md"
+            >
                 {tenants?.length === 0 ? (
                     <p className="text-center">
                         Add a tenant to your existing property
@@ -204,12 +211,20 @@ const TenantTable = ({ tenants }: { tenants: any }) => {
                                                         }
                                                     </span>
 
-                                                    {tenant?.userData?.isUserVerified && (
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                                                            <path fill="#1DA1F2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.41 15.06l-4.24-4.24 1.41-1.41 2.83 2.83 7.07-7.07 1.41 1.41-8.48 8.48z" />
+                                                    {tenant?.userData
+                                                        ?.isUserVerified && (
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 24 24"
+                                                            width="24"
+                                                            height="24"
+                                                        >
+                                                            <path
+                                                                fill="#1DA1F2"
+                                                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.41 15.06l-4.24-4.24 1.41-1.41 2.83 2.83 7.07-7.07 1.41 1.41-8.48 8.48z"
+                                                            />
                                                         </svg>
                                                     )}
-
                                                 </td>
                                                 <td className="py-6 px-14 ">
                                                     {getFormattedDate(
