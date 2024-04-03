@@ -234,7 +234,7 @@ export const roleMenus: Record<Role, string[]> = {
         // 'Maintenance',
         'Tenants',
         'Profile',
-        'Settings',
+        // 'Settings',
     ],
     [Role.Tenant]: [
         'Dashboard',

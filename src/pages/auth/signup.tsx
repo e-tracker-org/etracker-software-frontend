@@ -204,7 +204,7 @@ function SignUp() {
 }
 
 SignUp.getLayout = function getLayout(page: ReactElement) {
-    return <HomeLayout showFooter={false}>{page}</HomeLayout>;
+    return <HomeLayout showFooter={true}>{page}</HomeLayout>;
 };
 
 export default SignUp;

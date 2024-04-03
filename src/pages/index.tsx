@@ -18,19 +18,19 @@ import { getAllGeneralProperties } from 'services/newServices/properties';
 const SERVICES = [
     {
         title: 'Get data on properties',
-        img: '/service-1.png',
+        img: '/home/Properties.svg',
         content:
             'Buy, rent and gather information on real estate properties. As a tenant, you can also send personal chats to landlords and property managers.',
     },
     {
         title: 'Get data on landlords',
-        img: '/service-2.png',
+        img: '/home/Landlords.svg',
         content:
             'We give insights into their characteristics and characters which strengthen their agency&apos;s advertisement and promotion.',
     },
     {
         title: 'Get data on tenants',
-        img: '/service-3.png',
+        img: '/home/Tenants.svg',
         content:
             'We store tenancy data to improve your processes and enhance your ability to make an informed decision.',
     },
@@ -61,18 +61,20 @@ export default function Home() {
         <>
             <section className="py-[39px]">
                 <section className="relative mb-[130%] md:mb-[50%] lg:mb-[20%]">
-                    <section
+                    <section style={{padding: 100}}
                         className="flex items-center rounded-[12px]  justify-between lg:justify-center relative
                     gap-10 bg-[#E6F0F5] min-h-[400px] px-8 overflow-hidden "
                     >
-                        <div className="absolute z-10 md:relative w-4/6  md:w-3/5 flex flex-col gap-10 py-10 md:py-16 lg:py-20">
-                            <h1 className="text-xl lg:text-4xl font-bold">
+                        <div  style={{textAlign: 'center'}} className="absolute z-10 md:relative ">
+                            <button style={{backgroundColor: '#61C454', margin: 20, padding: 10, color: 'white', borderRadius: '20px', cursor: 'default'}}>🤝 We are the company that makes sure your properties are given to trusted individuals</button>
+                            <h1  className="text-xl lg:text-5xl font-bold">
                                 Your Trusted Partner for{' '}
                                 <span className="text-primary-600">
                                     Real Estate
                                 </span>{' '}
                                 Data and Property Management.
                             </h1>
+                            <br></br>
 
                             <p className="text-sm lg:text-lg font-medium">
                                 E-Tracka provides a complementary suite of
@@ -82,41 +84,48 @@ export default function Home() {
                             </p>
 
                             <Link href="/auth/signup">
-                                <button className="bg-primary-600 rounded-lg px-8 py-2 text-white font-semibold">
-                                    Sign up
+                                <button style={{marginTop: 10}} className="bg-primary-600 rounded-lg px-8 py-2 text-white font-semibold">
+                                    Get Started
                                 </button>
                             </Link>
 
-                            <div className="flex items-center gap-5 justify-between max-w-lg">
+                            <div style={{marginBottom: 50}} className="mx-auto flex lg:justify-center items-center gap-5 justify-between">
                                 <div className="">
-                                    <h3 className="text-sm lg:text-4xl">
-                                        200
+                                
+                                    <div className="text-sm lg:text-4xl">
+                                    
+                                    <Image src="/Home/Agents.svg" alt="" width={600} height={600} />
+                                        
                                         <span className="text-primary-600">
-                                            +
+                                        200  +
                                         </span>
-                                    </h3>
+                                       
+                                    </div>
+                                    
                                     <p className="font-medium text-xs lg:text-lg">
-                                        Agents & Developers
+                                        Agents
                                     </p>
                                 </div>
                                 <div className="">
-                                    <h3 className="text-sm lg:text-4xl">
-                                        1200
+                                    <div className="text-sm lg:text-4xl">
+                                        
+                                        <Image src="/Home/PropertyListing.svg" alt="" width={600} height={600} />
                                         <span className="text-primary-600">
-                                            +
+                                        1200  +
                                         </span>
-                                    </h3>
+                                    </div>
                                     <p className="font-medium text-xs lg:text-lg">
                                         Property Listing
                                     </p>
                                 </div>
                                 <div className="">
-                                    <h3 className="text-sm lg:text-4xl">
-                                        100
+                                    <div className="text-sm lg:text-4xl">
+                                    <Image src="/Home/AreasCoverd.svg" alt="" width={600} height={600} />
+                                        
                                         <span className="text-primary-600">
-                                            +
+                                        100   +
                                         </span>
-                                    </h3>
+                                    </div>
                                     <p className="font-medium text-xs lg:text-lg">
                                         Areas Covered
                                     </p>
@@ -132,6 +141,13 @@ export default function Home() {
                     </section>
                     <PropertySearch />
                 </section>
+                <h1  className="text-lg lg:text-4xl font-bold">
+                                Explore{' '}
+                                <span className="text-primary-600">
+                                    Your Dream
+                                </span>{' '}
+                                 Properties
+                            </h1>
                 <section
                     style={{
                         borderLeftColor: '#1F32EB',
@@ -171,7 +187,7 @@ export default function Home() {
                                 <div className="w-full aspect-[7/5] relative rounded-lg overflow-clip">
                                     <Image src={service.img} alt="" fill />
                                 </div>
-                                <h3 className="font-bold text-xl 2xl:text-4xl 2xl:my-5 text-center my-3">
+                                <h3 className="font-bold text-primary-600 text-xl 2xl:text-4xl 2xl:my-5 text-center my-3">
                                     {service.title}
                                 </h3>
                                 <p className="font-medium text-sm 2xl:text-xl 2xl:pb-5 text-center opacity-60">

@@ -20,6 +20,7 @@ import { MutationKey } from 'react-query';
 import Loader from 'components/base/Loader';
 import { KycStatus } from 'interfaces';
 import useLandlord from 'hooks/useLandlord';
+import Footer from 'layouts/home/Footer';
 
 const schema = yup.object({
     email: yup
@@ -101,16 +102,16 @@ function Signin() {
                     if (
                         data?.data?.user?.currentKyc &&
                         data?.data?.user?.currentKyc?.status ===
-                            KycStatus.INCOMPLETE
+                        KycStatus.INCOMPLETE
                     ) {
                         //Gets the previous kycStage and set the next stage with +1
                         states?.setKycStage(
                             +data?.data?.user?.currentKyc?.kycStage &&
-                                +data?.data?.user?.currentKyc?.kycStage
+                            +data?.data?.user?.currentKyc?.kycStage
                         );
                         states?.setStep(
                             +data?.data?.user?.currentKyc?.kycStage &&
-                                +data?.data?.user?.currentKyc?.nextStage
+                            +data?.data?.user?.currentKyc?.nextStage
                         );
 
                         states?.setActiveKyc(data?.data?.user?.currentKyc);
@@ -135,7 +136,7 @@ function Signin() {
                     if (
                         data?.data?.user?.currentKyc &&
                         data?.data?.user?.currentKyc?.status ===
-                            KycStatus.COMPLETE
+                        KycStatus.COMPLETE
                     ) {
                         states?.setActiveKyc(data?.data?.user?.currentKyc);
                         states?.setScreen('');
@@ -192,7 +193,7 @@ function Signin() {
             {isVerifyLoading ? (
                 <Loader loading={isVerifyLoading} />
             ) : (
-                <section className="">
+                <><section className="">
                     <div className="h-[96px] md:h-[196px] lg:h-[296px] md:ml-[-15%] lg:ml-[-8%] w-[105vw] 4xl:-ml-[25%] bg-[url('/hero-banner.png')] bg-cover bg-center bg-no-repeat" />
 
                     <div className="py-3 md:px-[15%] lg:px-[25%]  xl:px-[30%] md:py-10 mx-auto">
@@ -224,16 +225,14 @@ function Signin() {
                                 error={errors.email}
                                 register={{ ...register('email') }}
                                 className="mb-12"
-                                rightElement={<HiOutlineUser />}
-                            />
+                                rightElement={<HiOutlineUser />} />
                             <Input
                                 label="Password"
                                 placeholder="Enter password"
                                 type="password"
                                 required
                                 error={errors.password}
-                                register={{ ...register('password') }}
-                            />
+                                register={{ ...register('password') }} />
 
                             <p className="text-left text-link block mt-5 mb-10 flex justify-between">
                                 <a
@@ -261,8 +260,7 @@ function Signin() {
                                 className="w-[80%] py-4 mx-auto block"
                                 title="Log In"
                                 isLoading={isLoading}
-                                disabled={isLoading}
-                            />
+                                disabled={isLoading} />
 
                             <div className="flex items-center my-12 gap-3 px-6">
                                 <hr className="w-full border border-gray-300" />
@@ -271,19 +269,19 @@ function Signin() {
                             </div>
 
                             {/* <button
-                                onClick={AuthService.OAuthLogin}
-                                type="button"
-                                className="my-5 rounded-md border border-gray-300 
-                            flex justify-between items-center px-6 mx-auto"
-                            >
-                                <Image
-                                    src="/google.svg"
-                                    alt="google auth"
-                                    width={50}
-                                    height={50}
-                                />
-                                <span>Continue with Google</span>
-                            </button> */}
+        onClick={AuthService.OAuthLogin}
+        type="button"
+        className="my-5 rounded-md border border-gray-300
+    flex justify-between items-center px-6 mx-auto"
+    >
+        <Image
+            src="/google.svg"
+            alt="google auth"
+            width={50}
+            height={50}
+        />
+        <span>Continue with Google</span>
+    </button> */}
 
                             <p className="text-center text-lg font-medium">
                                 Don&apos;t have an account?{' '}
@@ -292,8 +290,9 @@ function Signin() {
                                 </Link>
                             </p>
                         </form>
+
                     </div>
-                </section>
+                </section><Footer /></>
             )}
             {isForgottenPassword && (
                 <PasswordRecoveryModal
@@ -306,7 +305,7 @@ function Signin() {
 }
 
 Signin.getLayout = function getLayout(page: ReactElement) {
-    return <HomeLayout showFooter={false}>{page}</HomeLayout>;
+    return <HomeLayout showFooter={true}>{page}</HomeLayout>;
 };
 
 export default Signin;
