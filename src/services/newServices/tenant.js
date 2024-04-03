@@ -99,14 +99,15 @@ export async function pendingTask(body, tenantId) {
     });
 }
 
-export async function deleteTask(tenantId) {
+export async function deleteTask(tenantId, body) {
     return request(`${API_URL}/tenants/delete/${tenantId}`, {
-        method: 'delete',
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers': '*',
             Authorization: USER_TOKEN,
         },
+        body: JSON.stringify(body),
     });
 }

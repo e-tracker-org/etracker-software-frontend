@@ -87,7 +87,13 @@ const TenantDash: FC = () => {
                 <section className="py-10 px-8">
                     <div className="flex flex-col lg:flex-row justify-between lg:mb-5">
                         <div className="lg:w-1/2 lg:mr-5 mb-5 lg:mb-0">
-                            <div className="px-8  bg-white rounded-md pt-5">
+                            <div
+                                style={{
+                                    borderLeftColor: '#1F32EB',
+                                    borderLeftWidth: 5,
+                                }}
+                                className="mt-5 px-8  bg-white rounded-md pt-5"
+                            >
                                 <DetailsRowCard title="My Units">
                                     {Array.isArray(properties) &&
                                     properties.length ? (
@@ -119,7 +125,7 @@ const TenantDash: FC = () => {
                                             bgColor="#DBFFCE"
                                         />
                                         <Help
-                                            title="Contract E-tracka Support"
+                                            title="Contact E-tracka Support"
                                             icon={<SupportSvg />}
                                             bgColor="#FFF4CE"
                                         />
@@ -128,7 +134,13 @@ const TenantDash: FC = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="mt-5 px-8 bg-white rounded-md pt-5">
+                    <div
+                        style={{
+                            borderLeftColor: '#1F32EB',
+                            borderLeftWidth: 5,
+                        }}
+                        className="mt-5 px-8 bg-white rounded-md pt-5"
+                    >
                         <DetailsRowCard
                             title="Explore Listing"
                             subheader="Search for properties and spaces you may like"
