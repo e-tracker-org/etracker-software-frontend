@@ -100,7 +100,7 @@ export default function PropertySearch() {
 
 
     return (
-        <nav
+        <nav style={{paddingTop: 20}}
             className="absolute  z-10 right-0 left-0 bottom-[-72%] md:bottom-[-50%] lg:bottom-[-15%] mx-auto 
          bg-white rounded-md shadow-xl p-9 w-[94%] md:w-[90%] lg:w-[80%] 2xl:w-[60%]
         "

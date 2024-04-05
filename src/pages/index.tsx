@@ -62,7 +62,7 @@ export default function Home() {
             <section className="py-[39px]">
                 <section className="relative mb-[130%] md:mb-[50%] lg:mb-[20%]">
                     <section
-                        // style={{ padding: '20px 100px' }}
+                        style={{ paddingBottom: '20px' }}
                         className="flex items-center rounded-[12px]  justify-center lg:justify-center relative
                     gap-10 bg-[#E6F0F5] min-h-[400px] px-8 overflow-hidden lg:py-[100px]"
                     >
