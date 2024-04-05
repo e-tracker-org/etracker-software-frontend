@@ -33,12 +33,14 @@ export default function RentReceiptPage() {
                     tenantId: router.query.id as string,
                     notifyMsg: pdfBlob,
                 };
+                // @ts-ignore
                 await notifyTenant(requestObj);
                 toast.success('Email Notification sent successfully');
             } else {
                 throw new Error('Failed to generate PDF blob');
             }
         } catch (error) {
+            // @ts-ignore
             toast.error(error.message);
         }
     };

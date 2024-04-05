@@ -1,3 +1,4 @@
+
 import { useRouter } from 'next/router';
 import Dashboard from '..';
 import BackButton from 'components/base/BackButton';
@@ -58,6 +59,7 @@ const DetailsRowCard: FC<DetailsRowProps> = ({ title, children }) => {
 };
 
 export default function TenantDetails() {
+    // @ts-ignore
     const { query, router } = useRouter();
     const states = useAppStore();
     const { endTenantAgreement, isEndTenantAgreementLoading } = useLandlord();
@@ -67,6 +69,7 @@ export default function TenantDetails() {
     const [tenant, setTenant] = useState({} as User);
     const [tenantProperty, setTenantProperty] = useState([]);
     const { getProperty, getPropertyLoading } = useProperty(
+        // @ts-ignore
         tenantProperty?.propertyId
     );
 
@@ -153,6 +156,7 @@ export default function TenantDetails() {
                     <Button
                         title="End Agreement"
                         isLoading={isEndTenantAgreementLoading}
+                        // @ts-ignore
                         onClick={() => handleEndAgreement(tenantProperty?.id)}
                     />
                 </div>

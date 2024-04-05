@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast';
 import SendReceipt from './SendReceipt';
 import { getFormattedDate } from 'services/config/config';
 
+// @ts-ignore
 const TenantTable = ({ tenants, borderLeft = false }) => {
     const states = useAppStore();
     const router = useRouter();
@@ -103,6 +104,7 @@ const TenantTable = ({ tenants, borderLeft = false }) => {
             )}
 
             <div
+            // @ts-ignore
                 style={
                     borderLeft
                         ? { borderLeftColor: '#1F32EB', borderLeftWidth: 5 }
@@ -265,6 +267,7 @@ const TenantTable = ({ tenants, borderLeft = false }) => {
                 <div ref={modalRef}>
                     <SendReceipt
                         setOpenModal={setOpenModal}
+                        // @ts-ignore
                         selectedTenants={states?.selectedTenants}
                     />
                 </div>

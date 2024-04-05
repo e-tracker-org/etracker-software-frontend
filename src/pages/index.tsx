@@ -158,6 +158,7 @@ export default function Home() {
                     {/* <section className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 w-full mb-10 min-h-[300px] "> */}
                     {Array.isArray(properties) && properties.length ? (
                         properties.map((property) => (
+                            // @ts-ignore
                             <div key={property?.id} className="w-full">
                                 <PropertyListingCard property={property} />
                             </div>

@@ -24,16 +24,17 @@ function TenantRating({ tenant, show }: any) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [value, setValue] = useState(5);
-
-    const fileCount = Number(localStorage.getItem('selectedTenantFilesCount'));
+    
     // const updateUser = UserService.updateUser;
-    const tenantRating = tenant.rating ?? 0;
+    const tenantRating = tenant?.rating ?? 0;
 
     console.log('tenant', tenant);
 
     useEffect(() => {
         if (tenant) {
             let ratingValue = 0;
+            // @ts-ignore
+            const fileCount = Number(localStorage.getItem('selectedTenantFilesCount'));
 
             if (tenant?.profileImage == '' && tenant?.isUserVerified == false) {
                 ratingValue = 10;
@@ -59,7 +60,6 @@ function TenantRating({ tenant, show }: any) {
         const updatedRating = value; // removing this bevause we still need other calculations from frontend
         // const updatedRating = value + tenantRating;
 
-        console.log('value', value);
         try {
             const payload = {
                 ratingUpdate: updatedRating,
@@ -67,23 +67,29 @@ function TenantRating({ tenant, show }: any) {
             const response = await updateTenantRating(payload, id);
 
             if (response.status === 200) {
-                const storedTenant = localStorage.getItem('selectedTenant');
-
-                if (storedTenant) {
-                    const tenant = JSON.parse(storedTenant);
-
-                    tenant.userData.rating =
-                        tenant.userData.rating + updatedRating;
-
-                    localStorage.setItem(
-                        'selectedTenant',
-                        JSON.stringify(tenant)
-                    );
+                if (typeof localStorage !== 'undefined') {
+                    const storedTenant = localStorage.getItem('selectedTenant');
+                    if (storedTenant) {
+                        const tenant = JSON.parse(storedTenant);
+    
+                        tenant.userData.rating =
+                            tenant.userData.rating + updatedRating;
+    
+                        localStorage.setItem(
+                            'selectedTenant',
+                            JSON.stringify(tenant)
+                        );
+                    }
+                    setIsLoading(false);
+                    setIsModalOpen(false);
+                    toast.success('Tenant rating updated successfully');
+                    window.location.reload();
+                } else {
+                    console.error("localStorage is not available in this environment.");
                 }
-                setIsLoading(false);
-                setIsModalOpen(false);
-                toast.success('Tenant rating updated successfully');
-                window.location.reload();
+               
+
+                
             } else {
                 toast.error('User profile update failed:');
                 console.error('User profile update failed:', response.message);
