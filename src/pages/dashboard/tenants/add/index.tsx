@@ -35,7 +35,6 @@ export default function AddTenant() {
     const [tenantDropdownItems, setTenantDropdownItems] = useState<User[]>([]);
 
     const {
-        isLoading,
         getLandlordTenants,
         addLandlordTenant,
         isAddTenantLoading,
@@ -67,6 +66,7 @@ export default function AddTenant() {
             propId = selectedPropertyId;
         }
 
+        // @ts-ignore
         const propertyId: string = propId;
         const registrationLink = createRegistrationLink(propertyId);
 

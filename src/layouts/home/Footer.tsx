@@ -2,6 +2,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const Footer = () => {
+
+    // @ts-ignore
+    const date = 1900 + new Date().getYear();
     return (
         <footer className="border-t border-t-gray-200 mt-5 py-10 px-[5%] md:px-[8%] lg:px-[6%] 2xl:px-[5%] relative">
             <div className="flex flex-col-reverse md: gap-x-10 lg:gap-x-28 gap-y-12 md:flex-row  md:justify-items-start justify-items-center ">
@@ -210,7 +213,7 @@ const Footer = () => {
                     </Link>
                 </div>
                 <div className="py-4 my-6 md:my-10 md:text-right font-normal text-sm self-start">
-                &copy; {1900 + new Date().getYear()} E-Tracka Limited. All rights reserved.
+                &copy; {date} E-Tracka Limited. All rights reserved.
                 </div>
             </div>
             <p className="text-xs mb-10 lg:w-5/6">

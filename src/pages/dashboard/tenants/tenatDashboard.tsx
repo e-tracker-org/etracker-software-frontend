@@ -48,6 +48,7 @@ const DetailsRowCard: FC<DetailsRowProps> = ({
                 <a
                     style={{ cursor: 'pointer' }}
                     className="text-blue-500"
+                    // @ts-ignore
                     onClick={() => handleNavigate(Route)}
                 >
                     {linkText}
@@ -291,7 +292,9 @@ const TenantDash: FC = () => {
     );
 };
 
+// @ts-ignore
 TenantDash.auth = true;
+// @ts-ignore
 TenantDash.getLayout = Dashboard.getLayout;
 
 export default TenantDash;

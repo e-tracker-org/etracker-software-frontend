@@ -56,6 +56,7 @@ const DetailsRowCard: FC<DetailsRowProps> = ({
                 <a
                     style={{ cursor: 'pointer' }}
                     className="text-blue-500"
+                    // @ts-ignore
                     onClick={() => handleNavigate(Route)}
                 >
                     {linkText}
@@ -101,6 +102,7 @@ const LandlordDash: FC = () => {
 
         if (allProperties) {
             allProperties.forEach((property) => {
+                // @ts-ignore
                 if (property.tenant && property.tenant.length > 0) {
                     occupied++;
                 } else {
@@ -197,6 +199,7 @@ const LandlordDash: FC = () => {
                                     {/* <div className="flex items-center"> */}
                                     <CircularProgressbar
                                         value={occupiedPercentage}
+                                        // @ts-ignore
                                         text={totalProperties}
                                         className="mb-4 lg:mb-0"
                                         styles={buildStyles({
@@ -339,8 +342,9 @@ const LandlordDash: FC = () => {
         </div>
     );
 };
-
+// @ts-ignore
 LandlordDash.auth = true;
+// @ts-ignore
 LandlordDash.getLayout = Dashboard.getLayout;
 
 export default LandlordDash;

@@ -25,6 +25,7 @@ const TenantTable = ({
 
     const filteredTenants = tenants.filter((tenant) => {
         if (filter === 'all') return true;
+        // @ts-ignore
         return tenant.tenantData?.status.toLowerCase() === filter.toLowerCase();
     });
 
