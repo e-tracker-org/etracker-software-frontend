@@ -18,19 +18,19 @@ import { getAllGeneralProperties } from 'services/newServices/properties';
 const SERVICES = [
     {
         title: 'Get data on properties',
-        img: '/home/Properties.svg',
+        img: '/Home/Properties.svg',
         content:
             'Buy, rent and gather information on real estate properties. As a tenant, you can also send personal chats to landlords and property managers.',
     },
     {
         title: 'Get data on landlords',
-        img: '/home/Landlords.svg',
+        img: '/Home/Landlords.svg',
         content:
             'We give insights into their characteristics and characters which strengthen their agency&apos;s advertisement and promotion.',
     },
     {
         title: 'Get data on tenants',
-        img: '/home/Tenants.svg',
+        img: '/Home/Tenants.svg',
         content:
             'We store tenancy data to improve your processes and enhance your ability to make an informed decision.',
     },
@@ -115,7 +115,7 @@ export default function Home() {
                                 <div className="">
                                     <div className="text-sm lg:text-4xl">
                                         <Image
-                                            src="/home/Agents.svg"
+                                            src="/Home/Agents.svg"
                                             alt=""
                                             width={600}
                                             height={600}
@@ -133,7 +133,7 @@ export default function Home() {
                                 <div className="">
                                     <div className="text-sm lg:text-4xl">
                                         <Image
-                                            src="/home/PropertyListing.svg"
+                                            src="/Home/PropertyListing.svg"
                                             alt=""
                                             width={600}
                                             height={600}
@@ -149,7 +149,7 @@ export default function Home() {
                                 <div className="">
                                     <div className="text-sm lg:text-4xl">
                                         <Image
-                                            src="/home/AreasCoverd.svg"
+                                            src="/Home/AreasCoverd.svg"
                                             alt=""
                                             width={600}
                                             height={600}
