@@ -154,7 +154,7 @@ const TenantDash: FC = () => {
             {propertiesLoading ? (
                 <Loader loading={propertiesLoading} />
             ) : (
-                <section className="py-10 px-8">
+                <section className="py-10 lg:px-8">
                     <div className="flex flex-col lg:flex-row justify-between lg:mb-5">
                         <div className="lg:w-1/2 lg:mr-5 mb-5 lg:mb-0">
                             <div

@@ -10,7 +10,7 @@ import SendReceipt from './SendReceipt';
 import { getFormattedDate } from 'services/config/config';
 
 // @ts-ignore
-const TenantTable = ({ tenants, borderLeft = false }) => {
+const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
     const states = useAppStore();
     const router = useRouter();
     const modalRef = useRef<any>(null);
@@ -104,7 +104,7 @@ const TenantTable = ({ tenants, borderLeft = false }) => {
             )}
 
             <div
-            // @ts-ignore
+                // @ts-ignore
                 style={
                     borderLeft
                         ? { borderLeftColor: '#1F32EB', borderLeftWidth: 5 }
@@ -118,10 +118,10 @@ const TenantTable = ({ tenants, borderLeft = false }) => {
                     </p>
                 ) : (
                     <>
-                        <table className="w-full table-auto whitespace-nowrap text-gray-700 border-separate border-spacing-x-5 border-spacing-y-8 font-medium  text-center">
+                        <table className="w-full table-auto whitespace-nowrap text-gray-700 border-separate lg:border-spacing-x-5 border-spacing-y-8 font-medium  text-center">
                             <thead className="text-[#727070] text-xl ">
                                 <tr>
-                                    {states?.selectMultiple && (
+                                    {showCheckbox && states?.selectMultiple && (
                                         <th
                                             className="pl-6 cursor-default"
                                             onClick={(e) => e.stopPropagation()}
@@ -169,30 +169,35 @@ const TenantTable = ({ tenants, borderLeft = false }) => {
                                                     // router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
                                                 }}
                                             >
-                                                {states?.selectMultiple && (
-                                                    <td
-                                                        className="pl-6 cursor-default"
-                                                        onClick={(e) =>
-                                                            e.stopPropagation()
-                                                        }
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            className="cursor-pointer"
-                                                            data-id={
-                                                                tenant?.userData
-                                                                    ?.id
+                                                {showCheckbox &&
+                                                    states?.selectMultiple && (
+                                                        <td
+                                                            className="pl-6 cursor-default"
+                                                            onClick={(e) =>
+                                                                e.stopPropagation()
                                                             }
-                                                            checked={states?.selectedTenants.includes(
-                                                                tenant?.userData
-                                                                    ?.id
-                                                            )}
-                                                            onChange={(e) =>
-                                                                handleChange(e)
-                                                            }
-                                                        ></input>
-                                                    </td>
-                                                )}
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                className="cursor-pointer"
+                                                                data-id={
+                                                                    tenant
+                                                                        ?.userData
+                                                                        ?.id
+                                                                }
+                                                                checked={states?.selectedTenants.includes(
+                                                                    tenant
+                                                                        ?.userData
+                                                                        ?.id
+                                                                )}
+                                                                onChange={(e) =>
+                                                                    handleChange(
+                                                                        e
+                                                                    )
+                                                                }
+                                                            ></input>
+                                                        </td>
+                                                    )}
 
                                                 <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max ">
                                                     {/* <Image
@@ -246,7 +251,7 @@ const TenantTable = ({ tenants, borderLeft = false }) => {
                                 )}
                             </tbody>
                         </table>
-                        {states?.selectMultiple && (
+                        {showCheckbox && states?.selectMultiple && (
                             <div className="text-center">
                                 <Button
                                     className="w-1/5"
