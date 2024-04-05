@@ -61,13 +61,29 @@ export default function Home() {
         <>
             <section className="py-[39px]">
                 <section className="relative mb-[130%] md:mb-[50%] lg:mb-[20%]">
-                    <section style={{padding: 100}}
-                        className="flex items-center rounded-[12px]  justify-between lg:justify-center relative
-                    gap-10 bg-[#E6F0F5] min-h-[400px] px-8 overflow-hidden "
+                    <section
+                        // style={{ padding: '20px 100px' }}
+                        className="flex items-center rounded-[12px]  justify-center lg:justify-center relative
+                    gap-10 bg-[#E6F0F5] min-h-[400px] px-8 overflow-hidden lg:py-[100px]"
                     >
-                        <div  style={{textAlign: 'center'}} className="absolute z-10 md:relative ">
-                            <button style={{backgroundColor: '#61C454', margin: 20, padding: 10, color: 'white', borderRadius: '20px', cursor: 'default'}}>🤝 We are the company that makes sure your properties are given to trusted individuals</button>
-                            <h1  className="text-xl lg:text-5xl font-bold">
+                        <div
+                            style={{ textAlign: 'center' }}
+                            className="absolute z-10 md:relative "
+                        >
+                            <button
+                                style={{
+                                    backgroundColor: '#61C454',
+                                    margin: 20,
+                                    padding: 10,
+                                    color: 'white',
+                                    borderRadius: '20px',
+                                    cursor: 'default',
+                                }}
+                            >
+                                🤝 We are the company that makes sure your
+                                properties are given to trusted individuals
+                            </button>
+                            <h1 className="text-xl lg:text-5xl font-bold">
                                 Your Trusted Partner for{' '}
                                 <span className="text-primary-600">
                                     Real Estate
@@ -84,34 +100,46 @@ export default function Home() {
                             </p>
 
                             <Link href="/auth/signup">
-                                <button style={{marginTop: 10}} className="bg-primary-600 rounded-lg px-8 py-2 text-white font-semibold">
+                                <button
+                                    style={{ marginTop: 10 }}
+                                    className="bg-primary-600 rounded-lg px-8 py-2 text-white font-semibold"
+                                >
                                     Get Started
                                 </button>
                             </Link>
 
-                            <div style={{marginBottom: 50}} className="mx-auto flex lg:justify-center items-center gap-5 justify-between">
+                            <div
+                                style={{ marginBottom: 50 }}
+                                className="mx-auto flex lg:justify-center items-center gap-5 justify-between"
+                            >
                                 <div className="">
-                                
                                     <div className="text-sm lg:text-4xl">
-                                    
-                                    <Image src="/Home/Agents.svg" alt="" width={600} height={600} />
-                                        
+                                        <Image
+                                            src="/Home/Agents.svg"
+                                            alt=""
+                                            width={600}
+                                            height={600}
+                                        />
+
                                         <span className="text-primary-600">
-                                        200  +
+                                            200 +
                                         </span>
-                                       
                                     </div>
-                                    
+
                                     <p className="font-medium text-xs lg:text-lg">
                                         Agents
                                     </p>
                                 </div>
                                 <div className="">
                                     <div className="text-sm lg:text-4xl">
-                                        
-                                        <Image src="/Home/PropertyListing.svg" alt="" width={600} height={600} />
+                                        <Image
+                                            src="/Home/PropertyListing.svg"
+                                            alt=""
+                                            width={600}
+                                            height={600}
+                                        />
                                         <span className="text-primary-600">
-                                        1200  +
+                                            1200 +
                                         </span>
                                     </div>
                                     <p className="font-medium text-xs lg:text-lg">
@@ -120,10 +148,15 @@ export default function Home() {
                                 </div>
                                 <div className="">
                                     <div className="text-sm lg:text-4xl">
-                                    <Image src="/Home/AreasCoverd.svg" alt="" width={600} height={600} />
-                                        
+                                        <Image
+                                            src="/Home/AreasCoverd.svg"
+                                            alt=""
+                                            width={600}
+                                            height={600}
+                                        />
+
                                         <span className="text-primary-600">
-                                        100   +
+                                            100 +
                                         </span>
                                     </div>
                                     <p className="font-medium text-xs lg:text-lg">
@@ -141,13 +174,10 @@ export default function Home() {
                     </section>
                     <PropertySearch />
                 </section>
-                <h1  className="text-lg lg:text-4xl font-bold">
-                                Explore{' '}
-                                <span className="text-primary-600">
-                                    Your Dream
-                                </span>{' '}
-                                 Properties
-                            </h1>
+                <h1 className="text-lg lg:text-4xl font-bold">
+                    Explore <span className="text-primary-600">Your Dream</span>{' '}
+                    Properties
+                </h1>
                 <section
                     style={{
                         borderLeftColor: '#1F32EB',
