@@ -1,6 +1,8 @@
 import moment from 'moment';
 
-export const API_URL = 'http://localhost:8800/api/v1';
+export const API_URL = 'https://etracker-software-api.onrender.com/api/v1';
+// export const API_URL = 'http://localhost:8800/api/v1';
+
 export const USER_TOKEN = 'sampleToken';
 
 
