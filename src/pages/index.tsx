@@ -115,7 +115,7 @@ export default function Home() {
                                 <div className="">
                                     <div className="text-sm lg:text-4xl">
                                         <Image
-                                            src="/Home/Agents.svg"
+                                            src="/home/Agents.svg"
                                             alt=""
                                             width={600}
                                             height={600}
@@ -133,7 +133,7 @@ export default function Home() {
                                 <div className="">
                                     <div className="text-sm lg:text-4xl">
                                         <Image
-                                            src="/Home/PropertyListing.svg"
+                                            src="/home/PropertyListing.svg"
                                             alt=""
                                             width={600}
                                             height={600}
@@ -149,7 +149,7 @@ export default function Home() {
                                 <div className="">
                                     <div className="text-sm lg:text-4xl">
                                         <Image
-                                            src="/Home/AreasCoverd.svg"
+                                            src="/home/AreasCoverd.svg"
                                             alt=""
                                             width={600}
                                             height={600}
