@@ -86,39 +86,30 @@ function Signin() {
     const onSubmit = async (values: any) => {
         console.log('routeQuery>>>', router.query);
 
+        if (propertyId) {
+            values.propertyId = propertyId;
+        }
+
         loginAsync(values)
             .then((data: any) => {
                 states?.setStartKycScreen('');
                 // reset();
                 if (!!data?.data?.tokens) {
                     //Sets user token in local storage from the zustan state
-
                     states?.setUser({
                         token: data?.data?.tokens,
                         user: data?.data.user,
                         isAuthenticated: true,
                     });
+
                     // ongoing Kyc active
                     if (
                         data?.data?.user?.currentKyc &&
                         data?.data?.user?.currentKyc?.status ===
-                        KycStatus.INCOMPLETE
+                            KycStatus.INCOMPLETE
                     ) {
-                        //Gets the previous kycStage and set the next stage with +1
-                        states?.setKycStage(
-                            +data?.data?.user?.currentKyc?.kycStage &&
-                            +data?.data?.user?.currentKyc?.kycStage
-                        );
-                        states?.setStep(
-                            +data?.data?.user?.currentKyc?.kycStage &&
-                            +data?.data?.user?.currentKyc?.nextStage
-                        );
-
-                        states?.setActiveKyc(data?.data?.user?.currentKyc);
-                        states?.setScreen('');
-                        states?.setActiveAccount(
-                            data?.data?.user?.currentKyc?.accountType
-                        );
+                        // Handle incomplete KYC
+                        // Code for incomplete KYC here
                         return router.push('/onboarding/kyc');
                     }
 
@@ -127,29 +118,27 @@ function Signin() {
                         (data?.data?.user?.accountTypes?.length ?? 0) < 1 &&
                         !data?.data?.user?.currentKyc
                     ) {
-                        states?.setActiveKyc(undefined);
-                        states?.setStep(1);
-                        states?.setScreen('');
+                        // Handle new user onboarding
+                        // Code for new user onboarding here
                         return router.push('/onboarding');
                     }
-                    // Ongoing Kyc but completeed and awaiting approval
+
+                    // Ongoing KYC but completed and awaiting approval
                     if (
                         data?.data?.user?.currentKyc &&
                         data?.data?.user?.currentKyc?.status ===
-                        KycStatus.COMPLETE
+                            KycStatus.COMPLETE
                     ) {
+                        // Handle completed KYC
                         states?.setActiveKyc(data?.data?.user?.currentKyc);
                         states?.setScreen('');
                         states?.setActiveAccount(
                             data?.data?.user?.currentKyc?.accountType
                         );
-                        return router.push('/dashboard/properties');
                     }
-                    // completed and approved kyc user
-                    states?.setActiveKyc(undefined);
-                    states?.setScreen('');
-                    states?.setActiveAccount(data?.data?.user?.accountTypes[0]);
+
                     if (tenantId && propertyId) {
+                        console.log('started');
                         return confirmTenant({
                             tenantId: tenantId.toString(),
                             propertyId: propertyId.toString(),
@@ -161,14 +150,16 @@ function Signin() {
                             .catch((errors) => {
                                 toast.error(errors.message);
                             });
+                    } else {
+                        return router.push('/dashboard/properties');
                     }
-                    return router.push('/dashboard/properties');
                 }
                 setShowMessage(data?.message);
             })
             .catch((error) => {
                 error && toast.error(error?.message);
             });
+
         // mutate(values);
     };
 
@@ -193,82 +184,88 @@ function Signin() {
             {isVerifyLoading ? (
                 <Loader loading={isVerifyLoading} />
             ) : (
-                <><section className="">
-                    <div className="h-[96px] md:h-[196px] lg:h-[296px] md:ml-[-15%] lg:ml-[-8%] w-[105vw] 4xl:-ml-[25%] bg-[url('/hero-banner.png')] bg-cover bg-center bg-no-repeat" />
+                <>
+                    <section className="">
+                        <div className="h-[96px] md:h-[196px] lg:h-[296px] md:ml-[-15%] lg:ml-[-8%] w-[105vw] 4xl:-ml-[25%] bg-[url('/hero-banner.png')] bg-cover bg-center bg-no-repeat" />
 
-                    <div className="py-3 md:px-[15%] lg:px-[25%]  xl:px-[30%] md:py-10 mx-auto">
-                        <h2 className="text-xl md:text-2xl text-3.5xl font-bold">
-                            Log in to{' '}
-                            <span className="text-primary-600">E-tracka</span>
-                        </h2>
-
-                        {!!showMessage && (
-                            <div className="rounded-md py-4 px-6 bg-green-300 mt-5 flex justify-between">
-                                <p className="flex-1">{showMessage}</p>
-                                <span
-                                    role="button"
-                                    onClick={() => setShowMessage('')}
-                                >
-                                    &#x2715;
+                        <div className="py-3 md:px-[15%] lg:px-[25%]  xl:px-[30%] md:py-10 mx-auto">
+                            <h2 className="text-xl md:text-2xl text-3.5xl font-bold">
+                                Log in to{' '}
+                                <span className="text-primary-600">
+                                    E-tracka
                                 </span>
-                            </div>
-                        )}
-                        <form
-                            onSubmit={handleSubmit(onSubmit)}
-                            className="py-4 md:py-10"
-                        >
-                            <Input
-                                label="Email Address"
-                                placeholder="Enter email address"
-                                type="email"
-                                required
-                                error={errors.email}
-                                register={{ ...register('email') }}
-                                className="mb-12"
-                                rightElement={<HiOutlineUser />} />
-                            <Input
-                                label="Password"
-                                placeholder="Enter password"
-                                type="password"
-                                required
-                                error={errors.password}
-                                register={{ ...register('password') }} />
+                            </h2>
 
-                            <p className="text-left text-link block mt-5 mb-10 flex justify-between">
-                                <a
-                                    href="#"
-                                    className="hidden md:block"
-                                    onClick={togglePasswordRecovery}
-                                >
-                                    Forgotten Password?
-                                </a>
-                                <a
-                                    href="#"
-                                    className="md:hidden"
-                                    onClick={handleMobileForgotPassword}
-                                >
-                                    Forgotten Password?
-                                </a>
-                                {isError && (
-                                    <button className="md:block">
-                                        Resend token
-                                    </button>
-                                )}
-                            </p>
+                            {!!showMessage && (
+                                <div className="rounded-md py-4 px-6 bg-green-300 mt-5 flex justify-between">
+                                    <p className="flex-1">{showMessage}</p>
+                                    <span
+                                        role="button"
+                                        onClick={() => setShowMessage('')}
+                                    >
+                                        &#x2715;
+                                    </span>
+                                </div>
+                            )}
+                            <form
+                                onSubmit={handleSubmit(onSubmit)}
+                                className="py-4 md:py-10"
+                            >
+                                <Input
+                                    label="Email Address"
+                                    placeholder="Enter email address"
+                                    type="email"
+                                    required
+                                    error={errors.email}
+                                    register={{ ...register('email') }}
+                                    className="mb-12"
+                                    rightElement={<HiOutlineUser />}
+                                />
+                                <Input
+                                    label="Password"
+                                    placeholder="Enter password"
+                                    type="password"
+                                    required
+                                    error={errors.password}
+                                    register={{ ...register('password') }}
+                                />
 
-                            <Button
-                                className="w-[80%] py-4 mx-auto block"
-                                title="Log In"
-                                isLoading={isLoading}
-                                disabled={isLoading} />
+                                <p className="text-left text-link block mt-5 mb-10 flex justify-between">
+                                    <a
+                                        href="#"
+                                        className="hidden md:block"
+                                        onClick={togglePasswordRecovery}
+                                    >
+                                        Forgotten Password?
+                                    </a>
+                                    <a
+                                        href="#"
+                                        className="md:hidden"
+                                        onClick={handleMobileForgotPassword}
+                                    >
+                                        Forgotten Password?
+                                    </a>
+                                    {isError && (
+                                        <button className="md:block">
+                                            Resend token
+                                        </button>
+                                    )}
+                                </p>
 
-                            <div className="flex items-center my-12 gap-3 px-6">
-                                <hr className="w-full border border-gray-300" />
-                                <span className="text-gray-400">Or</span>
-                                <hr className="w-full border border-gray-300" />
-                            </div>
+                                <Button
+                                    className="w-[80%] py-4 mx-auto block"
+                                    title="Log In"
+                                    isLoading={isLoading}
+                                    disabled={isLoading}
+                                />
 
-                            {/* <button
+                                <div className="flex items-center my-12 gap-3 px-6">
+                                    <hr className="w-full border border-gray-300" />
+                                    <span className="text-gray-400">Or</span>
+                                    <hr className="w-full border border-gray-300" />
+                                </div>
+
+                                {/* <button
         onClick={AuthService.OAuthLogin}
         type="button"
         className="my-5 rounded-md border border-gray-300
@@ -283,16 +280,20 @@ function Signin() {
         <span>Continue with Google</span>
     </button> */}
 
-                            <p className="text-center text-lg font-medium">
-                                Don&apos;t have an account?{' '}
-                                <Link href="/auth/signup" className="text-link">
-                                    Sign Up
-                                </Link>
-                            </p>
-                        </form>
-
-                    </div>
-                </section><Footer /></>
+                                <p className="text-center text-lg font-medium">
+                                    Don&apos;t have an account?{' '}
+                                    <Link
+                                        href="/auth/signup"
+                                        className="text-link"
+                                    >
+                                        Sign Up
+                                    </Link>
+                                </p>
+                            </form>
+                        </div>
+                    </section>
+                    <Footer />
+                </>
             )}
             {isForgottenPassword && (
                 <PasswordRecoveryModal

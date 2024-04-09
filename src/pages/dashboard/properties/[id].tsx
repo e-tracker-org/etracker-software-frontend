@@ -55,6 +55,7 @@ export default function PropertyDetails() {
     const { getProperty, getPropertyLoading } = useProperty(id);
 
     const property = getProperty?.data;
+    console.log(property);
 
     return (
         <div className="h-auto">

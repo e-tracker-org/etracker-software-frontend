@@ -1,4 +1,3 @@
-
 import { useRouter } from 'next/router';
 import Dashboard from '..';
 import BackButton from 'components/base/BackButton';
@@ -36,6 +35,15 @@ interface DetailsRowProps {
     title?: string | undefined;
 }
 
+interface TenantProperty {
+    userId: string;
+    propertyId: string;
+    landlordId: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 const DetailsCard: FC<DetailsProps> = ({ label, className, content }) => {
     return (
         <div className="flex flex-col w-full">
@@ -67,14 +75,16 @@ export default function TenantDetails() {
     const id = query?.id as string | undefined;
     // const propertyId = states?.propertyId as string;
     const [tenant, setTenant] = useState({} as User);
-    const [tenantProperty, setTenantProperty] = useState([]);
+    const [tenantProperty, setTenantProperty] = useState<TenantProperty | null>(
+        null
+    );
     const { getProperty, getPropertyLoading } = useProperty(
         // @ts-ignore
         tenantProperty?.propertyId
     );
 
     const property = getProperty?.data;
-    console.log(property?.address, 'property?.address');
+    console.log(tenantProperty, 'tenantProperty');
 
     const { uploadedFiles, loadinguploadFiles } = useFileUploadHandler(
         'PROFILE',
@@ -117,15 +127,16 @@ export default function TenantDetails() {
 
     const handleEndAgreement = async (tenantId: string) => {
         const body = {
-            propert: property?.address,
+            property: property,
             name: tenant.firstname,
             email: tenant.email,
+            tenantId: tenantProperty?.userId,
         };
         try {
             const deleteTenant = await deleteTask(tenantId, body);
             console.log(deleteTenant);
             toast.success('Tenant agreement successfully ended');
-            router.back();
+            // router.back();
         } catch (error) {
             console.error('Error ending tenant agreement:', error);
             toast.error('Failed to end tenant agreement');
