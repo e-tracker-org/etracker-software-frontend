@@ -7,6 +7,7 @@ import useProperty from 'hooks/useProperty';
 
 export default function Dashboard() {
     const { acctType } = useAccountType();
+    console.log(acctType?.typeID);
 
     if (acctType) {
         return (

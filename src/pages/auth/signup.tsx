@@ -13,6 +13,7 @@ import { AxiosError } from 'axios';
 import { ReactElement, useState, useRef } from 'react';
 import HomeLayout from 'layouts/home';
 import { MutationKey } from 'react-query';
+import { useRouter } from 'next/router';
 
 const schema = yup.object({
     email: yup
@@ -42,7 +43,7 @@ function SignUp() {
         AuthService.signup,
         { onSuccess: () => queryClient.invalidateQueries('getUserData') }
     );
-
+    const router = useRouter();
     const {
         handleSubmit,
         register,
@@ -66,7 +67,9 @@ function SignUp() {
                 if (data.success) {
                     setShowMessage(data?.message);
                     reset({});
-                    console.log('Form reset successfully');
+                    setTimeout(() => {
+                        router.push('/auth/signin');
+                    }, 3000);
                 }
             })
             .catch((error) => {
