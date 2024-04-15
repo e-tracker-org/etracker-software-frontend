@@ -138,7 +138,6 @@ function Signin() {
                     }
 
                     if (tenantId && propertyId) {
-                        console.log('started');
                         return confirmTenant({
                             tenantId: tenantId.toString(),
                             propertyId: propertyId.toString(),
@@ -151,10 +150,12 @@ function Signin() {
                                 toast.error(errors.message);
                             });
                     } else {
-                        return router.push('/dashboard/properties');
+                        setShowMessage(data?.message);
+                        setTimeout(() => {
+                            router.push('/dashboard/properties');
+                        }, 3000);
                     }
                 }
-                setShowMessage(data?.message);
             })
             .catch((error) => {
                 error && toast.error(error?.message);

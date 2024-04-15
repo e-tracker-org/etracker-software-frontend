@@ -3,12 +3,66 @@ import { useAppStore } from 'hooks/useAppStore';
 import { KycStatus } from 'interfaces';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { goBackToKyc2 } from 'utils/helper';
 
 const Header = ({ propertyCount }: { propertyCount?: number }) => {
     const states = useAppStore();
     const router = useRouter();
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+
+    const checkScreenSize = () => {
+        setIsMobile(window.innerWidth < 768);
+    };
+
+    useEffect(() => {
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
+
+    const AddPropertyBtn = (
+        <div>
+            {states?.activeAccount !== 1 && (
+                <Button
+                    className="flex items-center md:py-2 lg:py-3 md:gap-1 lg:gap-2"
+                    onClick={() => {
+                        const isUserVerify = goBackToKyc2(states, router);
+                        if (isUserVerify) {
+                            router.replace('/dashboard/properties/add');
+                        }
+                        // if (
+                        //     states?.activeKyc?.status ===
+                        //     KycStatus.INCOMPLETE
+                        // ) {
+                        //     states?.setScreen('kyc');
+                        //     states?.setActiveKyc(states?.activeKyc);
+                        //     states?.setStep(
+                        //         states?.activeKyc?.kycStage + 1
+                        //     );
+                        //     router.push('/onboarding/kyc');
+                        // } else {
+                        //     router.push('/dashboard/property');
+                        // }
+                    }}
+                >
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M11 19V13H5V11H11V5H13V11H19V13H13V19H11Z"
+                            fill="white"
+                        />
+                    </svg>
+                    Add Property
+                </Button>
+            )}
+        </div>
+    );
     return (
         <header className="flex justify-between items-center w-full my-5 md:gap-10 lg:gap-20 pb-5">
             <span className="w-1/5 text-xl font-medium">
@@ -65,44 +119,6 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
                     </svg>
                     <span>Filter</span>
                 </div>
-                {states?.activeAccount !== 1 && (
-                    <Button
-                        className="flex items-center md:py-2 lg:py-3 md:gap-1 lg:gap-2"
-                        onClick={() => {
-                            const isUserVerify = goBackToKyc2(states, router);
-                            if (isUserVerify) {
-                                router.replace('/dashboard/properties/add');
-                            }
-                            // if (
-                            //     states?.activeKyc?.status ===
-                            //     KycStatus.INCOMPLETE
-                            // ) {
-                            //     states?.setScreen('kyc');
-                            //     states?.setActiveKyc(states?.activeKyc);
-                            //     states?.setStep(
-                            //         states?.activeKyc?.kycStage + 1
-                            //     );
-                            //     router.push('/onboarding/kyc');
-                            // } else {
-                            //     router.push('/dashboard/property');
-                            // }
-                        }}
-                    >
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M11 19V13H5V11H11V5H13V11H19V13H13V19H11Z"
-                                fill="white"
-                            />
-                        </svg>
-                        Add Property
-                    </Button>
-                )}
             </div>
         </header>
     );
