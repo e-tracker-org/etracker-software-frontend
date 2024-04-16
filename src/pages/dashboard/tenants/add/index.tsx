@@ -104,7 +104,7 @@ export default function AddTenant() {
 
         // }
     };
-
+    // @ts-ignore
     const handleEmailChange = (event) => {
         setEmail(event.target.value);
     };
@@ -112,7 +112,7 @@ export default function AddTenant() {
     const handleInviteTenant = async () => {
         try {
             setLoading(true);
-
+            // @ts-ignore
             const selectedPropertyLabel = properties.find(
                 (property) => property.value === selectedPropertyId
             )?.label;

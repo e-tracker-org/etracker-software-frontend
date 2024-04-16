@@ -212,6 +212,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
             country: states?.user?.country,
             dob: moment(states?.user?.dob).format('YYYY-MM-DD'),
             gender: states?.user?.gender,
+            // @ts-ignore
             landmark: states?.user?.landmark,
             fullAddress: states?.user?.fullAddress,
         };

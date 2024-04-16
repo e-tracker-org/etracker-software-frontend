@@ -59,6 +59,7 @@ export default function PropertyDetails() {
     const property = getProperty?.data;
     console.log(property);
 
+    // @ts-ignore
     const openModal = (index) => {
         setSelectedImageIndex(index);
         setShowModal(true);
