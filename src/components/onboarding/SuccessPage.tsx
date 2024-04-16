@@ -43,7 +43,11 @@ const SuccessPage: FC<SuccessProps> = ({
                 <p className={`text-lg text-center ${contentClassname}`}>
                     {content}
                 </p>
-                {isOnContinue && <Button onClick={onContinue}>Continue</Button>}
+                {isOnContinue && (
+                    <Button onClick={onContinue} className="w-full md:w-auto">
+                        Continue
+                    </Button>
+                )}
             </div>
         </section>
     );

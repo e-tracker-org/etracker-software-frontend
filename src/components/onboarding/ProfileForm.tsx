@@ -21,6 +21,7 @@ import {
 } from 'utils/helper';
 import Spinner from 'components/base/Spinner';
 import { uploadImage } from '../../services/newServices/image';
+import moment from 'moment';
 
 const schema = yup.object({
     firstname: yup.string().required('Enter your first name'),
@@ -209,9 +210,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
             state: states?.user?.state,
             area: states?.user?.area,
             country: states?.user?.country,
-            dob: new Date(states?.user?.dob as string),
+            dob: moment(states?.user?.dob).format('YYYY-MM-DD'),
             gender: states?.user?.gender,
-            landmark: '',
+            landmark: states?.user?.landmark,
             fullAddress: states?.user?.fullAddress,
         };
 
@@ -385,6 +386,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
                 placeholder="DD/MM/YY"
                 asterisk
                 required
+                value={watch('dob')}
                 register={{ ...register('dob') }}
                 error={errors.dob}
                 inputClassName="bg-white"

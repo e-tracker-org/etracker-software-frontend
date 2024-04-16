@@ -254,7 +254,7 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
                         {showCheckbox && states?.selectMultiple && (
                             <div className="text-center">
                                 <Button
-                                    className="w-1/5"
+                                    className="lg:w-1/5"
                                     onClick={handleCallToAction}
                                 >
                                     Continue
