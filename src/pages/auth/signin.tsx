@@ -153,7 +153,7 @@ function Signin() {
                         setShowMessage(data?.message);
                         setTimeout(() => {
                             router.push('/dashboard/properties');
-                        }, 3000);
+                        }, 2000);
                     }
                 }
             })
