@@ -34,6 +34,7 @@ export default function AddTenant() {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
 
+    console.log(selectedPropertyId, 'selectedPropertyId');
     const [selectedTenants, setSelectedTenants] = useState<User[]>([]);
     const [tenantDropdownItems, setTenantDropdownItems] = useState<User[]>([]);
 
@@ -288,7 +289,7 @@ export default function AddTenant() {
                 <section className="w-full">
                     <div className="lg:w-3/5 m-auto my-[50px]">
                         <section>
-                            {!id && (
+                            {id && (
                                 <div className="mb-8">
                                     <Select
                                         label="Property"
@@ -296,16 +297,14 @@ export default function AddTenant() {
                                         required
                                         selectDivClassName="bg-white rounded-xl placeholder:text-[#13131373] focus:border-primary-600 border border-[#B9B9B9] p-0"
                                         labelClassName="!text-base !text-[#131313]"
-                                        register={{
-                                            onChange: (
-                                                e: React.ChangeEvent<HTMLSelectElement>
-                                            ) => {
-                                                setSelectedPropertyId(
-                                                    e.target.value
-                                                );
-                                            },
-                                            value: selectedPropertyId,
-                                        }}
+                                        value={selectedPropertyId}
+                                        onChange={(
+                                            e: React.ChangeEvent<HTMLSelectElement>
+                                        ) =>
+                                            setSelectedPropertyId(
+                                                e.target.value
+                                            )
+                                        }
                                     >
                                         <option key="" value="">
                                             Select Property
@@ -426,6 +425,7 @@ export default function AddTenant() {
                 openModal={openModal}
                 contentClass="py-5 px-10"
                 className="rounded-md  sm:ml-[40%]  lg:ml-[10%]"
+                showClose={openModal}
             >
                 <div ref={modalRef}>
                     <section>

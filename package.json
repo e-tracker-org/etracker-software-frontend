@@ -42,6 +42,7 @@
         "react-hot-toast": "^2.4.0",
         "react-icons": "^4.8.0",
         "react-modal": "^3.16.1",
+        "react-password-strength-bar": "^0.4.1",
         "react-pdf": "^7.7.1",
         "react-query": "^3.39.3",
         "sharp": "^0.32.0",

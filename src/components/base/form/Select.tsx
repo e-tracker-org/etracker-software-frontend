@@ -1,4 +1,4 @@
-import { ReactNode, useId } from 'react';
+import { ReactNode, ChangeEvent, useId } from 'react';
 
 interface Props {
     children: ReactNode;
@@ -12,6 +12,7 @@ interface Props {
     selectClassName?: string;
     labelClassName?: string;
     placeholder?: string;
+    onChange?: (e: ChangeEvent<HTMLSelectElement>) => void; // Add onChange prop
 }
 
 export default function Select({
@@ -26,6 +27,7 @@ export default function Select({
     selectClassName,
     labelClassName,
     placeholder,
+    onChange, // Destructure onChange from props
 }: Props) {
     const id = useId();
     return (
@@ -51,6 +53,8 @@ export default function Select({
                     placeholder={placeholder}
                     id={id}
                     {...register}
+                    value={value} // Include value prop here
+                    onChange={onChange} // Pass onChange handler to the select element
                     className={`block px-3 py-2 w-full text-sm text-black 
 					 focus:outline-none autofill:bg-gray-200 bg-transparent bg-opacity-0
 					 focus:ring-0 focus:border-none peer ${selectClassName}`}

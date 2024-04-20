@@ -44,7 +44,7 @@ const SuccessPage: FC<SuccessProps> = ({
                     {content}
                 </p>
                 {isOnContinue && (
-                    <Button onClick={onContinue} className="w-full md:w-auto">
+                    <Button onClick={onContinue} className="w-full">
                         Continue
                     </Button>
                 )}

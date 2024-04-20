@@ -242,7 +242,7 @@ export const roleMenus: Record<Role, string[]> = {
         'Properties',
         // 'Rent',
         // 'Apartment',
-        'Inbox',
+        // 'Inbox',
         'Profile',
     ],
     [Role.LandlordTenant]: [
