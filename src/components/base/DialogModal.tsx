@@ -12,6 +12,9 @@ interface DialogModalProps {
     children?: ReactNode;
     showClose?: boolean;
     contentClass?: string;
+    subTitle?: string;
+    icon?: string;
+    alternative?: string;
 }
 
 const customStyles = {
@@ -34,46 +37,69 @@ export const DialogModal: FC<DialogModalProps> = ({
     children,
     showClose,
     contentClass,
+    subTitle,
+    icon,
+    alternative,
 }) => {
     return openModal ? (
         <div
             id="defaultModal"
             aria-hidden="true"
-            className={`w-screen h-screen flex flex-col items-center  bg-white md:bg-black/40 fixed z-[1000000000] inset-x-0 top-0 shadow-2xl  transition-all duration-300 ease-in-out px-5 md:px-0 overflow-y-scroll`}
-            onClick={() => {}}
+            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50`}
+            onClick={closeModal}
         >
             <div
-                className={`relative p-2 w-full sm:w-2/5 h-[auto] bg-white z-50 rounded-lg  md:top-[20px] lg:top-[200px] ${className}`}
+                className={`bg-white  rounded-lg overflow-hidden ${className}`}
             >
-                {/* <!-- Modal content --> */}
-                <div className="relative">
-                    <div className="flex flex-col items-center px-2 md:mb-0">
-                        {/* <!-- Modal header --> */}
-
-                        <div className="flex flex-end w-full">
-                            {showClose ? (
-                                <button
-                                    type="button"
-                                    className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm  ml-auto  inline-flex items-center "
-                                    onClick={(e) => {}}
-                                >
-                                    <Image
-                                        src="/close.svg"
-                                        alt="Modal Close"
-                                        width={20}
-                                        height={20}
-                                    />
-                                </button>
-                            ) : null}
-                        </div>
-
-                        {/* <!-- Modal body --> */}
-                        <div
-                            className={`flex flex-col m-auto py-14 ${contentClass}`}
+                {/* Modal content */}
+                <div className="p-4">
+                    {/* Modal header */}
+                    {showClose && (
+                        <button
+                            type="button"
+                            className="absolute top-[20%] lg:top-[15%] lg:right-[10%] right-2 text-black-400 hover:bg-gray-200 hover:text-gray-900 rounded-full p-1"
+                            onClick={closeModal}
                         >
-                            {title ? title : ''}
-                            {children}
+                            <Image
+                                src="/close.svg"
+                                alt="Modal Close"
+                                width={20}
+                                height={20}
+                            />
+                        </button>
+                    )}
+                    {/* Modal body */}
+                    <div
+                        className={`py-4 ${contentClass}`}
+                        style={{ textAlign: 'center' }}
+                    >
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}
+                        >
+                            {icon && (
+                                <Image
+                                    src={icon}
+                                    alt={alternative}
+                                    width={200}
+                                    height={200}
+                                />
+                            )}
+                            {title && (
+                                <h2 className="text-lg  font-bold mb-4">
+                                    {title}
+                                </h2>
+                            )}
+                            {subTitle && (
+                                <h3 className="text-sm  mb-4 w-[120px]">
+                                    {subTitle}
+                                </h3>
+                            )}
                         </div>
+                        {children}
                     </div>
                 </div>
             </div>

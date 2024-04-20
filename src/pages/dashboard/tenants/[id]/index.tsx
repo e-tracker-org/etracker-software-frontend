@@ -23,6 +23,8 @@ import { string } from 'yup';
 import { getLandlordTenant } from 'services/newServices/tenant';
 import { deleteTask } from 'services/newServices/tenant';
 import useProperty from 'hooks/useProperty';
+import { DialogModal } from 'components/base/DialogModal';
+import SuccessPage from 'components/onboarding/SuccessPage';
 
 interface DetailsProps {
     label?: string;
@@ -71,7 +73,8 @@ export default function TenantDetails() {
     const { query, router } = useRouter();
     const states = useAppStore();
     const { endTenantAgreement, isEndTenantAgreementLoading } = useLandlord();
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const id = query?.id as string | undefined;
     // const propertyId = states?.propertyId as string;
     const [tenant, setTenant] = useState({} as User);
@@ -84,12 +87,19 @@ export default function TenantDetails() {
     );
 
     const property = getProperty?.data;
-    console.log(tenantProperty, 'tenantProperty');
 
     const { uploadedFiles, loadinguploadFiles } = useFileUploadHandler(
         'PROFILE',
         'profile_image'
     );
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
     useEffect(() => {
         async function fetchData() {
@@ -133,9 +143,13 @@ export default function TenantDetails() {
             tenantId: tenantProperty?.userId,
         };
         try {
+            setIsLoading(true);
             const deleteTenant = await deleteTask(tenantId, body);
             console.log(deleteTenant);
             toast.success('Tenant agreement successfully ended');
+            setIsLoading(false);
+            setIsModalOpen(false);
+            router.push('/dashboard/tenants');
             // router.back();
         } catch (error) {
             console.error('Error ending tenant agreement:', error);
@@ -167,8 +181,9 @@ export default function TenantDetails() {
                     <Button
                         title="End Agreement"
                         isLoading={isEndTenantAgreementLoading}
-                        // @ts-ignore
-                        onClick={() => handleEndAgreement(tenantProperty?.id)}
+                        onClick={() => {
+                            openModal();
+                        }}
                     />
                 </div>
             </header>
@@ -264,6 +279,42 @@ export default function TenantDetails() {
                 <DetailsRowCard title="Transaction History">
                     <TransactionHistory />
                 </DetailsRowCard>
+
+                <DialogModal
+                    openModal={isModalOpen}
+                    closeModal={closeModal}
+                    title={`Do you want to end  agreement with your tenant?`}
+                    subTitle="Ending a tenancy early can lead to legal and financial repercussions for landlords, including compensation to the tenant and legal action. Seek legal advice before taking action."
+                    contentClass="w-full !py-10"
+                    className="rounded-md sm:ml-[40%] lg:ml-[10%] px-[10%]  lg:!top-[10%]"
+                >
+                    <div>
+                        <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-16 mb-2">
+                            <Button
+                                type="button"
+                                onClick={() => {
+                                    closeModal();
+                                }}
+                                variant="default"
+                                className="w-full py-4"
+                            >
+                                Cancel
+                            </Button>
+
+                            <Button
+                                className="w-full py-4"
+                                type="submit"
+                                isLoading={isLoading}
+                                // @ts-ignore
+                                onClick={() =>
+                                    handleEndAgreement(tenantProperty?.id)
+                                }
+                            >
+                                Confirm
+                            </Button>
+                        </div>
+                    </div>
+                </DialogModal>
             </section>
         </div>
     );
