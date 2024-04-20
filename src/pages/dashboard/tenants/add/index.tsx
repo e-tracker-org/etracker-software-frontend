@@ -34,7 +34,7 @@ export default function AddTenant() {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
 
-    console.log(selectedPropertyId, 'selectedPropertyId');
+    console.log(states?.propertyId, 'selectedPropertyId');
     const [selectedTenants, setSelectedTenants] = useState<User[]>([]);
     const [tenantDropdownItems, setTenantDropdownItems] = useState<User[]>([]);
 
@@ -52,9 +52,21 @@ export default function AddTenant() {
         {}
     );
 
-    const createRegistrationLink = (propertyId: string) => {
-        return `https://etracker-software-frontend.vercel.app/auth/signup?propertyId=${propertyId}`;
-    };
+    // const createRegistrationLink = (invitedByName: string) => {
+    //     return `localhost:3000/auth/invite-tenant?invitedBy=${encodeURIComponent(
+    //         invitedByName
+    //     )}`;
+    // };
+
+    // useEffect(() => {
+    //     const firstname: string = userProfile?.firstname || '';
+    //     const lastname: string = userProfile?.lastname || '';
+
+    //     const invitedByName: string = `${firstname} ${lastname}`;
+
+    // // const createRegistrationLink = (propertyId: string) => {
+    // //     return `https://etracker-software-frontend.vercel.app/auth/signup?propertyId=${propertyId}`;
+    // // };
 
     useEffect(() => {
         let propId;
@@ -62,11 +74,20 @@ export default function AddTenant() {
             propId = id;
         } else if (selectedPropertyId) {
             propId = selectedPropertyId;
+        } else if (states?.propertyId){
+            propId = states?.propertyId;
         }
+
+        const firstname: string = userProfile?.firstname || '';
+        const lastname: string = userProfile?.lastname || '';
+
+        const invitedByName: string = `${firstname} ${lastname}`;
 
         // @ts-ignore
         const propertyId: string = propId;
-        const registrationLink = createRegistrationLink(propertyId);
+        const registrationLink = `https://etracker-software-frontend.vercel.app/auth/invite-tenant?propertyId=${propertyId}&invitedBy=${encodeURIComponent(
+            invitedByName
+        )}`;
 
         setLink(registrationLink);
     }, [userProfile]);
@@ -113,24 +134,35 @@ export default function AddTenant() {
     const handleInviteTenant = async () => {
         try {
             setLoading(true);
+            let propId;
+            if (id) {
+                propId = id;
+            } else if (selectedPropertyId) {
+                propId = selectedPropertyId;
+            } else if (states?.propertyId){
+                propId = states?.propertyId;
+            }
+            // @ts-ignore
+            const propertyId: string = propId;
             // @ts-ignore
             const selectedPropertyLabel = properties.find(
-                (property) => property.value === selectedPropertyId
+
+                (property) => property.value === propertyId
             )?.label;
 
-            if (!selectedPropertyId || !email) {
+            if (!propId || !email) {
                 throw new Error('No property selected or email is missing');
             }
 
             const body = {
-                propertyId: selectedPropertyId,
+                propertyId: propId,
                 email,
                 propertyName: selectedPropertyLabel,
             };
 
             const response = await inviteTenant(body);
 
-            if (response.success) {
+            if (response) {
                 toast.success('Invite sent successfully');
             } else {
                 toast.error('Failed to send invite');

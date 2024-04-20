@@ -74,7 +74,6 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
         router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
     };
 
-    console.log('tenant', tenants);
 
     return (
         <div className="relative">
