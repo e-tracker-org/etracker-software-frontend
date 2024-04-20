@@ -83,7 +83,7 @@ function SignUp() {
             });
     };
 
-    const checkPassword = (myPassword) => {
+    const checkPassword = (myPassword: any) => {
         setPassword(myPassword);
         const strongRegex = new RegExp(
             '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=.{8,})'
@@ -99,7 +99,7 @@ function SignUp() {
         }
     };
 
-    const updateForm = (e) => {
+    const updateForm = (e:any) => {
         const { value, name } = e.target;
         if (name === 'password') {
             checkPassword(value);
