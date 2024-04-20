@@ -78,7 +78,7 @@ export default function TenantDetails() {
     const id = query?.id as string | undefined;
     // const propertyId = states?.propertyId as string;
     const [tenant, setTenant] = useState({} as User);
-    const [tenantProperty, setTenantProperty] = useState<TenantProperty | null>(
+    const [tenantProperty, setTenantProperty] = useState<TenantProperty | any>(
         null
     );
     const { getProperty, getPropertyLoading } = useProperty(
