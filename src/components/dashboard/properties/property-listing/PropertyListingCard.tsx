@@ -121,9 +121,9 @@ const PropertyListingCard: FC<PropertyListingProp> = ({ property }) => {
                             >
                                 {property?.is_active ? 'Active' : 'Off Market'}
                             </span>
-                            <span className="py-2 md:px-3 lg:px-5 md:text-sm lg:text-lg font-medium text-[#131313]">
+                            {/* <span className="py-2 md:px-3 lg:px-5 md:text-sm lg:text-lg font-medium text-[#131313]">
                                 100% occupancy rate
-                            </span>
+                            </span> */}
                         </p>
                     </div>
                 </Link>
