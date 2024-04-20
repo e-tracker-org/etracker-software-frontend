@@ -11,7 +11,11 @@ const TenantsList: FC<TenantProp> = ({ tenants }) => {
     return (
         <div className="w-full">
             <Header tenantsCount={tenants ? tenants.length : 0} />
-            <TenantTable tenants={tenants} borderLeft={true} />
+            <TenantTable
+                tenants={tenants}
+                borderLeft={true}
+                showCheckbox={true}
+            />
         </div>
     );
 };

@@ -111,3 +111,16 @@ export async function deleteTask(tenantId, body) {
         body: JSON.stringify(body),
     });
 }
+
+export async function inviteTenant(body) {
+    return request(`${API_URL}/tenants/invite`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+            Authorization: USER_TOKEN,
+        },
+        body: JSON.stringify(body),
+    });
+}

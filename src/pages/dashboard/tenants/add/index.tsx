@@ -18,6 +18,7 @@ import Select from 'components/base/form/Select';
 import useProperty from 'hooks/useProperty';
 import TenantSearchItem from 'components/dashboard/tenants/add/SearchItem';
 import { useQuery } from 'react-query';
+import { inviteTenant } from 'services/newServices/tenant';
 
 export default function AddTenant() {
     const states = useAppStore();
@@ -30,15 +31,14 @@ export default function AddTenant() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedPropertyId, setSelectedPropertyId] = useState('');
     const [link, setLink] = useState('');
+    const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const [selectedTenants, setSelectedTenants] = useState<User[]>([]);
     const [tenantDropdownItems, setTenantDropdownItems] = useState<User[]>([]);
 
-    const {
-        getLandlordTenants,
-        addLandlordTenant,
-        isAddTenantLoading,
-    } = useLandlord();
+    const { getLandlordTenants, addLandlordTenant, isAddTenantLoading } =
+        useLandlord();
 
     const properties = getMyProperties?.data.data.map((property) => ({
         value: property.id,
@@ -51,11 +51,8 @@ export default function AddTenant() {
         {}
     );
 
-    const createRegistrationLink = (invitedByName: string) => {
-        const propertyId = id ? id : selectedPropertyId;
-        return `localhost:3000/auth/invite-tenant?propertyId=${propertyId}&invitedBy=${encodeURIComponent(
-            invitedByName
-        )}`;
+    const createRegistrationLink = (propertyId: string) => {
+        return `https://etracker-software-frontend.vercel.app/auth/signup?propertyId=${propertyId}`;
     };
 
     useEffect(() => {
@@ -106,6 +103,44 @@ export default function AddTenant() {
         );
 
         // }
+    };
+    // @ts-ignore
+    const handleEmailChange = (event) => {
+        setEmail(event.target.value);
+    };
+
+    const handleInviteTenant = async () => {
+        try {
+            setLoading(true);
+            // @ts-ignore
+            const selectedPropertyLabel = properties.find(
+                (property) => property.value === selectedPropertyId
+            )?.label;
+
+            if (!selectedPropertyId || !email) {
+                throw new Error('No property selected or email is missing');
+            }
+
+            const body = {
+                propertyId: selectedPropertyId,
+                email,
+                propertyName: selectedPropertyLabel,
+            };
+
+            const response = await inviteTenant(body);
+
+            if (response.success) {
+                toast.success('Invite sent successfully');
+            } else {
+                toast.error('Failed to send invite');
+            }
+
+            setLoading(false);
+        } catch (error) {
+            console.error('Error inviting tenant:', error);
+            toast.error('Error inviting tenant');
+            setLoading(false);
+        }
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -251,7 +286,7 @@ export default function AddTenant() {
                     </p>
                 </section>
                 <section className="w-full">
-                    <div className="w-3/5 m-auto my-[50px]">
+                    <div className="lg:w-3/5 m-auto my-[50px]">
                         <section>
                             {!id && (
                                 <div className="mb-8">
@@ -405,16 +440,20 @@ export default function AddTenant() {
                     </section>
                     <section className="my-8">
                         <label>Email address</label>
-                        <div className="flex gap-6">
+                        <div className="flex flex-col lg:flex-row gap-6">
                             <input
                                 type="email"
                                 placeholder="contact@gmail.com"
-                                className="rounded-md bg-[#FFFFFF] placeholder:text-[#13131373] pl-16 pr-4 py-3 focus:border-primary-600 border border-[#B9B9B9] w-4/5"
+                                value={email}
+                                onChange={handleEmailChange}
+                                className="rounded-md bg-[#FFFFFF] placeholder:text-[#13131373] pl-5 pr-4 py-3 focus:border-primary-600 border border-[#B9B9B9] lg:w-4/5"
                             />
                             <Button
                                 title="Send Invite"
                                 type="submit"
-                                className="w-2/5"
+                                className="lg:w-2/5"
+                                onClick={() => handleInviteTenant()}
+                                isLoading={loading}
                             />
                         </div>
                     </section>

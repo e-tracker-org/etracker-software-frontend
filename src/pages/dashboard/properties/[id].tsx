@@ -53,8 +53,33 @@ export default function PropertyDetails() {
     const router = useRouter();
     const id = query?.id as string | undefined;
     const { getProperty, getPropertyLoading } = useProperty(id);
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [showModal, setShowModal] = useState(false);
 
     const property = getProperty?.data;
+    console.log(property);
+
+    // @ts-ignore
+    const openModal = (index) => {
+        setSelectedImageIndex(index);
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+    const nextImage = () => {
+        setSelectedImageIndex((prevIndex) =>
+            prevIndex === property?.image_list.length - 1 ? 0 : prevIndex + 1
+        );
+    };
+
+    const prevImage = () => {
+        setSelectedImageIndex((prevIndex) =>
+            prevIndex === 0 ? property?.image_list.length - 1 : prevIndex - 1
+        );
+    };
 
     return (
         <div className="h-auto">
@@ -102,49 +127,74 @@ export default function PropertyDetails() {
                     <DetailsRowCard title="General Information">
                         <div className="flex flex-row gap-4">
                             <div className="w-4/5">
-                                <Image
-                                    src={property?.image_list[0]?.urls[0]}
-                                    alt="property placeholder"
-                                    className="rounded-md"
-                                    width={700}
-                                    height={600}
-                                />
+                                <div onClick={() => openModal(0)}>
+                                    <Image
+                                        src={property?.image_list[0]?.urls[0]}
+                                        alt="property placeholder 0"
+                                        className="rounded-md"
+                                        width={700}
+                                        height={600}
+                                    />
+                                </div>
                             </div>
-                            <div className="flex flex-col  w-2/5">
-                                <Image
-                                    src={property?.image_list[0]?.urls[0]}
-                                    alt="property placeholder 1"
-                                    className="rounded-md"
-                                    width={400}
-                                    height={180}
-                                />
-                                <Image
-                                    src={property?.image_list[0]?.urls[0]}
-                                    alt="property placeholder 2"
-                                    className="rounded-md"
-                                    width={400}
-                                    height={200}
-                                />
-
-                                {/* {property?.image_list?.map((image:any) => (
-                                <Image
-                                    src={image?.urls[0]}
-                                    alt="property placeholder 1"
-                                    className="rounded-md"
-                                    width={400}
-                                    height={180}
-                                />
-                                // <Image
-                                //     src={property?.image_list[2]?.urls[0]}
-                                //     alt="property placeholder 2"
-                                //     className="rounded-md"
-                                //     width={400}
-                                //     height={200}
-                                // />
-                                ))} */}
+                            <div className="flex flex-col w-2/5">
+                                <div onClick={() => openModal(1)}>
+                                    <Image
+                                        src={property?.image_list[1]?.urls[0]}
+                                        alt="property placeholder 1"
+                                        className="rounded-md"
+                                        width={400}
+                                        height={180}
+                                    />
+                                </div>
+                                <div onClick={() => openModal(2)}>
+                                    <Image
+                                        src={property?.image_list[2]?.urls[0]}
+                                        alt="property placeholder 2"
+                                        className="rounded-md"
+                                        width={400}
+                                        height={200}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </DetailsRowCard>
+
+                    {showModal && (
+                        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+                            <div className="relative">
+                                <button
+                                    onClick={prevImage}
+                                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white rounded-full p-2"
+                                >
+                                    &lt;
+                                </button>
+                                <button
+                                    onClick={nextImage}
+                                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white rounded-full p-2"
+                                >
+                                    &gt;
+                                </button>
+                                <Image
+                                    src={
+                                        property?.image_list[selectedImageIndex]
+                                            ?.urls[0]
+                                    }
+                                    alt={`Image ${selectedImageIndex}`}
+                                    className="rounded-md transition-opacity duration-300"
+                                    width={500}
+                                    height={400}
+                                />
+
+                                <button
+                                    onClick={closeModal}
+                                    className="absolute top-0 right-0 m-4 text-white cursor-pointer"
+                                >
+                                    X
+                                </button>
+                            </div>
+                        </div>
+                    )}
                     <DetailsRowCard>
                         <div className="w-full">
                             <div className="flex gap-4 mb-6">

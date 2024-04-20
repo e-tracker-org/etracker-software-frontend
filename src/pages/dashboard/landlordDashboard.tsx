@@ -148,12 +148,12 @@ const LandlordDash: FC = () => {
             {propertiesLoading ? (
                 <Loader loading={propertiesLoading} />
             ) : (
-                <section className="py-10 px-8">
+                <section className="py-10 lg:px-8">
                     <div className="flex flex-col lg:flex-row lg:mb-5">
                         <div className="lg:w-1/2 lg:mr-5 mb-5 lg:mb-0">
                             <div
                                 style={{ backgroundColor: '#1F32EB' }}
-                                className=" rounded-md pt-5"
+                                className=" rounded-md pt-5 "
                             >
                                 <DetailsRowCard title="Property Management">
                                     <div className="flex gap-3">
@@ -188,7 +188,7 @@ const LandlordDash: FC = () => {
                             </div>
                         </div>
                         <div className="lg:w-1/2 lg:ml-5">
-                            <div className="px-8 bg-white rounded-md pt-5">
+                            <div className="lg:px-8 bg-white rounded-md pt-5">
                                 <DetailsRowCard
                                     title="Properties"
                                     linkText="View Properties"
@@ -250,7 +250,7 @@ const LandlordDash: FC = () => {
                             borderLeftColor: '#1F32EB',
                             borderLeftWidth: 5,
                         }}
-                        className="mt-5 bg-white rounded-md pt-5 px-8"
+                        className="mt-5 bg-white rounded-md pt-5 lg:px-8"
                     >
                         <DetailsRowCard
                             title="Tenants"
@@ -316,7 +316,7 @@ const LandlordDash: FC = () => {
                             borderLeftColor: '#1F32EB',
                             borderLeftWidth: 5,
                         }}
-                        className="mt-5 bg-white rounded-md pt-5 px-8"
+                        className="mt-5 bg-white rounded-md pt-5 lg:px-8"
                     >
                         <DetailsRowCard title="My Units" titleColor="black">
                             {Array.isArray(properties) && properties.length ? (
