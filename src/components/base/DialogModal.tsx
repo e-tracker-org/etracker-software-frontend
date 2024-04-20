@@ -14,7 +14,7 @@ interface DialogModalProps {
     contentClass?: string;
     subTitle?: string;
     icon?: string;
-    alternative?: string;
+    alternative?: string | undefined;
 }
 
 const customStyles = {
@@ -83,7 +83,7 @@ export const DialogModal: FC<DialogModalProps> = ({
                             {icon && (
                                 <Image
                                     src={icon}
-                                    alt={alternative}
+                                    alt={alternative ?? ''}
                                     width={200}
                                     height={200}
                                 />
