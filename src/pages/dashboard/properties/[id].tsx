@@ -644,10 +644,12 @@ export default function PropertyDetails() {
                                     content={
                                         editable ? (
                                             <TextArea
+                                                //@ts-ignore
                                                 value={formData?.description}
                                                 onChange={(e) =>
                                                     handleChange(
                                                         'description',
+                                                        //@ts-ignore
                                                         e.target.value
                                                     )
                                                 }

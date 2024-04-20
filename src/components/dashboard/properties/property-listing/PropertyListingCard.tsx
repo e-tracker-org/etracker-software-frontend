@@ -111,7 +111,7 @@ const PropertyListingCard: FC<PropertyListingProp> = ({ property }) => {
                                 />
                             </li>
                         </ul>
-                        <p className="flex items-center md:gap-3 lg:gap-6 mt-3 text-center">
+                        <p className="flex items-center gap-2 md:gap-3 lg:gap-6 mt-3 text-center">
                             <span
                                 className={`py-2 px-5 ${
                                     property?.is_active
@@ -122,7 +122,7 @@ const PropertyListingCard: FC<PropertyListingProp> = ({ property }) => {
                                 {property?.is_active ? 'Active' : 'Off Market'}
                             </span>
                             <span className="py-2 md:px-3 lg:px-5 md:text-sm lg:text-lg font-medium text-[#131313]">
-                                36% occupancy rate
+                                100% occupancy rate
                             </span>
                         </p>
                     </div>
