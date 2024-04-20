@@ -52,9 +52,21 @@ export default function AddTenant() {
         {}
     );
 
-    // const createRegistrationLink = (propertyId: string) => {
-    //     return `https://etracker-software-frontend.vercel.app/auth/signup?propertyId=${propertyId}`;
+    // const createRegistrationLink = (invitedByName: string) => {
+    //     return `localhost:3000/auth/invite-tenant?invitedBy=${encodeURIComponent(
+    //         invitedByName
+    //     )}`;
     // };
+
+    // useEffect(() => {
+    //     const firstname: string = userProfile?.firstname || '';
+    //     const lastname: string = userProfile?.lastname || '';
+
+    //     const invitedByName: string = `${firstname} ${lastname}`;
+
+    // // const createRegistrationLink = (propertyId: string) => {
+    // //     return `https://etracker-software-frontend.vercel.app/auth/signup?propertyId=${propertyId}`;
+    // // };
 
     useEffect(() => {
         let propId;
@@ -66,9 +78,16 @@ export default function AddTenant() {
             propId = states?.propertyId;
         }
 
+        const firstname: string = userProfile?.firstname || '';
+        const lastname: string = userProfile?.lastname || '';
+
+        const invitedByName: string = `${firstname} ${lastname}`;
+
         // @ts-ignore
         const propertyId: string = propId;
-        const registrationLink = `https://etracker-software-frontend.vercel.app/auth/signup?propertyId=${propertyId}`;
+        const registrationLink = `https://etracker-software-frontend.vercel.app/auth/invite-tenant?propertyId=${propertyId}&invitedBy=${encodeURIComponent(
+            invitedByName
+        )}`;
 
         setLink(registrationLink);
     }, [userProfile]);

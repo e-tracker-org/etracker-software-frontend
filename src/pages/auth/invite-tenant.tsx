@@ -95,6 +95,7 @@ function SignUp() {
 
     useEffect(() => {
         const { invitedBy, propertyId } = router.query;
+        console.log(invitedBy, propertyId);
         if (invitedBy) {
             setInvitedByName(decodeURIComponent(invitedBy as string));
         }
