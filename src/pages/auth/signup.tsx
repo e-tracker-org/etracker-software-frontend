@@ -14,6 +14,7 @@ import { ReactElement, useState, useRef } from 'react';
 import HomeLayout from 'layouts/home';
 import { MutationKey } from 'react-query';
 import { useRouter } from 'next/router';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 const schema = yup.object({
     email: yup
@@ -44,10 +45,13 @@ function SignUp() {
         { onSuccess: () => queryClient.invalidateQueries('getUserData') }
     );
     const router = useRouter();
+    const [password, setPassword] = useState('');
+    const [checkpassword, setCheckPassword] = useState('');
     const {
         handleSubmit,
         register,
         reset,
+        watch,
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
@@ -77,6 +81,29 @@ function SignUp() {
 
                 toast.error(error?.message);
             });
+    };
+
+    const checkPassword = (myPassword) => {
+        setPassword(myPassword);
+        const strongRegex = new RegExp(
+            '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=.{8,})'
+        );
+        if (strongRegex.test(password)) {
+            setCheckPassword('password is strong');
+            // document.getElementById("password").style.borderColor = "green";
+        } else {
+            setCheckPassword(
+                'password is weak, try adding special characters, numbers and capital letters'
+            );
+            // document.getElementById("password").style.borderColor = "red";
+        }
+    };
+
+    const updateForm = (e) => {
+        const { value, name } = e.target;
+        if (name === 'password') {
+            checkPassword(value);
+        }
     };
 
     return (
@@ -136,14 +163,21 @@ function SignUp() {
                         />
                     </div>
                     <div className="flex gap-4 mb-10">
-                        <Input
-                            className="flex-1"
-                            placeholder="Password"
-                            type="password"
-                            required
-                            error={errors.password}
-                            register={{ ...register('password') }}
-                        />
+                        <div>
+                            <Input
+                                className="flex-1"
+                                placeholder="Password"
+                                type="password"
+                                required
+                                error={errors.password}
+                                onChange={updateForm}
+                                register={{
+                                    ...register('password', { required: true }),
+                                }}
+                            />
+                            <PasswordStrengthBar password={watch('password')} />
+                        </div>
+
                         <Input
                             className="flex-1"
                             placeholder="Confirm Password"

@@ -1,3 +1,4 @@
+//@ts-ignore
 import { Property } from 'interfaces';
 import React, { FC, useEffect, useState } from 'react';
 import Header from './Header';
