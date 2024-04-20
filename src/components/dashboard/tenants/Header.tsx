@@ -146,6 +146,7 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
                     <button
                         data-id={property.value}
                         onClick={(e) => {
+                            console.log(e.currentTarget.dataset);
                             states?.setPropertyId(
                                 e.currentTarget.dataset.id as string
                             );
