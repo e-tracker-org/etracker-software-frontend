@@ -94,6 +94,7 @@ function Signin() {
             .then((data: any) => {
                 states?.setStartKycScreen('');
                 // reset();
+                console.log('user', data)
                 if (!!data?.data?.tokens) {
                     //Sets user token in local storage from the zustan state
                     states?.setUser({

@@ -4,15 +4,18 @@ import useAccountType from 'hooks/useAccountType';
 import TenantDash from './tenants/tenatDashboard';
 import LandlordDash from './landlordDashboard';
 import useProperty from 'hooks/useProperty';
+import { useAppStore } from 'hooks/useAppStore';
 
 export default function Dashboard() {
-    const { acctType } = useAccountType();
-    console.log(acctType?.typeID);
+    // const { acctType } = useAccountType(); // we can revert this when we figure out why it isnt working.
+    const states = useAppStore();
+    // @ts-ignore
+    const accountType = states?.user?.accountTypes[0];
 
-    if (acctType) {
+    if (accountType) {
         return (
             <section>
-                {acctType.typeID === 1 ? <TenantDash /> : <LandlordDash />}
+                {accountType === 1 ? <TenantDash /> : <LandlordDash />}
             </section>
         );
     } else {

@@ -163,12 +163,12 @@ const LandlordDash: FC = () => {
                                             title="Issue Recipt"
                                             icon={<ReceiptSvg />}
                                         />
-                                        <Box
+                                        {/* <Box
                                             onClick={handleNavigate}
                                             route="dashboard/tenants"
                                             title="Utility Bill"
                                             icon={<MoneySvg />}
-                                        />
+                                        /> */}
                                         <Box
                                             onClick={handleNavigate}
                                             route="dashboard/tenants/verify"

@@ -158,6 +158,7 @@ export default function AddTenant() {
                 propertyId: propId,
                 email,
                 propertyName: selectedPropertyLabel,
+                invitedBy: userProfile?.firstname + ' ' + userProfile?.lastname,
             };
 
             const response = await inviteTenant(body);
