@@ -18,6 +18,7 @@ export interface User {
     currentKyc: CurrentKyc;
     profileImage: string;
     rating: number;
+    landmark: string;
 }
 
 export interface User2 {
