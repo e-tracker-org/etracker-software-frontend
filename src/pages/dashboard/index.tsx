@@ -7,15 +7,15 @@ import useProperty from 'hooks/useProperty';
 import { useAppStore } from 'hooks/useAppStore';
 
 export default function Dashboard() {
-    // const { acctType } = useAccountType(); // we can revert this when we figure out why it isnt working.
+    const { acctType } = useAccountType(); // we can revert this when we figure out why it isnt working.
     const states = useAppStore();
     // @ts-ignore
-    const accountType = states?.user?.accountTypes[0];
+    // const accountType = states?.user?.currentKyc?.accountType;
 
-    if (accountType) {
+    if (acctType) {
         return (
             <section>
-                {accountType === 1 ? <TenantDash /> : <LandlordDash />}
+                {acctType.typeID === 1 ? <TenantDash /> : <LandlordDash />}
             </section>
         );
     } else {

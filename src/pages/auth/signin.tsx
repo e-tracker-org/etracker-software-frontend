@@ -94,7 +94,7 @@ function Signin() {
             .then((data: any) => {
                 states?.setStartKycScreen('');
                 // reset();
-                console.log('user', data)
+                console.log('user', data);
                 if (!!data?.data?.tokens) {
                     //Sets user token in local storage from the zustan state
                     states?.setUser({
@@ -134,7 +134,7 @@ function Signin() {
                         states?.setActiveKyc(data?.data?.user?.currentKyc);
                         states?.setScreen('');
                         states?.setActiveAccount(
-                            data?.data?.user?.accountTypes[0]
+                            data?.data?.user?.currentKyc?.accountType
                         );
                     }
 
