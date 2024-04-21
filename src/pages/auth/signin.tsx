@@ -134,7 +134,7 @@ function Signin() {
                         states?.setActiveKyc(data?.data?.user?.currentKyc);
                         states?.setScreen('');
                         states?.setActiveAccount(
-                            data?.data?.user?.currentKyc?.accountType
+                            data?.data?.user?.accountTypes[0]
                         );
                     }
 
