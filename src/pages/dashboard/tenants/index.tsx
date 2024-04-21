@@ -7,6 +7,7 @@ import { User } from 'interfaces';
 import { useEffect, useState } from 'react';
 import { useAppStore } from 'hooks/useAppStore';
 import { getLandlordTenant } from 'services/newServices/tenant';
+import toast from 'react-hot-toast';
 // import { GenericResponse } from 'services';
 
 export default function Tenants() {
@@ -18,11 +19,23 @@ export default function Tenants() {
         setLoading(true);
 
         async function fetchData() {
-            const tenantData = await getLandlordTenant(states?.user?.id);
-            console.log('okay', tenantData);
-            setTenants(tenantData);
-            setLoading(false);
+            try {
+                const tenantData = await getLandlordTenant(states?.user?.id);
+                console.log('okay', tenantData);
+                setTenants(tenantData);
+                setLoading(false);
+            } catch (error) {
+                // Check if the error is a 404 response
+                //@ts-ignore
+                if (error.response && error.response.status === 404) {
+                    toast.error('No tenant found for the specified landlordId');
+                } else {
+                    toast.error('An error occurred while fetching data.');
+                }
+                setLoading(false);
+            }
         }
+
         if (states?.user?.id) {
             fetchData();
         }
