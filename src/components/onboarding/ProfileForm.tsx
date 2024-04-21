@@ -31,7 +31,7 @@ const schema = yup.object({
     fullAddress: yup.string().required('Enter your address'),
     state: yup.string().required('Select state'),
     area: yup.string().required('Select local government area'),
-    landmark: yup.string().optional(),
+    landmark: yup.string().required('Enter a landmark'),
     dob: yup.date().required('Enter your date of birth'),
     gender: yup.string().required('Select your gender'),
     country: yup.string().required('Select country'),
@@ -146,6 +146,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
     const onSubmit = async (data: any) => {
         data.dob = new Date(data.dob).toUTCString();
 
+        console.log(data, 'data');
+
         // Add user image to the data
         if (profileImage) {
             data.profileImage = profileImage;
@@ -179,8 +181,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
                 });
         } else {
             updateUser(data)
-                .then((res) => {
+                .then((req) => {
                     toast.success('Profile updated.');
+                    console.log(req, 'req');
                 })
                 .catch((error) => {
                     console.log('error', error);
@@ -212,7 +215,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
             country: states?.user?.country,
             dob: moment(states?.user?.dob).format('YYYY-MM-DD'),
             gender: states?.user?.gender,
-            // @ts-ignore
             landmark: states?.user?.landmark,
             fullAddress: states?.user?.fullAddress,
         };

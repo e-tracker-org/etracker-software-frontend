@@ -72,7 +72,7 @@ export default function PropertyDetails() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const property = getProperty?.data;
-    const [editable, setEditable] = useState(true);
+    const [editable, setEditable] = useState(false);
     const { register, handleSubmit, watch } = useForm();
     const [formData, setFormData] = useState({
         name: property?.name,

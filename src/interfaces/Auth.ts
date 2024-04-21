@@ -19,6 +19,7 @@ export interface User {
     profileImage: string;
     landmark: string;
     rating: number;
+    landmark: string;
 }
 
 export interface User2 {
