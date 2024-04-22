@@ -20,3 +20,22 @@ export const KycServices = {
         }
     },
 };
+
+interface Kyc {
+    // Define the structure of your KYC data
+    // For example:
+    id: string;
+    name: string;
+    // Add more fields as needed
+}
+
+async function getAllKycs(): Promise<AxiosResponse<Kyc[]>> {
+    try {
+        const response = await http.get('/api/v1/kyc/all');
+        return response.data;
+    } catch (error: any) {
+        return Promise.reject(error.response.data);
+    }
+}
+
+export default getAllKycs;

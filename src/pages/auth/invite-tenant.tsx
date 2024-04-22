@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { AuthService } from 'services';
 import { AxiosError } from 'axios';
 import { ReactElement, useState, useRef, useEffect } from 'react';
@@ -15,6 +15,9 @@ import HomeLayout from 'layouts/home';
 import { MutationKey } from 'react-query';
 import { useRouter } from 'next/router';
 import useLandlord from 'hooks/useLandlord';
+import { UserService } from 'services';
+import { GET_ACCOUNT_TYPES_QUERY_KEY } from 'utils/constants';
+import { useAppStore } from 'hooks/useAppStore';
 
 const schema = yup.object({
     email: yup
@@ -44,6 +47,7 @@ function SignUp() {
         AuthService.signup,
         { onSuccess: () => queryClient.invalidateQueries('getUserData') }
     );
+    const states = useAppStore();
     const router = useRouter();
     const [invitedByName, setInvitedByName] = useState('');
     const [propertyId, setPropertyId] = useState('');
@@ -60,6 +64,8 @@ function SignUp() {
     const { addLandlordTenant } = useLandlord();
 
     const onSubmit = async (values: any) => {
+        const defaultAccountType = [1];
+
         const userObj = {
             firstname: values.firstName,
             lastname: values.lastName,
@@ -68,24 +74,25 @@ function SignUp() {
             email: values.email,
             password: values.password,
             propertyId: propertyId,
+            accountTypes: defaultAccountType,
         };
+
         registerAsync(userObj)
             .then((data: any) => {
                 if (data.success) {
-                    // if(propertyId){
-                    //     addLandlordTenant([{
-                    //         email: userObj?.email,
-                    //         propertyId,
-                    //     }])
-                    //     .then((res: any) => {
-                    //         if (res) toast.success(res?.message);
-                    //     })
-                    //     .catch((error) => {
-                    //         toast.error(error.message);
-                    //     });
-                    // }
                     setShowMessage(data?.message);
                     reset({});
+                    states?.setStartKycScreen('onboarding');
+                    states?.setActiveKyc({
+                        accountType: 1,
+                        kycStage: 1,
+                        nextStage: 2,
+                        status: 'INCOMPLETE',
+                    });
+                    states?.setActiveAccount(1);
+                    setTimeout(() => {
+                        router.push('/auth/signin');
+                    }, 3000);
                 }
             })
             .catch((error) => {
