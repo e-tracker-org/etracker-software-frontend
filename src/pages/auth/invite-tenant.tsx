@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { AuthService } from 'services';
 import { AxiosError } from 'axios';
 import { ReactElement, useState, useRef, useEffect } from 'react';
@@ -15,6 +15,10 @@ import HomeLayout from 'layouts/home';
 import { MutationKey } from 'react-query';
 import { useRouter } from 'next/router';
 import useLandlord from 'hooks/useLandlord';
+import { UserService } from 'services';
+import { GET_ACCOUNT_TYPES_QUERY_KEY } from 'utils/constants';
+import { useAppStore } from 'hooks/useAppStore';
+import PasswordStrengthBar from 'react-password-strength-bar';
 
 const schema = yup.object({
     email: yup
@@ -44,15 +48,19 @@ function SignUp() {
         AuthService.signup,
         { onSuccess: () => queryClient.invalidateQueries('getUserData') }
     );
+    const states = useAppStore();
     const router = useRouter();
     const [invitedByName, setInvitedByName] = useState('');
     const [propertyId, setPropertyId] = useState('');
+    const [password, setPassword] = useState('');
+    const [checkpassword, setCheckPassword] = useState('');
 
     const {
         handleSubmit,
         register,
         reset,
         formState: { errors },
+        watch,
     } = useForm({
         resolver: yupResolver(schema),
     });
@@ -60,6 +68,8 @@ function SignUp() {
     const { addLandlordTenant } = useLandlord();
 
     const onSubmit = async (values: any) => {
+        const defaultAccountType = [1];
+
         const userObj = {
             firstname: values.firstName,
             lastname: values.lastName,
@@ -68,24 +78,25 @@ function SignUp() {
             email: values.email,
             password: values.password,
             propertyId: propertyId,
+            accountTypes: defaultAccountType,
         };
+
         registerAsync(userObj)
             .then((data: any) => {
                 if (data.success) {
-                    // if(propertyId){
-                    //     addLandlordTenant([{
-                    //         email: userObj?.email,
-                    //         propertyId,
-                    //     }])
-                    //     .then((res: any) => {
-                    //         if (res) toast.success(res?.message);
-                    //     })
-                    //     .catch((error) => {
-                    //         toast.error(error.message);
-                    //     });
-                    // }
                     setShowMessage(data?.message);
                     reset({});
+                    states?.setStartKycScreen('onboarding');
+                    states?.setActiveKyc({
+                        accountType: 1,
+                        kycStage: 1,
+                        nextStage: 2,
+                        status: 'INCOMPLETE',
+                    });
+                    states?.setActiveAccount(1);
+                    setTimeout(() => {
+                        router.push('/auth/signin');
+                    }, 3000);
                 }
             })
             .catch((error) => {
@@ -103,6 +114,27 @@ function SignUp() {
             setPropertyId(propertyId as string);
         }
     }, [router.query]);
+
+    const checkPassword = (myPassword: any) => {
+        setPassword(myPassword);
+        const strongRegex = new RegExp(
+            '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=.{8,})'
+        );
+        if (strongRegex.test(password)) {
+            setCheckPassword('password is strong');
+        } else {
+            setCheckPassword(
+                'password is weak, try adding special characters, numbers and capital letters'
+            );
+        }
+    };
+
+    const updateForm = (e: any) => {
+        const { value, name } = e.target;
+        if (name === 'password') {
+            checkPassword(value);
+        }
+    };
 
     return (
         <section className="">
@@ -177,8 +209,10 @@ function SignUp() {
                             type="password"
                             required
                             error={errors.password}
+                            onChange={updateForm}
                             register={{ ...register('password') }}
                         />
+                        <PasswordStrengthBar password={watch('password')} />
                         <Input
                             className="flex-1"
                             placeholder="Confirm Password"

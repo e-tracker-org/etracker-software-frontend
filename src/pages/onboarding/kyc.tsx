@@ -33,6 +33,8 @@ export default function KycOnboarding() {
         UserService.getAccountTypes
     );
 
+    console.log(accountTypes?.data, 'accountTypes');
+
     const step = useMemo(() => states?.step as number, [states?.step]);
 
     const onNavBack = () => {
@@ -51,7 +53,18 @@ export default function KycOnboarding() {
                     return Number(accountype?.typeID) === Number(typeID);
                 }
             );
+            console.log(acctType, 'acctType');
+
             setAccounType(acctType);
+        } else {
+            states?.setActiveKyc({
+                accountType: states?.user?.currentKyc?.accountType,
+                kycStage: 1,
+                nextStage: 2,
+                status: 'INCOMPLETE',
+            });
+            states?.setActiveAccount(states?.user?.currentKyc?.accountType);
+            // setAccounType(states?.user?.currentKyc?.accountType);
         }
     }, [states?.activeKyc?.accountType, accountTypes?.data]);
 

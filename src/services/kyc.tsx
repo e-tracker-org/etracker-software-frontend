@@ -20,3 +20,20 @@ export const KycServices = {
         }
     },
 };
+
+// interface Kyc {
+
+//     id: string;
+//     name: string;
+// }
+
+// async function getAllKycs(): Promise<AxiosResponse<Kyc[]>> {
+//     try {
+//         const response = await http.get('/api/v1/kyc/all');
+//         return response.data;
+//     } catch (error: any) {
+//         return Promise.reject(error.response.data);
+//     }
+// }
+
+// export default getAllKycs;

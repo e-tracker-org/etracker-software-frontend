@@ -4,6 +4,7 @@ import { completeTask } from 'services/newServices/tenant';
 import Button from 'components/base/Button';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/router';
 
 interface TenantTableProps {
     tenants: { [key: string]: string }[];
@@ -22,6 +23,7 @@ const TenantTable = ({
     const [selectedTenantName, setSelectedTenantName] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
     const filteredTenants = tenants.filter((tenant) => {
         if (filter === 'all') return true;
@@ -37,10 +39,11 @@ const TenantTable = ({
         setIsModalOpen(false);
     };
 
-    const handleTenantClick = (tenantId: string, tenantName: string) => {
-        setSelectedTenant(tenantId);
-        setSelectedTenantName(tenantName);
-        openModal();
+    const handleTenantClick = (tenant: any) => {
+        localStorage.setItem('selectedTenant', JSON.stringify(tenant));
+        console.log(tenant, 'tenant');
+
+        router.push(`/dashboard/tenants/verify/${tenant?.userData?.id}`);
     };
 
     const handleConfirmAction = async () => {
@@ -82,12 +85,7 @@ const TenantTable = ({
                         <tr
                             key={i}
                             className="cursor-pointer tr-hover"
-                            onClick={() =>
-                                handleTenantClick(
-                                    t?.tenantData?.id,
-                                    `${t?.userData?.firstname} ${t?.userData?.lastname}`
-                                )
-                            } // Handle click on the table row
+                            onClick={() => handleTenantClick(t)}
                         >
                             <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max">
                                 <span className="inline-block">
