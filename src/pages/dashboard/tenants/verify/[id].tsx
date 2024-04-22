@@ -19,14 +19,8 @@ import TenantRating from '../[id]/rating';
 import { extractAndCapitalizeWords } from 'utils/helper';
 import useLandlord from 'hooks/useLandlord';
 import toast from 'react-hot-toast';
-import { string } from 'yup';
-import { getLandlordTenant } from 'services/newServices/tenant';
-import { deleteTask } from 'services/newServices/tenant';
 import useProperty from 'hooks/useProperty';
-import { DialogModal } from 'components/base/DialogModal';
-import SuccessPage from 'components/onboarding/SuccessPage';
 import PropertyHistory from './tenantProperty';
-import getAllKycs from 'services/kyc';
 
 interface DetailsProps {
     label?: string;
@@ -118,9 +112,6 @@ export default function VerifyTenantDetails() {
                 }
 
                 const tenantFilesCount = await getTenantFiles(id);
-                const kyc = await getAllKycs();
-
-                console.log(kyc, 'kyc');
 
                 localStorage.setItem(
                     'selectedTenantFilesCount',
