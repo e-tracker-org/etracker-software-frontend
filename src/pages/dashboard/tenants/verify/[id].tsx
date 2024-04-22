@@ -210,6 +210,10 @@ export default function VerifyTenantDetails() {
                     <PropertyHistory property={property} />
                 </DetailsRowCard>
 
+                <DetailsRowCard title="KYC Details"></DetailsRowCard>
+
+                <DetailsRowCard title="Default Record"></DetailsRowCard>
+
                 <div className="flex items-center justify-center ">
                     <DetailsRowCard title="Tenant Rating">
                         <TenantRating tenant={tenant} show={false} />
