@@ -16,6 +16,30 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
     const modalRef = useRef<any>(null);
     const [openModal, setOpenModal] = useState<boolean>(false);
 
+    const filteredTenants = states?.propertyId
+        ? tenants.filter(
+              (tenant: any) =>
+                  tenant?.tenantData?.propertyId === states?.propertyId
+          )
+        : tenants;
+
+    const searchedTenants = filteredTenants.filter(
+        (tenant: any) =>
+            tenant.userData.firstname
+                .toLowerCase()
+                .includes(states?.searchParam.toLowerCase()) ||
+            tenant.userData.lastname
+                .toLowerCase()
+                .includes(states?.searchParam.toLowerCase()) ||
+            tenant.userData.email
+                .toLowerCase()
+                .includes(states?.searchParam.toLowerCase())
+    );
+
+    const displayTenants = states?.searchParam
+        ? searchedTenants
+        : filteredTenants;
+
     const handleClickOutside = (event: MouseEvent) => {
         if (
             modalRef.current &&
@@ -74,6 +98,15 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
         router.push(`/dashboard/tenants/${tenant?.userData?.id}`);
     };
 
+    useEffect(() => {
+        if (
+            states?.searchParam &&
+            displayTenants.length === filteredTenants.length
+        ) {
+            // Remove the search parameter from the state
+            states?.setSearchParam('');
+        }
+    }, [states?.searchParam, displayTenants.length, filteredTenants.length]);
 
     return (
         <div className="relative">
@@ -111,7 +144,7 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
                 }
                 className="p-5 bg-white hidden-x-scrollbar rounded-md"
             >
-                {tenants?.length === 0 ? (
+                {displayTenants?.length === 0 ? (
                     <p className="text-center">
                         Add a tenant to your existing property
                     </p>
@@ -155,7 +188,7 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
                             </thead>
 
                             <tbody>
-                                {tenants?.map(
+                                {displayTenants?.map(
                                     (tenant: any) =>
                                         tenant?.userData?.email &&
                                         tenant?.userData?.firstname &&

@@ -93,7 +93,7 @@ export default function PropertyDetails() {
 
     const NigeriaState = formData?.location?.state;
 
-    console.log(formData, 'formData');
+    console.log(property, 'formData');
 
     // @ts-ignore
     const openModal = (index) => {
@@ -348,7 +348,7 @@ export default function PropertyDetails() {
                                         editable ? (
                                             <Input
                                                 type="text"
-                                                value={formData?.name}
+                                                value={property?.name}
                                                 onChange={(e) =>
                                                     handleChange(
                                                         'name',
@@ -368,7 +368,7 @@ export default function PropertyDetails() {
                                         editable ? (
                                             <Input
                                                 type="text"
-                                                value={formData?.year_built}
+                                                value={property?.year_built}
                                                 onChange={(e) =>
                                                     handleChange(
                                                         'year_built',
@@ -390,7 +390,7 @@ export default function PropertyDetails() {
                                         editable ? (
                                             <Select
                                                 value={
-                                                    formData?.is_active
+                                                    property?.is_active
                                                         ? 'Active'
                                                         : 'Off Market'
                                                 }
@@ -422,7 +422,7 @@ export default function PropertyDetails() {
                                         editable ? (
                                             <Input
                                                 type="text"
-                                                value={formData?.price}
+                                                value={property?.price}
                                                 onChange={(e) =>
                                                     handleChange(
                                                         'price',
@@ -449,7 +449,7 @@ export default function PropertyDetails() {
                                         editable ? (
                                             <Input
                                                 type="text"
-                                                value={formData?.address}
+                                                value={property?.address}
                                                 onChange={(e) =>
                                                     handleChange(
                                                         'address',
@@ -468,7 +468,7 @@ export default function PropertyDetails() {
                                     content={
                                         editable ? (
                                             <Select
-                                                value={formData?.location?.city}
+                                                value={property?.location?.city}
                                                 onChange={(e) =>
                                                     handleChange(
                                                         'city',
@@ -510,7 +510,7 @@ export default function PropertyDetails() {
                                         editable ? (
                                             <Select
                                                 value={
-                                                    formData?.location?.state
+                                                    property?.location?.state
                                                 }
                                                 onChange={(e) =>
                                                     handleChange(
@@ -558,7 +558,7 @@ export default function PropertyDetails() {
                                                 type="number"
                                                 min={1}
                                                 value={
-                                                    formData?.number_of_bedrooms
+                                                    property?.number_of_bedrooms
                                                 }
                                                 onChange={(e) =>
                                                     handleChange(
@@ -580,7 +580,7 @@ export default function PropertyDetails() {
                                             <Input
                                                 type="number"
                                                 min={1}
-                                                value={formData?.number_of_bath}
+                                                value={property?.number_of_bath}
                                                 onChange={(e) =>
                                                     handleChange(
                                                         'number_of_bath',
@@ -611,7 +611,7 @@ export default function PropertyDetails() {
                                     content={
                                         editable ? (
                                             <Select
-                                                value={formData?.apartmentType}
+                                                value={property?.apartmentType}
                                                 onChange={(e) =>
                                                     handleChange(
                                                         'apartmentType',
@@ -645,7 +645,7 @@ export default function PropertyDetails() {
                                         editable ? (
                                             <TextArea
                                                 //@ts-ignore
-                                                value={formData?.description}
+                                                value={property?.description}
                                                 onChange={(e) =>
                                                     handleChange(
                                                         'description',

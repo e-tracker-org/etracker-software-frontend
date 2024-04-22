@@ -70,6 +70,15 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
         );
     };
 
+    //@ts-ignore
+    const handleSearch = (e) => {
+        const searchTerm = e.target.value;
+        setSearchTerm(searchTerm);
+        if (searchTerm === '') {
+            states?.setSearchParam('');
+        }
+    };
+
     const SearchInput = (
         <div className="relative w-full lg:dontshow">
             <svg
@@ -91,9 +100,7 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
                 placeholder="Type in name or email and press Enter"
                 className="rounded-xl bg-[#FFFFFF] placeholder:text-[#13131373] w-full pl-16 pr-4 py-3 focus:border-primary-600 border border-[#B9B9B9]"
                 value={searchTerm}
-                onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                }}
+                onChange={handleSearch}
                 onKeyDown={handleKeyDown}
             />
         </div>
@@ -146,7 +153,10 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
                     <button
                         data-id={property.value}
                         onClick={(e) => {
-                            console.log(e.currentTarget.dataset);
+                            console.log(
+                                e.currentTarget.dataset,
+                                'current target'
+                            );
                             states?.setPropertyId(
                                 e.currentTarget.dataset.id as string
                             );

@@ -58,7 +58,7 @@ export default function KycOnboarding() {
             setAccounType(acctType);
         } else {
             states?.setActiveKyc({
-                //@ts-ignore
+                // @ts-ignore
                 accountType: states?.user?.currentKyc?.accountType,
                 kycStage: 1,
                 nextStage: 2,
