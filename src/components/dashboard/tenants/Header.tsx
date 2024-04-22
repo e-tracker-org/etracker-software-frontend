@@ -80,30 +80,44 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
     };
 
     const SearchInput = (
-        <div className="relative w-full lg:dontshow">
-            <svg
-                className="absolute top-[25%] left-5"
-                width="25"
-                height="25"
-                viewBox="0 0 25 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                    d="M22.2314 21.1895L16.5674 15.5255C17.9285 13.8914 18.6072 11.7956 18.4624 9.67389C18.3176 7.55219 17.3603 5.56801 15.7898 4.1341C14.2193 2.7002 12.1565 1.92697 10.0304 1.97528C7.90429 2.02359 5.87867 2.88971 4.37492 4.39347C2.87116 5.89723 2.00503 7.92284 1.95672 10.0489C1.90842 12.175 2.68164 14.2379 4.11555 15.8084C5.54945 17.3789 7.53364 18.3361 9.65534 18.481C11.777 18.6258 13.8729 17.9471 15.5069 16.586L21.1709 22.25L22.2314 21.1895ZM3.48141 10.25C3.48141 8.91494 3.87729 7.6099 4.61899 6.49987C5.36069 5.38983 6.4149 4.52467 7.6483 4.01378C8.8817 3.50289 10.2389 3.36921 11.5483 3.62966C12.8576 3.89011 14.0604 4.53299 15.0044 5.47699C15.9484 6.421 16.5913 7.62373 16.8517 8.9331C17.1122 10.2425 16.9785 11.5997 16.4676 12.8331C15.9567 14.0665 15.0915 15.1207 13.9815 15.8624C12.8715 16.6041 11.5664 17 10.2314 17C8.44181 16.998 6.72607 16.2862 5.46063 15.0207C4.19519 13.7553 3.4834 12.0396 3.48141 10.25Z"
-                    fill="#131313"
-                    fillOpacity="0.45"
+        <>
+            <div className="relative w-full">
+                <svg
+                    className="absolute top-[25%] left-5"
+                    width="25"
+                    height="25"
+                    viewBox="0 0 25 25"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M22.2314 21.1895L16.5674 15.5255C17.9285 13.8914 18.6072 11.7956 18.4624 9.67389C18.3176 7.55219 17.3603 5.56801 15.7898 4.1341C14.2193 2.7002 12.1565 1.92697 10.0304 1.97528C7.90429 2.02359 5.87867 2.88971 4.37492 4.39347C2.87116 5.89723 2.00503 7.92284 1.95672 10.0489C1.90842 12.175 2.68164 14.2379 4.11555 15.8084C5.54945 17.3789 7.53364 18.3361 9.65534 18.481C11.777 18.6258 13.8729 17.9471 15.5069 16.586L21.1709 22.25L22.2314 21.1895ZM3.48141 10.25C3.48141 8.91494 3.87729 7.6099 4.61899 6.49987C5.36069 5.38983 6.4149 4.52467 7.6483 4.01378C8.8817 3.50289 10.2389 3.36921 11.5483 3.62966C12.8576 3.89011 14.0604 4.53299 15.0044 5.47699C15.9484 6.421 16.5913 7.62373 16.8517 8.9331C17.1122 10.2425 16.9785 11.5997 16.4676 12.8331C15.9567 14.0665 15.0915 15.1207 13.9815 15.8624C12.8715 16.6041 11.5664 17 10.2314 17C8.44181 16.998 6.72607 16.2862 5.46063 15.0207C4.19519 13.7553 3.4834 12.0396 3.48141 10.25Z"
+                        fill="#131313"
+                        fillOpacity="0.45"
+                    />
+                </svg>
+                <input
+                    type="search"
+                    placeholder="Type in name or email and press Enter"
+                    className="rounded-xl bg-[#FFFFFF] placeholder:text-[#13131373] w-full pl-16 pr-4 py-3 focus:border-primary-600 border border-[#B9B9B9]"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    onKeyDown={handleKeyDown}
                 />
-            </svg>
-            <input
-                type="search"
-                placeholder="Type in name or email and press Enter"
-                className="rounded-xl bg-[#FFFFFF] placeholder:text-[#13131373] w-full pl-16 pr-4 py-3 focus:border-primary-600 border border-[#B9B9B9]"
-                value={searchTerm}
-                onChange={handleSearch}
-                onKeyDown={handleKeyDown}
-            />
-        </div>
+            </div>
+            <div className="flex justify-end w-full">
+                {searchTerm && isMobile ? (
+                    <Button
+                        title="Clear"
+                        className="py-4  text-[17px] w-auto text-center"
+                        onClick={() => {
+                            states?.setSearchParam('');
+                            setSearchTerm('');
+                        }}
+                    />
+                ) : null}
+            </div>
+        </>
     );
 
     const AddTenant = (
