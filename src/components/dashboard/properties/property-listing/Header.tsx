@@ -5,11 +5,22 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { goBackToKyc2 } from 'utils/helper';
+import nigeriaStates from 'nigeria-states-lgas';
 
 const Header = ({ propertyCount }: { propertyCount?: number }) => {
     const states = useAppStore();
     const router = useRouter();
     const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
+    const [selectedFilter, setSelectedFilter] = useState<{
+        state?: string;
+        propertyActive?: string;
+        apartmentType?: string;
+    }>();
+    const [applyFilterKey, setApplyFilterKey] = useState<number>(0);
+    const [localStorageChangeKey, setLocalStorageChangeKey] =
+        useState<number>(0); // New state variable
 
     const checkScreenSize = () => {
         setIsMobile(window.innerWidth < 768);
@@ -20,6 +31,61 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
         window.addEventListener('resize', checkScreenSize);
         return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
+
+    useEffect(() => {
+        setSearchTerm(states?.searchParam as string);
+    }, [states?.searchParam]);
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            states?.setSearchParam(searchTerm?.trim());
+        }
+    };
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const searchTerm = e.target.value;
+        setSearchTerm(searchTerm);
+        if (searchTerm === '') {
+            states?.setSearchParam('');
+        }
+    };
+
+    const saveFilterDetailsToLocalstorage = () => {
+        const filterDetails = {
+            state: selectedFilter?.state,
+            propertyActive: selectedFilter?.propertyActive,
+            apartmentType: selectedFilter?.apartmentType,
+        };
+
+        localStorage.setItem('filterDetails', JSON.stringify(filterDetails));
+        setLocalStorageChangeKey((prevKey) => prevKey + 1); // Update localStorageChangeKey to trigger re-render
+    };
+
+    const toggleFilterModal = () => {
+        saveFilterDetailsToLocalstorage();
+        setShowFilterModal(!showFilterModal);
+        setApplyFilterKey((prevKey) => prevKey + 1); // Update applyFilterKey to trigger re-render
+    };
+
+    useEffect(() => {
+        // This effect will run after every render, effectively causing a remount when applyFilterKey or localStorageChangeKey changes
+    }, [applyFilterKey, localStorageChangeKey]);
+
+    const handleFilterSelect = (filter: string, value: string) => {
+        setSelectedFilter({ ...selectedFilter, [filter]: value });
+    };
+
+    const filterOptions = {
+        propertyActives: ['Active', 'Off Market'],
+        apartmentTypes: ['Flat', 'Duplex'],
+    };
+
+    const clearFilterDetails = () => {
+        localStorage.removeItem('filterDetails');
+        setSelectedFilter({});
+        setShowFilterModal(false);
+        setApplyFilterKey((prevKey) => prevKey + 1);
+    };
 
     const AddPropertyBtn = (
         <>
@@ -87,6 +153,9 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
                 type="search"
                 placeholder="Type here to search for property"
                 className="rounded-xl bg-[#FFFFFF] placeholder:text-[#13131373] w-full pl-16 pr-4 py-3 focus:border-primary-600 border border-[#B9B9B9]"
+                value={searchTerm}
+                onChange={handleSearch}
+                onKeyDown={handleKeyDown}
             />
         </div>
     );
@@ -98,7 +167,10 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
                     {propertyCount} Total
                 </span>
                 {!isMobile ? SearchInput : null}
-                <div className="flex w-2/5 justify-between items-center">
+                <div
+                    className="flex w-2/5 justify-between items-center"
+                    onClick={() => setShowFilterModal(true)}
+                >
                     <svg
                         width="24"
                         height="22"
@@ -129,11 +201,123 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
                         <span>Filter</span>
                     </div>
                 </div>
-                {/* Conditionally render AddPropertyBtn based on screen size */}
                 {!isMobile ? AddPropertyBtn : null}
             </div>
-            {/* Conditionally render SearchInput based on screen size */}
             {isMobile ? SearchInput : null}
+
+            {showFilterModal && (
+                <div
+                    key={applyFilterKey}
+                    className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center z-50"
+                >
+                    <div className="bg-white rounded-lg p-6">
+                        <h2 className="text-lg font-semibold mb-4">
+                            Filter Properties
+                        </h2>
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <label
+                                    htmlFor="stateFilter"
+                                    className="block mb-1"
+                                >
+                                    State:
+                                </label>
+                                <select
+                                    id="stateFilter"
+                                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                                    value={selectedFilter?.state}
+                                    onChange={(e) =>
+                                        handleFilterSelect(
+                                            'state',
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option disabled value="">
+                                        State
+                                    </option>
+                                    {nigeriaStates
+                                        .states()
+                                        .map((state: string, i: number) => (
+                                            <option key={i} value={state}>
+                                                {state}
+                                            </option>
+                                        ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="propertyTypeFilter"
+                                    className="block mb-1"
+                                >
+                                    Property Status:
+                                </label>
+                                <select
+                                    id="propertyTypeFilter"
+                                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                                    value={selectedFilter?.propertyActive}
+                                    onChange={(e) =>
+                                        handleFilterSelect(
+                                            'propertyActive',
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option value="">
+                                        Select Property Status
+                                    </option>
+                                    {filterOptions.propertyActives.map(
+                                        (type) => (
+                                            <option key={type} value={type}>
+                                                {type}
+                                            </option>
+                                        )
+                                    )}
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="apartmentTypeFilter"
+                                    className="block mb-1"
+                                >
+                                    Apartment Type:
+                                </label>
+                                <select
+                                    id="apartmentTypeFilter"
+                                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                                    value={selectedFilter?.apartmentType}
+                                    onChange={(e) =>
+                                        handleFilterSelect(
+                                            'apartmentType',
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option value="">
+                                        Select Apartment Type
+                                    </option>
+                                    {filterOptions.apartmentTypes.map(
+                                        (type) => (
+                                            <option key={type} value={type}>
+                                                {type}
+                                            </option>
+                                        )
+                                    )}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="flex justify-between mt-4">
+                            <button
+                                className="text-gray-500 hover:text-gray-800"
+                                onClick={clearFilterDetails}
+                            >
+                                Clear
+                            </button>
+                            <Button onClick={toggleFilterModal}>Apply</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </header>
     );
 };
