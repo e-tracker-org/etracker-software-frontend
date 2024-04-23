@@ -294,7 +294,7 @@ function Signin() {
                             </form>
                         </div>
                     </section>
-                    <Footer />
+                    {/* <Footer /> */}
                 </>
             )}
             {isForgottenPassword && (

@@ -166,10 +166,10 @@ export const switchAccount = (
 };
 export const extractAndCapitalizeWords = (str: string) => {
     // Split the string into an array of words
-    const words = str.split(' ');
+    const words = str?.split(' ');
 
     // Extract the initial character of each word and capitalize it
-    const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase());
+    const capitalizedWords = words?.map((word) => word.charAt(0).toUpperCase());
 
     return capitalizedWords;
 };

@@ -19,13 +19,13 @@ interface DocumentFormProps {
 
 export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
     const [idType, setIdType] = useState('');
-    const [typeIDs, setTypeIDs] = useState<any>();
+    const [typeIDs, setTypeIDs] = useState<any[]>([]);
     const [idNumber, setIdNumber] = useState('');
     const [files, setFiles] = useState<CustomFile[]>([]);
     const [showError, setShowError] = useState(false);
     const [showMessage, setShowMessage] = useState('');
     const [handleFileChangeCalled, setHandleFileChangeCalled] = useState(false);
-
+    console.log(idType, 'idType');
     const imageRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
@@ -61,6 +61,7 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
     };
 
     const onPickImage = () => {
+        console.log(selectedIdType?.askForDocID, 'askForDocID');
         if (selectedIdType?.askForDocID === 1 && !idNumber) {
             setShowError(true);
             return;
@@ -89,7 +90,9 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
             url: '',
         };
         if (existingDocIndex !== -1) {
-            files.splice(existingDocIndex, 1, DocPayload); // Replace existing object
+            const updatedFiles = [...files];
+            updatedFiles.splice(existingDocIndex, 1, DocPayload); // Replace existing object
+            setFiles(updatedFiles);
         } else {
             setFiles((prev) => [...prev, DocPayload]);
         }
@@ -99,7 +102,7 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
     };
 
     const removeFile = (id: number) => {
-        const filtered = files.filter((el) => el.id !== id);
+        const filtered = files.filter((el) => el.typeID !== id);
         setFiles(filtered);
         setHandleFileChangeCalled(true);
     };
@@ -180,7 +183,7 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
     };
 
     const createFileList = (fileName: string): FileList => {
-        const file = new File([], fileName); // Create an empty file with the given file name
+        const file = new File([], fileName, { type: 'application/octet-stream' }); // Create an empty file with the given file name
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
@@ -212,7 +215,9 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                         (file) => file.id === doc.docTypeID
                     );
                     if (existingDocIndex !== -1) {
-                        files.splice(existingDocIndex, 1, updatedDoc); // Replace existing object
+                        const updatedFiles = [...files];
+                        updatedFiles.splice(existingDocIndex, 1, updatedDoc); // Replace existing object
+                        setFiles(updatedFiles);
                     } else {
                         updatedDocs.push(updatedDoc);
                     }
@@ -256,6 +261,7 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                                 onChange: (
                                     e: ChangeEvent<HTMLSelectElement>
                                 ) => {
+                                    
                                     const selectedTypeID: any[] = [];
                                     setIdType(e.target.value);
                                     const selectedOption =
@@ -267,7 +273,7 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                                             )
                                         );
 
-                                    setTypeIDs((): any => selectedTypeID);
+                                    setTypeIDs(selectedTypeID);
                                 },
                                 value: idType,
                             }}
@@ -275,7 +281,7 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                             <option value="" disabled>
                                 Select
                             </option>
-                            {fileTypeOptions.map((ftype, i) => {
+                            {fileTypes && fileTypeOptions.map((ftype, i) => {
                                 return (
                                     <option
                                         key={i}
@@ -326,10 +332,10 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                         <Loader loading={loadinguploadFiles} />
                     ) : (
                         (!!files.length &&
-                            files.map((file) => {
+                            files.map((file, index) => {
                                 return (
                                     <div
-                                        key={file?.id}
+                                        key={index}
                                         className="flex items-center py-2 px-4 bg-gray-200 border border-gray-300 mb-1"
                                     >
                                         <div className="w-full">
@@ -351,7 +357,7 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                                             </a>
                                             <button
                                                 onClick={() =>
-                                                    removeFile(file.id)
+                                                    removeFile(file.typeID)
                                                 }
                                                 className="w-8 h-8 text-brand-red"
                                                 title="Remove"

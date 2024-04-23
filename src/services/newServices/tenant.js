@@ -23,6 +23,16 @@ export async function getLandlordTenant(landordId) {
     });
 }
 
+export async function getDefaultTenant(landordId) {
+    return request(`${API_URL}/tenants/default/landlord/${landordId}`, {
+        method: 'get',
+        headers: {  
+            'Content-Type': 'application/json',
+            Authorization: USER_TOKEN,
+        },
+    });
+}
+
 export async function getTenantTransactions(tenantId) {
     return request(`${API_URL}/tenants/transactions/${tenantId}`, {
         method: 'get',
@@ -55,6 +65,19 @@ export async function getPropertyTenant(propertyId) {
 
 export async function createTenant(body) {
     return request(`${API_URL}/tenants/create`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+            Authorization: USER_TOKEN,
+        },
+        body: JSON.stringify(body),
+    });
+}
+
+export async function createDefaultTenant(body) {
+    return request(`${API_URL}/tenants/default/create-default`, {
         method: 'post',
         headers: {
             'Content-Type': 'application/json',
