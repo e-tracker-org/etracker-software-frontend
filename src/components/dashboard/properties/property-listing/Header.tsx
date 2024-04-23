@@ -5,11 +5,22 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { goBackToKyc2 } from 'utils/helper';
+import nigeriaStates from 'nigeria-states-lgas';
 
 const Header = ({ propertyCount }: { propertyCount?: number }) => {
     const states = useAppStore();
     const router = useRouter();
     const [isMobile, setIsMobile] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
+    const [selectedFilter, setSelectedFilter] = useState<{
+        state?: string;
+        propertyActive?: string;
+        apartmentType?: string;
+    }>();
+    const [applyFilterKey, setApplyFilterKey] = useState<number>(0);
+    const [localStorageChangeKey, setLocalStorageChangeKey] =
+        useState<number>(0); // New state variable
 
     const checkScreenSize = () => {
         setIsMobile(window.innerWidth < 768);
@@ -20,6 +31,61 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
         window.addEventListener('resize', checkScreenSize);
         return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
+
+    useEffect(() => {
+        setSearchTerm(states?.searchParam as string);
+    }, [states?.searchParam]);
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            states?.setSearchParam(searchTerm?.trim());
+        }
+    };
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const searchTerm = e.target.value;
+        setSearchTerm(searchTerm);
+        if (searchTerm === '') {
+            states?.setSearchParam('');
+        }
+    };
+
+    const saveFilterDetailsToLocalstorage = () => {
+        const filterDetails = {
+            state: selectedFilter?.state,
+            propertyActive: selectedFilter?.propertyActive,
+            apartmentType: selectedFilter?.apartmentType,
+        };
+
+        localStorage.setItem('filterDetails', JSON.stringify(filterDetails));
+        setLocalStorageChangeKey((prevKey) => prevKey + 1); // Update localStorageChangeKey to trigger re-render
+    };
+
+    const toggleFilterModal = () => {
+        saveFilterDetailsToLocalstorage();
+        setShowFilterModal(!showFilterModal);
+        setApplyFilterKey((prevKey) => prevKey + 1); // Update applyFilterKey to trigger re-render
+    };
+
+    useEffect(() => {
+        // This effect will run after every render, effectively causing a remount when applyFilterKey or localStorageChangeKey changes
+    }, [applyFilterKey, localStorageChangeKey]);
+
+    const handleFilterSelect = (filter: string, value: string) => {
+        setSelectedFilter({ ...selectedFilter, [filter]: value });
+    };
+
+    const filterOptions = {
+        propertyActives: ['Active', 'Off Market'],
+        apartmentTypes: ['Flat', 'Duplex'],
+    };
+
+    const clearFilterDetails = () => {
+        localStorage.removeItem('filterDetails');
+        setSelectedFilter({});
+        setShowFilterModal(false);
+        setApplyFilterKey((prevKey) => prevKey + 1);
+    };
 
     const AddPropertyBtn = (
         <>
@@ -67,28 +133,46 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
     );
 
     const SearchInput = (
-        <div className="relative w-full">
-            <svg
-                className="absolute top-[25%] left-5"
-                width="25"
-                height="25"
-                viewBox="0 0 25 25"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <path
-                    d="M22.2314 21.1895L16.5674 15.5255C17.9285 13.8914 18.6072 11.7956 18.4624 9.67389C18.3176 7.55219 17.3603 5.56801 15.7898 4.1341C14.2193 2.7002 12.1565 1.92697 10.0304 1.97528C7.90429 2.02359 5.87867 2.88971 4.37492 4.39347C2.87116 5.89723 2.00503 7.92284 1.95672 10.0489C1.90842 12.175 2.68164 14.2379 4.11555 15.8084C5.54945 17.3789 7.53364 18.3361 9.65534 18.481C11.777 18.6258 13.8729 17.9471 15.5069 16.586L21.1709 22.25L22.2314 21.1895ZM3.48141 10.25C3.48141 8.91494 3.87729 7.6099 4.61899 6.49987C5.36069 5.38983 6.4149 4.52467 7.6483 4.01378C8.8817 3.50289 10.2389 3.36921 11.5483 3.62966C12.8576 3.89011 14.0604 4.53299 15.0044 5.47699C15.9484 6.421 16.5913 7.62373 16.8517 8.9331C17.1122 10.2425 16.9785 11.5997 16.4676 12.8331C15.9567 14.0665 15.0915 15.1207 13.9815 15.8624C12.8715 16.6041 11.5664 17 10.2314 17C8.44181 16.998 6.72607 16.2862 5.46063 15.0207C4.19519 13.7553 3.4834 12.0396 3.48141 10.25Z"
-                    fill="#131313"
-                    fillOpacity="0.45"
-                />
-            </svg>
+        <>
+            {' '}
+            <div className="relative w-full">
+                <svg
+                    className="absolute top-[25%] left-5"
+                    width="25"
+                    height="25"
+                    viewBox="0 0 25 25"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M22.2314 21.1895L16.5674 15.5255C17.9285 13.8914 18.6072 11.7956 18.4624 9.67389C18.3176 7.55219 17.3603 5.56801 15.7898 4.1341C14.2193 2.7002 12.1565 1.92697 10.0304 1.97528C7.90429 2.02359 5.87867 2.88971 4.37492 4.39347C2.87116 5.89723 2.00503 7.92284 1.95672 10.0489C1.90842 12.175 2.68164 14.2379 4.11555 15.8084C5.54945 17.3789 7.53364 18.3361 9.65534 18.481C11.777 18.6258 13.8729 17.9471 15.5069 16.586L21.1709 22.25L22.2314 21.1895ZM3.48141 10.25C3.48141 8.91494 3.87729 7.6099 4.61899 6.49987C5.36069 5.38983 6.4149 4.52467 7.6483 4.01378C8.8817 3.50289 10.2389 3.36921 11.5483 3.62966C12.8576 3.89011 14.0604 4.53299 15.0044 5.47699C15.9484 6.421 16.5913 7.62373 16.8517 8.9331C17.1122 10.2425 16.9785 11.5997 16.4676 12.8331C15.9567 14.0665 15.0915 15.1207 13.9815 15.8624C12.8715 16.6041 11.5664 17 10.2314 17C8.44181 16.998 6.72607 16.2862 5.46063 15.0207C4.19519 13.7553 3.4834 12.0396 3.48141 10.25Z"
+                        fill="#131313"
+                        fillOpacity="0.45"
+                    />
+                </svg>
 
-            <input
-                type="search"
-                placeholder="Type here to search for property"
-                className="rounded-xl bg-[#FFFFFF] placeholder:text-[#13131373] w-full pl-16 pr-4 py-3 focus:border-primary-600 border border-[#B9B9B9]"
-            />
-        </div>
+                <input
+                    type="search"
+                    placeholder="Type here to search for property"
+                    className="rounded-xl bg-[#FFFFFF] placeholder:text-[#13131373] w-full pl-16 pr-4 py-3 focus:border-primary-600 border border-[#B9B9B9]"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    onKeyDown={handleKeyDown}
+                />
+            </div>
+            <div className="flex justify-end w-full">
+                {searchTerm && isMobile ? (
+                    <Button
+                        title="Clear"
+                        className="py-4  text-[17px] w-auto text-center"
+                        onClick={() => {
+                            states?.setSearchParam('');
+                            setSearchTerm('');
+                        }}
+                    />
+                ) : null}
+            </div>
+        </>
     );
     return (
         <header className="flex flex-col lg:flex-row justify-between items-center w-full my-5 gap-5 lg:gap-20 pb-5 px-5">
@@ -98,7 +182,10 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
                     {propertyCount} Total
                 </span>
                 {!isMobile ? SearchInput : null}
-                <div className="flex w-2/5 justify-between items-center">
+                <div
+                    className="flex w-2/5 justify-between items-center"
+                    onClick={() => setShowFilterModal(true)}
+                >
                     <svg
                         width="24"
                         height="22"
@@ -129,11 +216,123 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
                         <span>Filter</span>
                     </div>
                 </div>
-                {/* Conditionally render AddPropertyBtn based on screen size */}
                 {!isMobile ? AddPropertyBtn : null}
             </div>
-            {/* Conditionally render SearchInput based on screen size */}
             {isMobile ? SearchInput : null}
+
+            {showFilterModal && (
+                <div
+                    key={applyFilterKey}
+                    className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center z-50"
+                >
+                    <div className="bg-white rounded-lg p-6">
+                        <h2 className="text-lg font-semibold mb-4">
+                            Filter Properties
+                        </h2>
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <label
+                                    htmlFor="stateFilter"
+                                    className="block mb-1"
+                                >
+                                    State:
+                                </label>
+                                <select
+                                    id="stateFilter"
+                                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                                    value={selectedFilter?.state}
+                                    onChange={(e) =>
+                                        handleFilterSelect(
+                                            'state',
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option disabled value="">
+                                        State
+                                    </option>
+                                    {nigeriaStates
+                                        .states()
+                                        .map((state: string, i: number) => (
+                                            <option key={i} value={state}>
+                                                {state}
+                                            </option>
+                                        ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="propertyTypeFilter"
+                                    className="block mb-1"
+                                >
+                                    Property Status:
+                                </label>
+                                <select
+                                    id="propertyTypeFilter"
+                                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                                    value={selectedFilter?.propertyActive}
+                                    onChange={(e) =>
+                                        handleFilterSelect(
+                                            'propertyActive',
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option value="">
+                                        Select Property Status
+                                    </option>
+                                    {filterOptions.propertyActives.map(
+                                        (type) => (
+                                            <option key={type} value={type}>
+                                                {type}
+                                            </option>
+                                        )
+                                    )}
+                                </select>
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="apartmentTypeFilter"
+                                    className="block mb-1"
+                                >
+                                    Apartment Type:
+                                </label>
+                                <select
+                                    id="apartmentTypeFilter"
+                                    className="border border-gray-300 rounded px-3 py-2 w-full"
+                                    value={selectedFilter?.apartmentType}
+                                    onChange={(e) =>
+                                        handleFilterSelect(
+                                            'apartmentType',
+                                            e.target.value
+                                        )
+                                    }
+                                >
+                                    <option value="">
+                                        Select Apartment Type
+                                    </option>
+                                    {filterOptions.apartmentTypes.map(
+                                        (type) => (
+                                            <option key={type} value={type}>
+                                                {type}
+                                            </option>
+                                        )
+                                    )}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="flex justify-between mt-4">
+                            <button
+                                className="text-gray-500 hover:text-gray-800"
+                                onClick={clearFilterDetails}
+                            >
+                                Clear
+                            </button>
+                            <Button onClick={toggleFilterModal}>Apply</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </header>
     );
 };
