@@ -47,6 +47,9 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
         [idType, fileTypes?.data?.data]
     );
 
+    // console.log(fileTypes, 'fileTypes');
+    // console.log(selectedIdType, 'selectedIdType');
+
     const fileTypeOptions = useMemo(() => {
         const allDocIDs = files.map((fx) => fx.typeID);
         if (!fileTypes) return [];
@@ -61,7 +64,6 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
     };
 
     const onPickImage = () => {
-        console.log(selectedIdType?.askForDocID, 'askForDocID');
         if (selectedIdType?.askForDocID === 1 && !idNumber) {
             setShowError(true);
             return;
@@ -257,12 +259,9 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                         <Select
                             className="bg-white"
                             selectDivClassName="bg-white"
-                            register={{
-                                onChange: (
-                                    e: ChangeEvent<HTMLSelectElement>
-                                ) => {
-                                    
-                                    const selectedTypeID: any[] = [];
+                            onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                const selectedTypeID: any[] = [];
+                                    console.log(e.target.value, 'value>>>', selectedTypeID);
                                     setIdType(e.target.value);
                                     const selectedOption =
                                         e.target.selectedOptions[0];
@@ -274,11 +273,30 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                                         );
 
                                     setTypeIDs(selectedTypeID);
-                                },
-                                value: idType,
                             }}
+                            // register={{
+                            //     onChange: (
+                            //         e: ChangeEvent<HTMLSelectElement>
+                            //     ) => {
+                                    
+                            //         const selectedTypeID: any[] = [];
+                            //         console.log(e.target.value, 'value>>>', selectedTypeID);
+                            //         setIdType(e.target.value);
+                            //         const selectedOption =
+                            //             e.target.selectedOptions[0];
+                            //         if (selectedOption)
+                            //             selectedTypeID.push(
+                            //                 selectedOption.getAttribute(
+                            //                     'data-id'
+                            //                 )
+                            //             );
+
+                            //         setTypeIDs(selectedTypeID);
+                            //     },
+                            //     value: idType,
+                            // }}
                         >
-                            <option value="" disabled>
+                            <option selected value="">
                                 Select
                             </option>
                             {fileTypes && fileTypeOptions.map((ftype, i) => {
