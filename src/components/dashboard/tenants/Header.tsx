@@ -18,6 +18,7 @@ import React, {
 } from 'react';
 import { goBackToKyc2 } from 'utils/helper';
 import { TenantState } from 'store/tenantSlice';
+import toast from 'react-hot-toast';
 
 interface TenantProp {
     tenantsCount: number;
@@ -121,10 +122,15 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
     );
 
     const AddTenant = (
+        
         <div className="flex justify-end w-full">
             <Button
                 className="flex items-center max-h-[47px] !text-base !font-bold px-8 py-3"
                 onClick={() => {
+                    if(!states?.propertyId) {
+                        toast.error('Please select a property');
+                        return;
+                    }
                     router.push('/dashboard/tenants/add');
                 }}
             >
@@ -132,6 +138,8 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
             </Button>
         </div>
     );
+
+
 
     const PropertyDropdown = (
         <Dropdown
@@ -183,6 +191,8 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
             ))}
         </Dropdown>
     );
+
+   
 
     return (
         <header className="bg-white rounded-md px-5 py-[14px] mb-12 mt-6 flex flex-col lg:flex-row justify-between items-center w-full gap-10 lg:gap-20">

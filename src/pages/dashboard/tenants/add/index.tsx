@@ -287,6 +287,17 @@ export default function AddTenant() {
                         className="md:px-[10px] lg:px-[40px] md:py-2 lg:py-3 flex lg:gap-4 items-center"
                         onClick={() => {
                             const isUserVerify = goBackToKyc2(states, router);
+                            // if (!selectedPropertyId) {
+                            //     toast.error('Please go back and select a property');
+                            //     return;
+                            // }
+
+                            if (!isUserVerify) {
+                                toast.error(
+                                    'Please verify your account first'
+                                )
+                                return;
+                            }
                             if (isUserVerify) {
                                 setOpenModal(true);
                             }
