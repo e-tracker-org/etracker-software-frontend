@@ -371,6 +371,7 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
                         label="Number of Rooms"
                         type="number"
                         min={1}
+                        maxLength={6}
                         required
                         placeholder="Number of Rooms"
                         asterisk
