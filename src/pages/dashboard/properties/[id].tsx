@@ -91,6 +91,28 @@ export default function PropertyDetails() {
         is_active: property?.is_active,
     });
 
+    const handleEditable = (state: boolean) => {
+        setEditable(state);
+
+        setFormData({
+            name: property?.name,
+            price: property?.price,
+            number_of_bedrooms: property?.number_of_bedrooms,
+            number_of_bath: property?.number_of_bath,
+            address: property?.address,
+            status: property?.status as 'RENT' | 'BUY' | 'SELL' | undefined,
+            description: property?.description,
+            location: {
+                city: property?.location?.city,
+                state: property?.location?.state,
+            },
+            year_built: property?.year_built,
+            apartmentType: property?.apartmentType,
+            is_active: property?.is_active,
+        })
+    }
+
+
     const NigeriaState = formData?.location?.state;
 
     console.log(property, 'formData');
@@ -243,7 +265,7 @@ export default function PropertyDetails() {
                                 <button
                                     className="w-full px-3 py-2 text-left hover:bg-slate-50 font-medium"
                                     data-action="notify"
-                                    onClick={() => setEditable(true)}
+                                    onClick={() => handleEditable(true)}
                                 >
                                     Edit Property
                                 </button>
