@@ -84,13 +84,14 @@ export default function AddTenant() {
         const invitedByName: string = `${firstname} ${lastname}`;
 
         // @ts-ignore
-        const propertyId: string = states?.propertyId;
+        const propertyId = states?.propertyId;
+        console.log(propertyId, 'propertyId');
         const registrationLink = `https://etracker-software-frontend.vercel.app/auth/invite-tenant?propertyId=${propertyId}&invitedBy=${encodeURIComponent(
             invitedByName
         )}`;
 
         setLink(registrationLink);
-    }, [userProfile]);
+    }, [userProfile, selectedPropertyId, id, states?.propertyId]);
 
     const handleClickOutside = (event: MouseEvent) => {
         if (
