@@ -84,7 +84,7 @@ export default function AddTenant() {
         const invitedByName: string = `${firstname} ${lastname}`;
 
         // @ts-ignore
-        const propertyId = states?.propertyId;
+        const propertyId = propId;
         console.log(propertyId, 'propertyId');
         const registrationLink = `https://etracker-software-frontend.vercel.app/auth/invite-tenant?propertyId=${propertyId}&invitedBy=${encodeURIComponent(
             invitedByName
@@ -259,6 +259,26 @@ export default function AddTenant() {
     }, []);
 
     const handleCopyLink = () => {
+        let propId;
+        if (id) {
+            propId = id;
+        } else if (selectedPropertyId) {
+            propId = selectedPropertyId;
+        } else if (states?.propertyId){
+            propId = states?.propertyId;
+        }
+
+        const firstname: string = userProfile?.firstname || '';
+        const lastname: string = userProfile?.lastname || '';
+
+        const invitedByName: string = `${firstname} ${lastname}`;
+
+        // @ts-ignore
+        const propertyId = propId;
+        console.log(propertyId, 'propertyId');
+        const link = `https://etracker-software-frontend.vercel.app/auth/invite-tenant?propertyId=${propertyId}&invitedBy=${encodeURIComponent(
+            invitedByName
+        )}`;
         navigator.clipboard
             .writeText(link)
             .then(() => {
