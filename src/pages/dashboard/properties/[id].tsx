@@ -219,9 +219,20 @@ export default function PropertyDetails() {
 
             //@ts-ignore
             await PropertyService.updatePropertyById(partialProperty);
+
+            // set state
+            setFormData({
+                ...formData,
+                location: {
+                    city: formData.location.city,
+                    state: formData.location.state,
+                },
+            })
             toast.success('Property updated successfully');
             setIsLoading(false);
             setEditable(false);
+            // reload page
+            router.reload();
         } catch (error) {
             console.error('Error updating property:', error);
             setIsLoading(false);

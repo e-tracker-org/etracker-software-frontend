@@ -10,11 +10,12 @@ import Image from 'next/image';
 import { useMutation, useQueryClient } from 'react-query';
 import { AuthService } from 'services';
 import { AxiosError } from 'axios';
-import { ReactElement, useState, useRef } from 'react';
+import { ReactElement, useState, useRef, useEffect } from 'react';
 import HomeLayout from 'layouts/home';
 import { MutationKey } from 'react-query';
 import { useRouter } from 'next/router';
 import PasswordStrengthBar from 'react-password-strength-bar';
+import { useAppStore } from 'hooks/useAppStore';
 
 const schema = yup.object({
     email: yup
@@ -44,6 +45,7 @@ function SignUp() {
         AuthService.signup,
         { onSuccess: () => queryClient.invalidateQueries('getUserData') }
     );
+    const states = useAppStore();
     const router = useRouter();
     const [password, setPassword] = useState('');
     const [checkpassword, setCheckPassword] = useState('');
@@ -56,6 +58,14 @@ function SignUp() {
     } = useForm({
         resolver: yupResolver(schema),
     });
+
+
+    useEffect(() => {
+        if (states?.user) {
+            toast.success(`Welcome back, ${states?.user?.firstname}!`);
+            router.push('/dashboard');
+        }
+    })
 
     const onSubmit = async (values: any) => {
         const userObj = {

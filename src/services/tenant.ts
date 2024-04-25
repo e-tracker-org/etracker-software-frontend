@@ -12,6 +12,8 @@ export const TenantService = {
         try {
             const { data } = await http.get('/api/v1/landlord/tenant');
 
+            console.log('data', data);
+
             return Promise.resolve(data);
         } catch (error: any) {
             return Promise.reject(error?.response.data);

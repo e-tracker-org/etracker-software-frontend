@@ -71,7 +71,7 @@ export default function VeriifyTenants() {
                             </li>
                             <li
                                 className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer"
-                                onClick={() => setFilter('pending')}
+                                onClick={() => setFilter('incomplete')}
                             >
                                 Pending Request
                             </li>

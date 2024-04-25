@@ -112,7 +112,7 @@ export default function Header({
             <header className="py-4 px-[5%] border-0 md:border-b z-50 sticky top-0 bg-white min-h-[96px] flex items-center">
                 <div className="hidden md:flex justify-between items-center w-full">
                     <div className="relative w-1/2 4xl:h-3/5">
-                        <svg
+                        {/* <svg
                             className="absolute top-[25%] left-5"
                             width="25"
                             height="25"
@@ -131,7 +131,7 @@ export default function Header({
                             type="search"
                             placeholder="Search properties, tenants..."
                             className="rounded-xl bg-[#EEEEEE] placeholder:text-[#13131373] w-full pl-16 pr-4 py-3 focus:border-primary-600"
-                        />
+                        /> */}
                     </div>
                     <div className="flex items-center gap-6">
                         {/* <span role="button">

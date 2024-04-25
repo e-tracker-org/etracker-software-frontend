@@ -24,7 +24,8 @@ export async function fetchAllUsers() {
 export async function fetchAndFilterUsersByAccountType() {
     const allUsersResponse = await fetchAllUsers();
     const filteredUsers = allUsersResponse.filter((user) =>
-        user.accountTypes.includes(1)
+        // user.accountTypes.includes(1)
+        user.currentKyc?.accountType === 1
     );
     return filteredUsers;
 }

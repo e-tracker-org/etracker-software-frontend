@@ -47,6 +47,14 @@ function Signin() {
     const { tenantId, propertyId } = router.query;
     const { confirmTenant, isConfirmTenantLoading } = useLandlord();
 
+    // check if user is already logged in
+    useEffect(() => {
+        if (states?.user) {
+            toast.success(`Welcome back, ${states?.user?.firstname}!`);
+            router.push('/dashboard');
+        }
+    })
+
     const {
         mutate,
         isLoading: isVerifyLoading,
@@ -90,11 +98,14 @@ function Signin() {
             values.propertyId = propertyId;
         }
 
+        states?.setActiveKyc(undefined);
+        states?.setActiveAccount(undefined);
         loginAsync(values)
             .then((data: any) => {
                 states?.setStartKycScreen('');
-                // reset();
+                reset();
                 console.log('user', data);
+
                 if (!!data?.data?.tokens) {
                     //Sets user token in local storage from the zustan state
                     states?.setUser({
