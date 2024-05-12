@@ -26,7 +26,7 @@ export async function getLandlordTenant(landordId) {
 export async function getDefaultTenant(landordId) {
     return request(`${API_URL}/tenants/default/landlord/${landordId}`, {
         method: 'get',
-        headers: {  
+        headers: {
             'Content-Type': 'application/json',
             Authorization: USER_TOKEN,
         },
@@ -55,6 +55,16 @@ export async function getTenantFiles(tenantId) {
 
 export async function getPropertyTenant(propertyId) {
     return request(`${API_URL}/tenants/property/${propertyId}`, {
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: USER_TOKEN,
+        },
+    });
+}
+
+export async function getPropertyByTenantId(tenantId) {
+    return request(`${API_URL}/tenants/tenant-property/${tenantId}`, {
         method: 'get',
         headers: {
             'Content-Type': 'application/json',

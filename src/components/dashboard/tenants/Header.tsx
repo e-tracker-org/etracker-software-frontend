@@ -82,7 +82,7 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
 
     const SearchInput = (
         <>
-            <div className="relative w-full">
+            <div className="relative w-full lg:w-[50%] mb-3">
                 <svg
                     className="absolute top-[25%] left-5"
                     width="25"
@@ -100,7 +100,7 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
                 <input
                     type="search"
                     placeholder="Type in name or email and press Enter"
-                    className="rounded-xl bg-[#FFFFFF] placeholder:text-[#13131373] w-full pl-16 pr-4 py-3 focus:border-primary-600 border border-[#B9B9B9]"
+                    className="rounded-xl bg-[#FFFFFF] placeholder:text-[#13131373] w-full pl-16  py-3 focus:border-primary-600 border border-[#B9B9B9]"
                     value={searchTerm}
                     onChange={handleSearch}
                     onKeyDown={handleKeyDown}
@@ -122,12 +122,11 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
     );
 
     const AddTenant = (
-        
-        <div className="flex justify-end w-full">
+        <div className=" w-full">
             <Button
                 className="flex items-center max-h-[47px] !text-base !font-bold px-8 py-3"
                 onClick={() => {
-                    if(!states?.propertyId) {
+                    if (!states?.propertyId) {
                         toast.error('Please select a property');
                         return;
                     }
@@ -138,8 +137,6 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
             </Button>
         </div>
     );
-
-
 
     const PropertyDropdown = (
         <Dropdown
@@ -192,41 +189,48 @@ const Header: FC<TenantProp> = ({ tenantsCount }) => {
         </Dropdown>
     );
 
-   
+    const Notify = (
+        <button
+            className=" w-full flex justify-center items-center max-h-[47px] text-sm font-bold px-8 py-3   bg-primary-600 text-[#FFFFFF] rounded-lg  text-center hover:bg-primary-700 "
+            data-action="notify"
+            onClick={(event) => handleTenantAction(event)}
+        >
+            Notify Tenants
+        </button>
+    );
+
+    const SendReceipt = (
+        <button
+            className=" w-full flex justify-center items-center max-h-[47px] text-sm font-bold px-8 py-3   bg-primary-600 text-[#FFFFFF] rounded-lg  text-center hover:bg-primary-700 "
+            data-action="receipt"
+            onClick={(event) => handleTenantAction(event)}
+        >
+            Send Receipt
+        </button>
+    );
 
     return (
-        <header className="bg-white rounded-md px-5 py-[14px] mb-12 mt-6 flex flex-col lg:flex-row justify-between items-center w-full gap-10 lg:gap-20">
-            {isMobile ? AddTenant : null}
-            <div className="flex items-center  gap-x-8 mb-4">
-                {!isMobile ? PropertyDropdown : null}
-                <span className="text-xl font-medium whitespace-nowrap">
-                    {tenantsCount} Total
-                </span>
-                {isMobile ? PropertyDropdown : null}
-                {!isMobile ? SearchInput : null}
-                {!isMobile ? AddTenant : null}
-                <DropdownDialog title="More">
-                    <li className="py-2 text-black border-b border-[#E7E5E5] last:border:0">
-                        <button
-                            className="w-full px-3 py-2 text-left hover:bg-slate-50 font-medium"
-                            data-action="notify"
-                            onClick={(e) => handleTenantAction(e)}
-                        >
-                            Notify Tenants
-                        </button>
-                    </li>
-                    <li className="py-2 text-black border-b border-[#E7E5E5] last:border:0">
-                        <button
-                            className="w-full px-3 py-2 text-left  hover:bg-slate-50 font-medium"
-                            data-action="receipt"
-                            onClick={handleTenantAction}
-                        >
-                            Send Receipt
-                        </button>
-                    </li>
-                </DropdownDialog>
+        <header className="bg-white rounded-md px-5 lg:px-10 py-[14px] mb-12 mt-6 ">
+            {!isMobile ? SearchInput : null}
+            <div className="flex flex-col lg:flex-row justify-between items-center w-full gap-5">
+                {isMobile ? AddTenant : null}
+                <div className="flex gap-5">
+                    {isMobile ? Notify : null}
+                    {isMobile ? SendReceipt : null}
+                </div>
+
+                <div className="flex items-center  gap-x-8 mb-4">
+                    {!isMobile ? PropertyDropdown : null}
+                    <span className="text-xl font-medium whitespace-nowrap">
+                        {tenantsCount} Total
+                    </span>
+                    {isMobile ? PropertyDropdown : null}
+                    {!isMobile ? Notify : null}
+                    {!isMobile ? SendReceipt : null}
+                    {!isMobile ? AddTenant : null}
+                </div>
+                {isMobile ? SearchInput : null}
             </div>
-            {isMobile ? SearchInput : null}
         </header>
     );
 };

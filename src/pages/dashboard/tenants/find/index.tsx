@@ -16,6 +16,12 @@ import { getFormattedDate } from 'services/config/config';
 import TenantRating from '../[id]/rating';
 import toast from 'react-hot-toast';
 import Button from 'components/base/Button';
+import PropertyHistory from '../verify/tenantProperty';
+import {
+    getPropertyTenant,
+    getPropertyByTenantId,
+} from 'services/newServices/tenant';
+import { getAllGeneralProperties } from 'services/newServices/properties';
 
 interface DetailsProps {
     label?: string;
@@ -56,11 +62,16 @@ export default function FindTenants() {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchedTenant, setSearchedTenant] = useState<User[] | null>(null); // Initialize with null
+    const [tenantProperty, setTenantProperty] = useState([]);
+    console.log(searchedTenant, 'searchedTenant');
 
     useEffect(() => {
         setLoading(true);
         async function fetchData() {
             const tenantData = await fetchAndFilterUsersByAccountType();
+            const general = await getAllGeneralProperties();
+            console.log(general, 'general');
+
             setTenants(tenantData);
             setLoading(false);
         }
@@ -72,6 +83,7 @@ export default function FindTenants() {
         const filteredTenant = tenants.filter((tenant: User) =>
             tenant.email.toLowerCase().includes(searchTerm.toLowerCase())
         );
+        console.log(filteredTenant, 'filteredTenant');
 
         if (filteredTenant.length === 0) {
             toast.error('Email does not belong to a tenant');
@@ -79,6 +91,28 @@ export default function FindTenants() {
             setSearchedTenant(filteredTenant);
         }
     };
+
+    useEffect(() => {
+        const fetchProperty = async () => {
+            try {
+                if (searchedTenant) {
+                    const property = searchedTenant[0].id;
+
+                    const propertyDetails = await getPropertyByTenantId(
+                        property
+                    );
+                    console.log(propertyDetails, 'propertyDetails');
+
+                    setTenantProperty(propertyDetails);
+                }
+            } catch (error) {
+                console.error('Error fetching property:', error);
+                toast.error('Error retrieving property details');
+            }
+        };
+
+        fetchProperty();
+    }, [searchedTenant]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
@@ -222,6 +256,9 @@ export default function FindTenants() {
                                         />
                                     </div>
                                 </div>
+                            </DetailsRowCard>
+                            <DetailsRowCard title="Property History">
+                                {/* <PropertyHistory /> */}
                             </DetailsRowCard>
                             <div className="flex items-center justify-center ">
                                 <DetailsRowCard title="Tenant Rating">
