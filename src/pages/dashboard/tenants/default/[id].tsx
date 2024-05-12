@@ -69,19 +69,19 @@ export default function VerifyTenantDetails() {
     const id = query?.id as string | undefined;
     // const propertyId = states?.propertyId as string;
     const [tenant, setTenant] = useState({} as any);
-   
+
     useEffect(() => {
         async function fetchData() {
             try {
-                const storedTenant = localStorage.getItem('selectedDefaultTenant');
+                const storedTenant = localStorage.getItem(
+                    'selectedDefaultTenant'
+                );
 
                 const tenant = JSON.parse(storedTenant || '');
 
                 if (tenant) {
                     setTenant(tenant);
                 }
-
-
             } catch (error) {
                 console.error('Error fetching tenant transactions:', error);
             }
@@ -91,7 +91,6 @@ export default function VerifyTenantDetails() {
             fetchData();
         }
     }, [id]);
-
 
     return (
         <div>
@@ -117,7 +116,7 @@ export default function VerifyTenantDetails() {
                             <div className="flex justify-center items-center bg-primary-600 py-7 px-8 rounded-full text-white w-[80px] h-[80px]">
                                 <span className="text-xl font-semibold">
                                     {extractAndCapitalizeWords(
-                                        tenant.tenantName 
+                                        tenant.tenantName
                                     )}
                                 </span>
                             </div>
@@ -130,7 +129,6 @@ export default function VerifyTenantDetails() {
                                 content={tenant.tenantName}
                                 className="w-full sm:w-auto"
                             />
-                           
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row mb-4">
                             <DetailsCard
@@ -179,14 +177,13 @@ export default function VerifyTenantDetails() {
                         </div>
 
                         <div className="flex flex-col gap-4 sm:flex-row mb-4">
-                            
                             <DetailsCard
                                 label="Date Submitted"
                                 // format date
                                 content={getFormattedDate(tenant.createdAt)}
                                 className="w-full bg-green-200 sm:w-auto" // Adjust width for small screens
                             />
-                             <DetailsCard
+                            <DetailsCard
                                 label="Tenant Gender"
                                 content={tenant.tenantGender}
                                 className="w-full sm:w-auto"
@@ -200,20 +197,20 @@ export default function VerifyTenantDetails() {
                 </DetailsRowCard> */}
 
                 {/* <DetailsRowCard title="KYC Details"></DetailsRowCard> */}
-{/* 
-                <DetailsRowCard title="Default Record">
+
+                {/* <DetailsRowCard title="Default Record">
                     <DefaultRecords
                         tenantProperty={tenantProperty}
                         tenant={tenant}
                     />
-                </DetailsRowCard> */}
+                </DetailsRowCard>  */}
 
                 {/* <div className="flex items-center justify-center ">
                     <DetailsRowCard title="Tenant Rating">
                         <TenantRating tenant={tenant} show={false} />
                     </DetailsRowCard>
                 </div> */}
-{/* 
+                {/* 
                 <DetailsRowCard title="Transaction History">
                     <TransactionHistory />
                 </DetailsRowCard> */}
