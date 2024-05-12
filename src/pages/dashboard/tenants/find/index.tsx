@@ -258,7 +258,7 @@ export default function FindTenants() {
                                 </div>
                             </DetailsRowCard>
                             <DetailsRowCard title="Property History">
-                                <PropertyHistory />
+                                {/* <PropertyHistory /> */}
                             </DetailsRowCard>
                             <div className="flex items-center justify-center ">
                                 <DetailsRowCard title="Tenant Rating">
