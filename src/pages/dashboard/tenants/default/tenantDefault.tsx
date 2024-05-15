@@ -22,7 +22,9 @@ function PropertyHistory({ property }: { property: any }) {
                     {Array.isArray(property) ? (
                         property.map((prop: any) => (
                             <tr key={prop.id} className="capitalize">
-                                <td className="p-6 pl-0">{prop.propertyAddress}</td>
+                                <td className="p-6 pl-0">
+                                    {prop.propertyAddress}
+                                </td>
                                 <td className="p-6">{prop.tenantName}</td>
                                 <td className="p-6">{prop.tenantPhone}</td>
                                 <td className="p-6 pr-0">
