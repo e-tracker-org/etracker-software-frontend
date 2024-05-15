@@ -67,6 +67,13 @@ function SignUp() {
         resolver: yupResolver(schema),
     });
 
+    // check if user is already logged in
+    useEffect(() => {
+        if (states?.isAuthenticated) {
+            router.push('/dashboard');
+        }
+    }, [states]);
+
     const { addLandlordTenant } = useLandlord();
 
     const onSubmit = async (values: any) => {
@@ -105,14 +112,13 @@ function SignUp() {
                 //@ts-ignore
                 const userId = userData.data?.id.toString();
 
-                const historyData = {
-                    userId: userId,
-                    tenantEmail: values.email,
-                    landlordId: landlordId,
-                    propertyId: propertyId,
-                };
-
-                const history = await createHistory(historyData);
+                // Create history with individual parameters
+                const history = await createHistory(
+                    userId,
+                    values.email,
+                    landlordId,
+                    propertyId
+                );
                 console.log(history, 'history');
 
                 setTimeout(() => {

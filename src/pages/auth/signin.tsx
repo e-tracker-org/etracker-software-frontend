@@ -49,12 +49,11 @@ function Signin() {
     const { confirmTenant, isConfirmTenantLoading } = useLandlord();
 
     // check if user is already logged in
-    // useEffect(() => {
-    //     if (states?.user) {
-    //         toast.success(`Welcome back, ${states?.user?.firstname}!`);
-    //         router.push('/dashboard');
-    //     }
-    // })
+    useEffect(() => {
+        if (states?.isAuthenticated) {
+            router.push('/dashboard');
+        }
+    }, [states]);
 
     const {
         mutate,
