@@ -73,7 +73,7 @@ export default function FindTenants() {
     const [tenantHistory, setTenantHistory] = useState([]);
     const [tenantDefault, setTenantDefault] = useState([]);
     const [allDefault, setAllDefault] = useState([]);
-    console.log(tenantDefault, 'tenantDefault');
+    console.log(tenantHistory, 'tenantHistory');
 
     useEffect(() => {
         setLoading(true);
@@ -82,7 +82,7 @@ export default function FindTenants() {
             const general = await getAllGeneralProperties();
             const allTenantDefault = await getAllTenantDefault();
 
-            console.log(general, 'general');
+            console.log(allTenantDefault, 'allTenantDefault');
 
             setTenants(tenantData);
             setGeneralProperty(general);
