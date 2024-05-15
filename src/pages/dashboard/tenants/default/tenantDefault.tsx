@@ -7,7 +7,7 @@ function PropertyHistory({ property }: { property: any }) {
 
     if (!property) return renderEmptyState();
     return (
-        <div className="w-full h-[300px] hidden-thin-scrollbar">
+        <div className="w-full h-[300px] hidden-thin-scrollbar container">
             <table className="w-full whitespace-nowrap text-gray-700 border-separate font-[700]  text-center">
                 <thead className="text-[#727070]">
                     <tr>

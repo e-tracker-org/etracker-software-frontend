@@ -145,7 +145,7 @@ export default function VerifyForm() {
     };
     console.log(formState);
     return (
-        <form className="bg-white ">
+        <form className="bg-white p-10">
             <section className="grid grid-cols-2 gap-6">
                 <Input
                     label="Tenant Name"
