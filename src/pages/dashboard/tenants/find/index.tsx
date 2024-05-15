@@ -129,10 +129,10 @@ export default function FindTenants() {
             }
 
             // Filter out the default tenants based on userId from tenantHistory
-            if (tenantHist && tenantHist.userId) {
+            if (tenantHist && tenantHist.tenantEmail) {
                 const filteredDefaultTenants = allDefault.filter(
                     (defaultTenant: any) =>
-                        defaultTenant.userId === tenantHist.userId
+                        defaultTenant.tenantEmail === tenantHist.tenantEmail
                 );
                 console.log(filteredDefaultTenants, 'filteredDefaultTenants');
                 setTenantDefault(filteredDefaultTenants);
