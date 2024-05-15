@@ -6,7 +6,11 @@ import Loader from 'components/base/Loader';
 import { User } from 'interfaces';
 import { useEffect, useState, ReactNode, FC } from 'react';
 import { useAppStore } from 'hooks/useAppStore';
-import { getLandlordTenant } from 'services/newServices/tenant';
+import {
+    getAllTenantDefault,
+    getDefaultTenant,
+    getLandlordTenant,
+} from 'services/newServices/tenant';
 // import { GenericResponse } from 'services';
 import { getAllTenants } from 'services/newServices/tenant';
 import { fetchAndFilterUsersByAccountType } from 'services/newServices/user';
@@ -22,6 +26,8 @@ import {
     getPropertyByTenantId,
 } from 'services/newServices/tenant';
 import { getAllGeneralProperties } from 'services/newServices/properties';
+import { findOneHistoryByEmail } from 'services/newServices/history';
+import FindTenantDefault from 'components/dashboard/tenants/default/FindTenantDefault';
 
 interface DetailsProps {
     label?: string;
@@ -62,57 +68,102 @@ export default function FindTenants() {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchedTenant, setSearchedTenant] = useState<User[] | null>(null); // Initialize with null
-    const [tenantProperty, setTenantProperty] = useState([]);
-    console.log(searchedTenant, 'searchedTenant');
+    const [generalProperty, setGeneralProperty] = useState([]);
+    const [tenantProperty, setTenantlProperty] = useState([]);
+    const [tenantHistory, setTenantHistory] = useState([]);
+    const [tenantDefault, setTenantDefault] = useState([]);
+    const [allDefault, setAllDefault] = useState([]);
+    console.log(tenantDefault, 'tenantDefault');
 
     useEffect(() => {
         setLoading(true);
         async function fetchData() {
             const tenantData = await fetchAndFilterUsersByAccountType();
             const general = await getAllGeneralProperties();
+            const allTenantDefault = await getAllTenantDefault();
+
             console.log(general, 'general');
 
             setTenants(tenantData);
+            setGeneralProperty(general);
+            setAllDefault(allTenantDefault);
             setLoading(false);
         }
 
         fetchData();
     }, []);
 
-    const searchTenant = (searchTerm: string) => {
+    const searchTenant = async (searchTerm: string) => {
         const filteredTenant = tenants.filter((tenant: User) =>
             tenant.email.toLowerCase().includes(searchTerm.toLowerCase())
         );
-        console.log(filteredTenant, 'filteredTenant');
 
         if (filteredTenant.length === 0) {
             toast.error('Email does not belong to a tenant');
+            return;
         } else {
             setSearchedTenant(filteredTenant);
         }
+
+        try {
+            const tenantHist = await findOneHistoryByEmail(searchTerm);
+            if (!tenantHist) {
+                toast.success('No tenant history found');
+                return;
+            }
+            setTenantHistory(tenantHist);
+
+            // Filter out the properties from the general property list
+            if (
+                tenantHist &&
+                tenantHist.propertyId &&
+                tenantHist.propertyId.length > 0
+            ) {
+                const filteredProperties = generalProperty.filter(
+                    (property: any) =>
+                        tenantHist.propertyId.includes(property.id)
+                );
+                console.log(filteredProperties, 'filteredProperties');
+                // Set the filtered properties to state
+                setTenantlProperty(filteredProperties);
+            }
+
+            // Filter out the default tenants based on userId from tenantHistory
+            if (tenantHist && tenantHist.userId) {
+                const filteredDefaultTenants = allDefault.filter(
+                    (defaultTenant: any) =>
+                        defaultTenant.userId === tenantHist.userId
+                );
+                console.log(filteredDefaultTenants, 'filteredDefaultTenants');
+                setTenantDefault(filteredDefaultTenants);
+            }
+        } catch (error) {
+            console.error('Error retrieving history:', error);
+            toast.error('Error retrieving history');
+        }
     };
 
-    useEffect(() => {
-        const fetchProperty = async () => {
-            try {
-                if (searchedTenant) {
-                    const property = searchedTenant[0].id;
+    // useEffect(() => {
+    //     const fetchProperty = async () => {
+    //         try {
+    //             if (searchedTenant) {
+    //                 const property = searchedTenant[0].id;
 
-                    const propertyDetails = await getPropertyByTenantId(
-                        property
-                    );
-                    console.log(propertyDetails, 'propertyDetails');
+    //                 const propertyDetails = await getPropertyByTenantId(
+    //                     property
+    //                 );
+    //                 console.log(propertyDetails, 'propertyDetails');
 
-                    setTenantProperty(propertyDetails);
-                }
-            } catch (error) {
-                console.error('Error fetching property:', error);
-                toast.error('Error retrieving property details');
-            }
-        };
+    //                 setTenantProperty(propertyDetails);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching property:', error);
+    //             toast.error('Error retrieving property details');
+    //         }
+    //     };
 
-        fetchProperty();
-    }, [searchedTenant]);
+    //     fetchProperty();
+    // }, [searchedTenant]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
@@ -258,7 +309,22 @@ export default function FindTenants() {
                                 </div>
                             </DetailsRowCard>
                             <DetailsRowCard title="Property History">
-                                {/* <PropertyHistory /> */}
+                                {tenantProperty ? (
+                                    <PropertyHistory
+                                        property={tenantProperty}
+                                    />
+                                ) : (
+                                    'No property history found'
+                                )}
+                            </DetailsRowCard>
+                            <DetailsRowCard title="Previous Default">
+                                {tenantDefault && tenantDefault.length > 0 ? (
+                                    <FindTenantDefault
+                                        tenants={tenantDefault}
+                                    />
+                                ) : (
+                                    'No default found'
+                                )}
                             </DetailsRowCard>
                             <div className="flex items-center justify-center ">
                                 <DetailsRowCard title="Tenant Rating">

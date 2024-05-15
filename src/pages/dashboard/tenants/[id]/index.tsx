@@ -148,8 +148,9 @@ export default function TenantDetails() {
             console.log(deleteTenant);
             toast.success('Tenant agreement successfully ended');
             setIsLoading(false);
-            setIsModalOpen(false);
             router.push('/dashboard/tenants');
+            setIsModalOpen(false);
+
             // router.back();
         } catch (error) {
             console.error('Error ending tenant agreement:', error);

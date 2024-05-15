@@ -33,6 +33,16 @@ export async function getDefaultTenant(landordId) {
     });
 }
 
+export async function getAllTenantDefault() {
+    return request(`${API_URL}/tenants/default/all`, {
+        method: 'get',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: USER_TOKEN,
+        },
+    });
+}
+
 export async function getTenantTransactions(tenantId) {
     return request(`${API_URL}/tenants/transactions/${tenantId}`, {
         method: 'get',

@@ -74,21 +74,18 @@ export default function AddTenant() {
             propId = id;
         } else if (selectedPropertyId) {
             propId = selectedPropertyId;
-        } else if (states?.propertyId){
+        } else if (states?.propertyId) {
             propId = states?.propertyId;
         }
 
         const firstname: string = userProfile?.firstname || '';
         const lastname: string = userProfile?.lastname || '';
-
         const invitedByName: string = `${firstname} ${lastname}`;
+        const userId = userProfile?.id || ''; // Assuming the user ID is stored in userProfile
 
-        // @ts-ignore
-        const propertyId = propId;
-        console.log(propertyId, 'propertyId');
-        const registrationLink = `https://etracker-software-frontend.vercel.app/auth/invite-tenant?propertyId=${propertyId}&invitedBy=${encodeURIComponent(
+        const registrationLink = `https://etracker-software-frontend.vercel.app/auth/invite-tenant?propertyId=${propId}&invitedBy=${encodeURIComponent(
             invitedByName
-        )}`;
+        )}&userId=${userId}`; // Include userId in the link
 
         setLink(registrationLink);
     }, [userProfile, selectedPropertyId, id, states?.propertyId]);
@@ -140,14 +137,14 @@ export default function AddTenant() {
                 propId = id;
             } else if (selectedPropertyId) {
                 propId = selectedPropertyId;
-            } else if (states?.propertyId){
+            } else if (states?.propertyId) {
                 propId = states?.propertyId;
             }
             // @ts-ignore
             const propertyId: string = propId;
+            const userId = userProfile?.id || ''; // Assuming the user ID is stored in userProfile
             // @ts-ignore
             const selectedPropertyLabel = properties.find(
-
                 (property) => property.value === propertyId
             )?.label;
 
@@ -160,6 +157,7 @@ export default function AddTenant() {
                 email,
                 propertyName: selectedPropertyLabel,
                 invitedBy: userProfile?.firstname + ' ' + userProfile?.lastname,
+                userId: userId,
             };
 
             const response = await inviteTenant(body);
@@ -171,6 +169,7 @@ export default function AddTenant() {
             }
 
             setLoading(false);
+            setOpenModal(false);
         } catch (error) {
             console.error('Error inviting tenant:', error);
             toast.error('Error inviting tenant');
@@ -264,7 +263,7 @@ export default function AddTenant() {
             propId = id;
         } else if (selectedPropertyId) {
             propId = selectedPropertyId;
-        } else if (states?.propertyId){
+        } else if (states?.propertyId) {
             propId = states?.propertyId;
         }
 
@@ -314,9 +313,7 @@ export default function AddTenant() {
                             // }
 
                             if (!isUserVerify) {
-                                toast.error(
-                                    'Please verify your account first'
-                                )
+                                toast.error('Please verify your account first');
                                 return;
                             }
                             if (isUserVerify) {

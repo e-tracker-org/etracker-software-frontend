@@ -109,9 +109,8 @@ export default function PropertyDetails() {
             year_built: property?.year_built,
             apartmentType: property?.apartmentType,
             is_active: property?.is_active,
-        })
-    }
-
+        });
+    };
 
     const NigeriaState = formData?.location?.state;
 
@@ -227,7 +226,7 @@ export default function PropertyDetails() {
                     city: formData.location.city,
                     state: formData.location.state,
                 },
-            })
+            });
             toast.success('Property updated successfully');
             setIsLoading(false);
             setEditable(false);
@@ -242,36 +241,58 @@ export default function PropertyDetails() {
 
     return (
         <div className="h-auto">
-            <header className="lg:flex lg:justify-between flex flex-col lg:flex-row gap-8">
+            <header className="flex flex-col lg:flex lg:justify-between lg:flex-row gap-8">
                 <div className="flex gap-4 items-center">
                     <BackButton />
                     <h3 className="text-xl lg:text-2xl font-medium text-black">
                         Property details
                     </h3>
                 </div>
-                {acctType?.typeID === 2 && (
-                    <div className="flex justify-center lg:justify-end gap-4 items-center">
-                        <Button
-                            title="List"
-                            href="/dashboard/properties"
-                            variant="default"
-                        />
-                        <Button
-                            title="Add Tenant"
-                            onClick={() => {
-                                const isUserVerify = goBackToKyc2(
-                                    states,
-                                    router
-                                );
+                <div>
+                    {acctType?.typeID === 2 && (
+                        <div className="flex flex-col sm:flex-row justify-center lg:justify-end gap-4 items-center">
+                            <div className="flex gap-5">
+                                <Button
+                                    title="List"
+                                    href="/dashboard/properties"
+                                    variant="default"
+                                />
+                                <Button
+                                    title="Add Tenant"
+                                    onClick={() => {
+                                        const isUserVerify = goBackToKyc2(
+                                            states,
+                                            router
+                                        );
 
-                                if (isUserVerify) {
-                                    router.push(
-                                        `/dashboard/tenants/add?q=${id}`
-                                    );
-                                }
-                            }}
-                        />
-                        <DropdownDialog title="More">
+                                        if (isUserVerify) {
+                                            router.push(
+                                                `/dashboard/tenants/add?q=${id}`
+                                            );
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div className="flex gap-5">
+                                <button
+                                    className=" w-full flex justify-center items-center max-h-[47px] text-sm font-bold px-8 py-3   bg-primary-600 text-[#FFFFFF] rounded-lg  text-center hover:bg-primary-700 "
+                                    data-action="notify"
+                                    onClick={() => handleEditable(true)}
+                                >
+                                    Edit Property
+                                </button>
+                                <button
+                                    className=" w-full flex justify-center items-center max-h-[47px] text-sm font-bold px-8 py-3   bg-[#DA0202] text-[#FFFFFF] rounded-lg  text-center hover:bg-primary-700 "
+                                    data-action="notify"
+                                    onClick={() => {
+                                        openDialogModal();
+                                    }}
+                                >
+                                    Delete Property
+                                </button>
+                            </div>
+
+                            {/* <DropdownDialog title="More">
                             <li className="py-2 text-black border-b border-[#E7E5E5] last:border:0">
                                 <button
                                     className="w-full px-3 py-2 text-left hover:bg-slate-50 font-medium"
@@ -292,9 +313,10 @@ export default function PropertyDetails() {
                                     Delete Property
                                 </button>
                             </li>
-                        </DropdownDialog>
-                    </div>
-                )}
+                        </DropdownDialog> */}
+                        </div>
+                    )}
+                </div>
             </header>
 
             {getPropertyLoading ? (
