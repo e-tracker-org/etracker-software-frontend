@@ -5,7 +5,7 @@ import Checkbox from 'components/base/form/Checkbox';
 import Input from 'components/base/form/Input';
 import Select from 'components/base/form/Select';
 import { useAppStore } from 'hooks/useAppStore';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { createDefaultTenant } from 'services/newServices/tenant';
 import Image from 'next/image';
@@ -13,9 +13,16 @@ import Dropzone from 'react-dropzone';
 import { MdOutlineCancel } from 'react-icons/md';
 import { getBase64Async } from 'libs/files';
 type ImageList = Array<{ id: number; base64: string; preview: string }>;
+import { uploadImage } from 'services/newServices/image';
+import useFileUploadHandler from 'hooks/useFileUploadHandler';
+import {
+    convertDataUrlToImageFile,
+    generateRandomAlphanumeric,
+} from 'utils/helper';
 
 export default function VerifyForm() {
-    const [images, setImages] = useState<ImageList>([]);
+    const [images, setImages] = useState<File[]>([]);
+    const imageRef = useRef<HTMLInputElement>(null);
     const states = useAppStore();
     const landlordId = states?.user?.id;
     const [formState, setFormState] = useState({
@@ -29,15 +36,18 @@ export default function VerifyForm() {
         tenantPhone: '',
         tenantName: '',
         agreed: false,
-        image_list: [] as { id: number }[],
     });
+    const {
+        uploadedFiles,
+        loadinguploadFiles,
+        setUploadFileAsync,
+        uploadProfileLoading,
+    } = useFileUploadHandler('DEFAULT', 'default_image');
 
-    // function to update the form state
     const updateFormState = (key: string, value: any) => {
         setFormState({ ...formState, [key]: value });
     };
 
-    // function to submit the form
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -75,11 +85,6 @@ export default function VerifyForm() {
             return;
         }
 
-        if (formState.image_list.length < 1) {
-            toast.error('Upload atleast one image');
-            return;
-        }
-
         const data = {
             ...formState,
             landlordId,
@@ -100,49 +105,50 @@ export default function VerifyForm() {
                 tenantPhone: '',
                 tenantName: '',
                 agreed: false,
-                image_list: [],
             });
         }
     };
 
-    const handleDrop = async (dropped: File[], id?: string | null) => {
-        const ls = dropped.map(async (el) => {
-            const imageId: any = {};
-            if (id) {
-                imageId.id = id; // Assign the ID if provided
-            }
-            return {
-                ...imageId,
-                base64: await getBase64Async(el),
-                preview: URL.createObjectURL(el),
-                // blobURL: URL.createObjectURL(el), // Use blobURL instead of blob
-            };
-        });
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const fileList = e.target.files as FileList;
+        if (!fileList.length) return;
 
-        const imgPromises = (await Promise.all(ls)).filter(
-            (el) => el.base64
-        ) as ImageList;
+        const newImages = [...images, ...Array.from(fileList)];
+        setImages(newImages);
 
-        // Set images
-        setImages((prev) => [...prev, ...imgPromises]);
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = reader.result as string;
+            handleImageUpload(dataUrl, newImages[0]);
+        };
 
-        // Update form state with the new images including their IDs
-        setFormState((prevState) => {
-            return {
-                ...prevState,
-                image_list: [
-                    ...prevState.image_list,
-                    ...imgPromises, // Remove the map function here
-                ],
-            };
+        reader.readAsDataURL(fileList[0]);
+    };
+
+    const handleImageUpload = (dataUrl: string, imageFile: File) => {
+        const formData = new FormData();
+        formData.append(`doc1_docTypeID`, `14`);
+        formData.append(`doc1_docNo`, `${generateRandomAlphanumeric()}`);
+        formData.append(`doc1_description`, `Default Images`);
+        formData.append(`doc1_files`, imageFile);
+
+        setUploadFileAsync(formData)
+            .then((data) => {
+                console.log('upload result', data);
+            })
+            .catch((error) => {
+                toast.error('Not Successful. ', error.message);
+            });
+    };
+
+    const removeImage = (index: number) => {
+        setImages((prevImages) => {
+            const updatedImages = [...prevImages];
+            updatedImages.splice(index, 1);
+            return updatedImages;
         });
     };
 
-    const removeImage = (i: number) => {
-        const updatedImages = [...images];
-        updatedImages.splice(i, 1);
-        setImages(updatedImages);
-    };
     console.log(formState);
     return (
         <form className="bg-white p-10">
@@ -266,52 +272,27 @@ export default function VerifyForm() {
             </section>
 
             <div className="mt-20 mb-28">
-                <div className="border border-dashed bg-white border-gray-400 text-gray-500 rounded-lg lg:w-7/12 h-[230px]">
-                    <Dropzone
-                        onDrop={(dropped) => handleDrop(dropped)}
-                        noKeyboard
+                <div className="border border-dashed bg-white border-gray-400 text-gray-500 rounded-lg lg:w-7/12 h-[130px]">
+                    <input
+                        ref={imageRef}
+                        type="file"
+                        accept=".jpg, .jpeg, .png, .gif"
+                        multiple
+                        className="opacity-0 invisible w-1"
+                        onChange={handleFileChange}
+                    />
+                    <Button
+                        type="button"
+                        className="mt-3 disabled:bg-blue-500"
+                        onClick={() => imageRef.current?.click()}
                     >
-                        {({ getRootProps, getInputProps }) => (
-                            <div
-                                {...getRootProps()}
-                                className="grid gap-4 justify-items-center py-6 px-5 h-full w-full"
-                            >
-                                {!images.length && images.length === 1 && (
-                                    <Image
-                                        alt=""
-                                        width={200}
-                                        height={200}
-                                        src={images[0].preview}
-                                    />
-                                )}
-
-                                <input {...getInputProps()} multiple />
-
-                                <svg
-                                    width="40"
-                                    height="41"
-                                    viewBox="0 0 40 41"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M18.3337 33.8333H10.8337C8.30588 33.8333 6.14588 32.9583 4.35366 31.2083C2.56144 29.4583 1.66588 27.3194 1.66699 24.7916C1.66699 22.625 2.31977 20.6944 3.62533 19C4.93088 17.3055 6.63922 16.2222 8.75033 15.75C9.44477 13.1944 10.8337 11.125 12.917 9.54163C15.0003 7.95829 17.3614 7.16663 20.0003 7.16663C23.2503 7.16663 26.0075 8.29885 28.272 10.5633C30.5364 12.8277 31.6681 15.5844 31.667 18.8333C33.5837 19.0555 35.1742 19.8822 36.4387 21.3133C37.7031 22.7444 38.3348 24.4177 38.3337 26.3333C38.3337 28.4166 37.6042 30.1877 36.1453 31.6466C34.6864 33.1055 32.9159 33.8344 30.8337 33.8333H21.667V21.9166L24.3337 24.5L26.667 22.1666L20.0003 15.5L13.3337 22.1666L15.667 24.5L18.3337 21.9166V33.8333Z"
-                                        fill="#9A9999"
-                                    />
-                                </svg>
-                                <h3>Accepts .gif, .jpg, and .png</h3>
-                                <p className="text-sm">
-                                    Upload a minimum of 1 photo, Each photo must
-                                    not exceed 5mb.
-                                </p>
-                            </div>
-                        )}
-                    </Dropzone>
+                        Upload Image
+                    </Button>
                 </div>
 
-                {images.length > 0 && (
+                {images?.length > 0 && (
                     <div className="grid grid-cols-4 gap-5 mt-10">
-                        {images.map((img, i) => (
+                        {images?.map((img, i) => (
                             <div
                                 key={i}
                                 className="relative flex justify-center border-2 border-white h-72 rounded-3xl"
@@ -320,7 +301,7 @@ export default function VerifyForm() {
                                     alt=""
                                     fill
                                     className="inline-block object-cover rounded-3xl"
-                                    src={img.base64}
+                                    src={URL.createObjectURL(img)}
                                 />
                                 <button
                                     type="button"

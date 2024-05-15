@@ -189,7 +189,7 @@ export default function Home() {
                     {Array.isArray(properties) && properties.length ? (
                         properties.map((property) => (
                             // @ts-ignore
-                            <div key={property?.id} className="w-full">
+                            <div key={property?.id}>
                                 <PropertyListingCard property={property} />
                             </div>
                         ))
