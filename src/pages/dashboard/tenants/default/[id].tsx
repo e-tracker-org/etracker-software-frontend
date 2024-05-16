@@ -20,6 +20,9 @@ import { extractAndCapitalizeWords } from 'utils/helper';
 import useLandlord from 'hooks/useLandlord';
 import toast from 'react-hot-toast';
 import useProperty from 'hooks/useProperty';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+// import Slider from 'react-slick';
 
 interface DetailsProps {
     label?: string;
@@ -30,15 +33,6 @@ interface DetailsProps {
 interface DetailsRowProps {
     children?: ReactNode;
     title?: string | undefined;
-}
-
-interface TenantProperty {
-    userId: string;
-    propertyId: string;
-    landlordId: string;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
 }
 
 const DetailsCard: FC<DetailsProps> = ({ label, className, content }) => {
@@ -64,11 +58,10 @@ const DetailsRowCard: FC<DetailsRowProps> = ({ title, children }) => {
 };
 
 export default function VerifyTenantDetails() {
-    // @ts-ignore
-    const { query, router } = useRouter();
+    const { query } = useRouter();
     const id = query?.id as string | undefined;
-    // const propertyId = states?.propertyId as string;
     const [tenant, setTenant] = useState({} as any);
+    const [imageList, setImageList] = useState<string[]>([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -81,6 +74,8 @@ export default function VerifyTenantDetails() {
 
                 if (tenant) {
                     setTenant(tenant);
+                    // Assuming tenant.images is an array of image URLs
+                    setImageList(tenant.image_list || []);
                 }
             } catch (error) {
                 console.error('Error fetching tenant transactions:', error);
@@ -92,12 +87,19 @@ export default function VerifyTenantDetails() {
         }
     }, [id]);
 
+    const settings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+    };
+
     return (
-        <div>
+        <div className="relative min-h-screen">
             <header className="flex justify-between items-center mb-5">
                 <div className="flex items-center">
                     <BackButton />
-                    {/* <h3 className="ml-5">Ref ID-#1FA09123GH</h3> */}
                 </div>
             </header>
 
@@ -191,29 +193,27 @@ export default function VerifyTenantDetails() {
                         </div>
                     </div>
                 </DetailsRowCard>
-
-                {/* <DetailsRowCard title="Proprty History">
-                    <PropertyHistory property={property} />
-                </DetailsRowCard> */}
-
-                {/* <DetailsRowCard title="KYC Details"></DetailsRowCard> */}
-
-                {/* <DetailsRowCard title="Default Record">
-                    <DefaultRecords
-                        tenantProperty={tenantProperty}
-                        tenant={tenant}
-                    />
-                </DetailsRowCard>  */}
-
-                {/* <div className="flex items-center justify-center ">
-                    <DetailsRowCard title="Tenant Rating">
-                        <TenantRating tenant={tenant} show={false} />
-                    </DetailsRowCard>
-                </div> */}
-                {/* 
-                <DetailsRowCard title="Transaction History">
-                    <TransactionHistory />
-                </DetailsRowCard> */}
+                {imageList.length > 0 && (
+                    <div className="">
+                        {/* <Slider {...settings}> */}
+                        {imageList.map((image, index) => (
+                            <div
+                                key={index}
+                                className="flex overflow-x-auto justify-center"
+                            >
+                                <Image
+                                    src={image}
+                                    className=" rounded-lg"
+                                    alt={`Tenant image ${index + 1}`}
+                                    width={300}
+                                    height={200}
+                                    objectFit="cover"
+                                />
+                            </div>
+                        ))}
+                        {/* </Slider> */}
+                    </div>
+                )}
             </section>
         </div>
     );

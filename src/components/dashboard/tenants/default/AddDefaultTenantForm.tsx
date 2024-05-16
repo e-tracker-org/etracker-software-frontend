@@ -22,6 +22,7 @@ import {
 
 export default function VerifyForm() {
     const [images, setImages] = useState<File[]>([]);
+    const [imageList, setImageList] = useState<string[]>([]);
     const imageRef = useRef<HTMLInputElement>(null);
     const states = useAppStore();
     const landlordId = states?.user?.id;
@@ -43,6 +44,8 @@ export default function VerifyForm() {
         setUploadFileAsync,
         uploadProfileLoading,
     } = useFileUploadHandler('DEFAULT', 'default_image');
+
+    console.log(imageList, 'imageList');
 
     const updateFormState = (key: string, value: any) => {
         setFormState({ ...formState, [key]: value });
@@ -88,12 +91,14 @@ export default function VerifyForm() {
         const data = {
             ...formState,
             landlordId,
+            imageList,
         };
 
         const addDefault = await createDefaultTenant(data);
+        console.log(addDefault, 'Default response');
 
         if (addDefault) {
-            toast.success('Tenant added successfully');
+            toast.success('Tenant default added successfully');
             setFormState({
                 propertyAddress: '',
                 complaints: '',
@@ -106,35 +111,35 @@ export default function VerifyForm() {
                 tenantName: '',
                 agreed: false,
             });
+            setImages([]);
         }
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const fileList = e.target.files as FileList;
+    // Function to handle file input change
+    //@ts-ignore
+    const handleFileChange = (e) => {
+        const fileList = e.target.files;
         if (!fileList.length) return;
 
-        const newImages = [...images, ...Array.from(fileList)];
+        const newImages = [...Array.from(fileList)];
+        //@ts-ignore
         setImages(newImages);
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            const dataUrl = reader.result as string;
-            handleImageUpload(dataUrl, newImages[0]);
-        };
-
-        reader.readAsDataURL(fileList[0]);
+        handleImageUpload(newImages[0]);
     };
 
-    const handleImageUpload = (dataUrl: string, imageFile: File) => {
+    //@ts-ignore
+    const handleImageUpload = (imageFile) => {
         const formData = new FormData();
-        formData.append(`doc1_docTypeID`, `14`);
-        formData.append(`doc1_docNo`, `${generateRandomAlphanumeric()}`);
-        formData.append(`doc1_description`, `Default Images`);
-        formData.append(`doc1_files`, imageFile);
+        formData.append('doc1_docTypeID', '7');
+        formData.append('doc1_docNo', `${generateRandomAlphanumeric()}`);
+        formData.append('doc1_description', 'Default Images');
+        formData.append('doc1_files', imageFile);
 
-        setUploadFileAsync(formData)
+        uploadImage(formData)
             .then((data) => {
-                console.log('upload result', data);
+                console.log('Upload result', data);
+                setImageList((prevList) => [...prevList, data.url]); // Save uploaded image URL
             })
             .catch((error) => {
                 toast.error('Not Successful. ', error.message);
