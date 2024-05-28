@@ -105,7 +105,6 @@ function Signin() {
             .then((data: any) => {
                 states?.setStartKycScreen('');
                 reset();
-                console.log('user', data.data.user);
 
                 if (!!data?.data?.tokens) {
                     //Sets user token in local storage from the zustan state
@@ -195,6 +194,9 @@ function Signin() {
                         }, 2000);
                     }
                 }
+                setShowMessage(data?.message);
+
+                // toast.success(data.message ?? 'Login successful');
             })
             .catch((error) => {
                 error && toast.error(error?.message);

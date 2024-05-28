@@ -381,9 +381,10 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
                         inputClassName="bg-white"
                     />
                     <Input
-                        label="Number of Bathrooms"
+                        label="Number of Bathrooms(Maximum of 6 bathrooms)"
                         type="number"
                         min={1}
+                        max={6}
                         required
                         placeholder="Number of Bathrooms"
                         asterisk
