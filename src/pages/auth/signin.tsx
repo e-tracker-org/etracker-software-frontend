@@ -119,7 +119,8 @@ function Signin() {
 
                      // New user onboarding
                     if (
-                        data.data.user.accountTypes.length  === 0
+                        data.data.user.accountTypes.length  === 0 &&
+                        !data?.data?.user?.currentKyc
                         
                     ) {
                         // Handle new user onboarding
