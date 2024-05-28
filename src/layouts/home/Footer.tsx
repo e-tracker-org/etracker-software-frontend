@@ -6,7 +6,7 @@ const Footer = () => {
     // @ts-ignore
     const date = 1900 + new Date().getYear();
     return (
-        <footer className="border-t border-t-gray-200 mt-5 py-10 px-[5%] md:px-[8%] lg:px-[6%] 2xl:px-[5%] relative">
+        <footer className="mt-5 py-10 px-[5%] md:px-[8%] lg:px-[6%] 2xl:px-[5%] relative">
             <div className="flex flex-col-reverse md: gap-x-10 lg:gap-x-28 gap-y-12 md:flex-row  md:justify-items-start justify-items-center ">
                 <div className="hidden md:block">
                     <div className="lg:w-[200px] h-[55px] relative mx-auto">

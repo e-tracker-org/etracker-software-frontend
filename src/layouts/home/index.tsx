@@ -11,7 +11,8 @@ const HomeLayout = ({
     return (
         <main className="max-w-screen-4xl mx-auto bg-gray-50 overflow-clip">
             <Header />
-            <main className="px-[5%] md:px-[8%] lg:px-[6%] 2xl:px-[5%]">
+            {/* <main className="px-[5%] md:px-[8%] lg:px-[6%] 2xl:px-[5%]"> */}
+            <main className="">
                 {children}
             </main>
             {showFooter && <Footer />}
