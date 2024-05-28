@@ -21,6 +21,7 @@ import Loader from 'components/base/Loader';
 import { KycStatus } from 'interfaces';
 import useLandlord from 'hooks/useLandlord';
 import Footer from 'layouts/home/Footer';
+import { createHistory } from 'services/newServices/history';
 
 const schema = yup.object({
     email: yup
@@ -49,11 +50,10 @@ function Signin() {
 
     // check if user is already logged in
     useEffect(() => {
-        if (states?.user) {
-            toast.success(`Welcome back, ${states?.user?.firstname}!`);
+        if (states?.isAuthenticated) {
             router.push('/dashboard');
         }
-    })
+    }, [states]);
 
     const {
         mutate,
@@ -101,6 +101,7 @@ function Signin() {
         states?.setActiveKyc(undefined);
         states?.setActiveAccount(undefined);
         loginAsync(values)
+            //@ts-ignore
             .then((data: any) => {
                 states?.setStartKycScreen('');
                 reset();
@@ -161,7 +162,29 @@ function Signin() {
                         })
                             .then((res) => {
                                 console.log('ressssss', res);
-                                return router.push('/dashboard/properties');
+                                //@ts-ignore
+                                const landlordId = res.data?.current_owner; // Extract landlord ID from response data
+                                if (landlordId) {
+                                    // After confirming tenant, create history
+                                    createHistory(
+                                        tenantId.toString(), // Pass user ID
+                                        data.data.user.email, // Pass user email
+                                        landlordId, // Pass landlord ID
+                                        propertyId.toString() // Pass property ID
+                                    )
+                                        .then((historyRes) => {
+                                            console.log(
+                                                'History created:',
+                                                historyRes
+                                            );
+                                            router.push(
+                                                '/dashboard/properties'
+                                            );
+                                        })
+                                        .catch((historyError) => {
+                                            toast.error(historyError.message);
+                                        });
+                                }
                             })
                             .catch((errors) => {
                                 toast.error(errors.message);

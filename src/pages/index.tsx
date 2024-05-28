@@ -178,18 +178,18 @@ export default function Home() {
                     Explore <span className="text-primary-600">Your Dream</span>{' '}
                     Properties
                 </h1>
-                <section
+                <div
                     style={{
                         borderLeftColor: '#1F32EB',
                         borderLeftWidth: 5,
                     }}
-                    className="mt-5 px-8 bg-white rounded-md pt-5 flex gap-4 my-5 w-full overflow-x-auto"
+                    className="flex gap-4 my-5 w-full overflow-x-auto"
                 >
                     {/* <section className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 w-full mb-10 min-h-[300px] "> */}
                     {Array.isArray(properties) && properties.length ? (
                         properties.map((property) => (
                             // @ts-ignore
-                            <div key={property?.id} className="w-full">
+                            <div key={property?.id} className=" flex-none">
                                 <PropertyListingCard property={property} />
                             </div>
                         ))
@@ -198,7 +198,7 @@ export default function Home() {
                             No property record found
                         </p>
                     )}
-                </section>
+                </div>
                 {/* <PropertyListingCard properties={properties} /> */}
                 <section
                     id="aboutus"

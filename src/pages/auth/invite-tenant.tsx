@@ -19,6 +19,7 @@ import { UserService } from 'services';
 import { GET_ACCOUNT_TYPES_QUERY_KEY } from 'utils/constants';
 import { useAppStore } from 'hooks/useAppStore';
 import PasswordStrengthBar from 'react-password-strength-bar';
+import { createHistory } from 'services/newServices/history';
 
 const schema = yup.object({
     email: yup
@@ -52,6 +53,7 @@ function SignUp() {
     const router = useRouter();
     const [invitedByName, setInvitedByName] = useState('');
     const [propertyId, setPropertyId] = useState('');
+    const [landlordId, setLandlordId] = useState('');
     const [password, setPassword] = useState('');
     const [checkpassword, setCheckPassword] = useState('');
 
@@ -64,6 +66,13 @@ function SignUp() {
     } = useForm({
         resolver: yupResolver(schema),
     });
+
+    // check if user is already logged in
+    useEffect(() => {
+        if (states?.isAuthenticated) {
+            router.push('/dashboard');
+        }
+    }, [states]);
 
     const { addLandlordTenant } = useLandlord();
 
@@ -81,37 +90,58 @@ function SignUp() {
             accountTypes: defaultAccountType,
         };
 
-        registerAsync(userObj)
-            .then((data: any) => {
-                if (data.success) {
-                    setShowMessage(data?.message);
-                    reset({});
-                    states?.setStartKycScreen('onboarding');
-                    states?.setActiveKyc({
-                        accountType: 1,
-                        kycStage: 1,
-                        nextStage: 2,
-                        status: 'INCOMPLETE',
-                    });
-                    states?.setActiveAccount(1);
-                    setTimeout(() => {
-                        router.push('/auth/signin');
-                    }, 3000);
-                }
-            })
-            .catch((error) => {
-                toast.error(error?.message);
-            });
+        try {
+            // Register user
+            const userData = await registerAsync(userObj);
+            console.log(userData, 'userData');
+            //@ts-ignore
+            if (userData.success) {
+                //@ts-ignore
+                setShowMessage(userData?.message);
+                reset({});
+                states?.setStartKycScreen('onboarding');
+                states?.setActiveKyc({
+                    accountType: 1,
+                    kycStage: 1,
+                    nextStage: 2,
+                    status: 'INCOMPLETE',
+                });
+                states?.setActiveAccount(1);
+
+                // Assign userId directly as a string
+                //@ts-ignore
+                const userId = userData.data?.id.toString();
+
+                // Create history with individual parameters
+                const history = await createHistory(
+                    userId,
+                    values.email,
+                    landlordId,
+                    propertyId
+                );
+                console.log(history, 'history');
+
+                setTimeout(() => {
+                    router.push('/auth/signin');
+                }, 2000);
+            }
+        } catch (error) {
+            //@ts-ignore
+            toast.error(error?.message);
+        }
     };
 
     useEffect(() => {
-        const { invitedBy, propertyId } = router.query;
-        console.log(invitedBy, propertyId);
+        const { invitedBy, propertyId, landlordId } = router.query;
+        console.log(invitedBy, propertyId, landlordId);
         if (invitedBy) {
             setInvitedByName(decodeURIComponent(invitedBy as string));
         }
         if (propertyId) {
             setPropertyId(propertyId as string);
+        }
+        if (landlordId) {
+            setLandlordId(landlordId as string);
         }
     }, [router.query]);
 
@@ -203,16 +233,19 @@ function SignUp() {
                         />
                     </div>
                     <div className="flex gap-4 mb-10">
-                        <Input
-                            className="flex-1"
-                            placeholder="Password"
-                            type="password"
-                            required
-                            error={errors.password}
-                            onChange={updateForm}
-                            register={{ ...register('password') }}
-                        />
-                        <PasswordStrengthBar password={watch('password')} />
+                        <div className="flex flex-col gap-3">
+                            <Input
+                                className="flex-1"
+                                placeholder="Password"
+                                type="password"
+                                required
+                                error={errors.password}
+                                onChange={updateForm}
+                                register={{ ...register('password') }}
+                            />
+                            <PasswordStrengthBar password={watch('password')} />
+                        </div>
+
                         <Input
                             className="flex-1"
                             placeholder="Confirm Password"

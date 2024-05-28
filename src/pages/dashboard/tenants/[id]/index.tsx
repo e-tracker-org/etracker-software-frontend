@@ -69,8 +69,8 @@ const DetailsRowCard: FC<DetailsRowProps> = ({ title, children }) => {
 };
 
 export default function TenantDetails() {
-    // @ts-ignore
-    const { query, router } = useRouter();
+    const router = useRouter();
+    const { query } = router;
     const states = useAppStore();
     const { endTenantAgreement, isEndTenantAgreementLoading } = useLandlord();
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -142,18 +142,23 @@ export default function TenantDetails() {
             email: tenant.email,
             tenantId: tenantProperty?.userId,
         };
+
         try {
             setIsLoading(true);
             const deleteTenant = await deleteTask(tenantId, body);
             console.log(deleteTenant);
+
             toast.success('Tenant agreement successfully ended');
+
             setIsLoading(false);
             setIsModalOpen(false);
+
             router.push('/dashboard/tenants');
-            // router.back();
         } catch (error) {
             console.error('Error ending tenant agreement:', error);
             toast.error('Failed to end tenant agreement');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -180,7 +185,7 @@ export default function TenantDetails() {
                 <div className="flex">
                     <Button
                         title="End Agreement"
-                        isLoading={isEndTenantAgreementLoading}
+                        isLoading={isLoading}
                         onClick={() => {
                             openModal();
                         }}
