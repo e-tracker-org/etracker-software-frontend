@@ -107,8 +107,6 @@ function Signin() {
                 reset();
                 console.log('user', data.data.user);
 
-                console.log("account type", data.data.user.accountTypes.length)
-
                 if (!!data?.data?.tokens) {
                     //Sets user token in local storage from the zustan state
                     states?.setUser({
@@ -119,7 +117,7 @@ function Signin() {
 
                      // New user onboarding
                     if (
-                        data.data.user.accountTypes.length  === 0 &&
+                        data?.data?.user?.accountTypes?.length  === 0 &&
                         !data?.data?.user?.currentKyc
                         
                     ) {

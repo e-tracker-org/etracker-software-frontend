@@ -368,9 +368,10 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
                         <option value="Duplex">Duplex</option>
                     </Select>
                     <Input
-                        label="Number of Rooms"
+                        label="Number of Rooms(Maximum of 6 rooms)"
                         type="number"
                         min={1}
+                        max={6}
                         maxLength={6}
                         required
                         placeholder="Number of Rooms"
