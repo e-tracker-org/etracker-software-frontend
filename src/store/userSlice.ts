@@ -86,6 +86,8 @@ export const userSlice: StateCreator<UserState, [], [], UserAction> = (
     signout: () => {
         // Clear local storage
         localStorage.clear();
+        // clear bound-store
+        localStorage.removeItem('bound-store');
         set(initialState);
     },
 });

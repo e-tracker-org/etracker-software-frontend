@@ -104,7 +104,9 @@ function Signin() {
             .then((data: any) => {
                 states?.setStartKycScreen('');
                 reset();
-                console.log('user', data);
+                console.log('user', data.data.user);
+
+                console.log("account type", data.data.user.accountTypes.length)
 
                 if (!!data?.data?.tokens) {
                     //Sets user token in local storage from the zustan state
@@ -113,6 +115,17 @@ function Signin() {
                         user: data?.data.user,
                         isAuthenticated: true,
                     });
+
+                     // New user onboarding
+                    if (
+                        data.data.user.accountTypes.length  === 0
+                        
+                    ) {
+                        // Handle new user onboarding
+                        // Code for new user onboarding here
+                        window.location.href = '/onboarding';
+                        // return router.push('/onboarding');
+                    }
 
                     // ongoing Kyc active
                     if (
@@ -125,15 +138,7 @@ function Signin() {
                         return router.push('/onboarding/kyc');
                     }
 
-                    // New user onboarding
-                    if (
-                        (data?.data?.user?.accountTypes?.length ?? 0) < 1 &&
-                        !data?.data?.user?.currentKyc
-                    ) {
-                        // Handle new user onboarding
-                        // Code for new user onboarding here
-                        return router.push('/onboarding');
-                    }
+                   
 
                     // Ongoing KYC but completed and awaiting approval
                     if (
