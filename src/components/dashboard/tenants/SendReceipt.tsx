@@ -89,7 +89,6 @@ export default function SendReceipt({
         }
     };
 
-    console.log(selectedTenants);
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Input
@@ -140,7 +139,7 @@ export default function SendReceipt({
                 inputClassName="bg-white"
             />
 
-            <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-16 mb-2">
+            <div className="flex gap-4 mt-16 mb-2">
                 <Button
                     type="button"
                     onClick={() => {

@@ -59,13 +59,12 @@ function SignUp() {
         resolver: yupResolver(schema),
     });
 
-
     useEffect(() => {
         if (states?.user) {
             toast.success(`Welcome back, ${states?.user?.firstname}!`);
             router.push('/dashboard');
         }
-    })
+    });
 
     const onSubmit = async (values: any) => {
         const userObj = {
@@ -109,7 +108,7 @@ function SignUp() {
         }
     };
 
-    const updateForm = (e:any) => {
+    const updateForm = (e: any) => {
         const { value, name } = e.target;
         if (name === 'password') {
             checkPassword(value);
@@ -120,7 +119,7 @@ function SignUp() {
         <section className="">
             <div className="h-[96px] md:h-[196px] lg:h-[296px] md:ml-[-17%] lg:ml-[-8%] w-[105vw] 4xl:-ml-[25%] bg-[url('/hero-banner.png')] bg-cover bg-center bg-no-repeat" />
 
-            <div className="py-3 md:px-[15%] lg:px-[25%]  xl:px-[30%] md:py-10 mx-auto">
+            <div className="py-3 px-2 md:px-[15%] lg:px-[25%]  xl:px-[30%] md:py-10 mx-auto">
                 <h2 className="text-xl md:text-2xl lg:text-3.5xl font-bold">
                     Create an account
                 </h2>

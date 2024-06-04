@@ -15,6 +15,21 @@ import { useAppStore } from 'hooks/useAppStore';
 import toast from 'react-hot-toast';
 // import { UserService } from 'services';
 
+const getRatingComment = (rating: number) => {
+    if (rating <= 10) return 'Very Poor';
+    if (rating <= 20) return 'Poor';
+    if (rating <= 40) return 'Good';
+    if (rating <= 60) return 'Very Good';
+    return 'Excellent';
+};
+
+const getRatingCommentColor = (rating: number) => {
+    if (rating <= 20) return 'text-red-500';
+    if (rating <= 40) return 'text-yellow-500';
+    if (rating <= 60) return 'text-green-500';
+    return 'text-green-700';
+};
+
 function TenantRating({ tenant, show }: any) {
     const states = useAppStore();
     const landlordId = states?.user?.id;
@@ -24,7 +39,7 @@ function TenantRating({ tenant, show }: any) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [value, setValue] = useState(5);
-    
+
     // const updateUser = UserService.updateUser;
     const tenantRating = tenant?.rating ?? 0;
 
@@ -34,7 +49,9 @@ function TenantRating({ tenant, show }: any) {
         if (tenant) {
             let ratingValue = 0;
             // @ts-ignore
-            const fileCount = Number(localStorage.getItem('selectedTenantFilesCount'));
+            const fileCount = Number(
+                localStorage.getItem('selectedTenantFilesCount')
+            );
 
             if (tenant?.profileImage == '' && tenant?.isUserVerified == false) {
                 ratingValue = 10;
@@ -71,10 +88,10 @@ function TenantRating({ tenant, show }: any) {
                     const storedTenant = localStorage.getItem('selectedTenant');
                     if (storedTenant) {
                         const tenant = JSON.parse(storedTenant);
-    
+
                         tenant.userData.rating =
                             tenant.userData.rating + updatedRating;
-    
+
                         localStorage.setItem(
                             'selectedTenant',
                             JSON.stringify(tenant)
@@ -85,11 +102,10 @@ function TenantRating({ tenant, show }: any) {
                     toast.success('Tenant rating updated successfully');
                     window.location.reload();
                 } else {
-                    console.error("localStorage is not available in this environment.");
+                    console.error(
+                        'localStorage is not available in this environment.'
+                    );
                 }
-               
-
-                
             } else {
                 toast.error('User profile update failed:');
                 console.error('User profile update failed:', response.message);
@@ -120,23 +136,34 @@ function TenantRating({ tenant, show }: any) {
         }
     };
 
+    const ratingComment = getRatingComment(rating);
+    const ratingCommentColor = getRatingCommentColor(rating);
+
     return (
         <div>
             <main className="flex flex-col gap-5 items-center justify-center mb-5">
-                <CircularProgressbar
-                    value={rating}
-                    text={`${rating}%`}
-                    styles={buildStyles({
-                        rotation: 0.25,
-                        strokeLinecap: 'butt',
-                        textSize: '16px',
-                        pathTransitionDuration: 0.5,
-                        pathColor: `rgba(62, 152, 199, ${rating / 100})`,
-                        textColor: 'green',
-                        trailColor: '#d6d6d6',
-                        backgroundColor: '#3e98c7',
-                    })}
-                />
+                <div>
+                    <CircularProgressbar
+                        value={rating}
+                        text={`${rating}%`}
+                        styles={buildStyles({
+                            rotation: 0.25,
+                            strokeLinecap: 'butt',
+                            textSize: '16px',
+                            pathTransitionDuration: 0.5,
+                            pathColor: `rgba(62, 152, 199, ${rating / 100})`,
+                            textColor: 'green',
+                            trailColor: '#d6d6d6',
+                            backgroundColor: '#3e98c7',
+                        })}
+                    />
+                    <div
+                        className={`text-center text-xl font-bold ${ratingCommentColor}`}
+                    >
+                        {ratingComment}
+                    </div>
+                </div>
+
                 <div>
                     {show ? (
                         <Button title="Modify Rating" onClick={openModal} />

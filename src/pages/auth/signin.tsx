@@ -114,11 +114,10 @@ function Signin() {
                         isAuthenticated: true,
                     });
 
-                     // New user onboarding
+                    // New user onboarding
                     if (
-                        data?.data?.user?.accountTypes?.length  === 0 &&
+                        data?.data?.user?.accountTypes?.length === 0 &&
                         !data?.data?.user?.currentKyc
-                        
                     ) {
                         // Handle new user onboarding
                         // Code for new user onboarding here
@@ -136,8 +135,6 @@ function Signin() {
                         // Code for incomplete KYC here
                         return router.push('/onboarding/kyc');
                     }
-
-                   
 
                     // Ongoing KYC but completed and awaiting approval
                     if (
@@ -230,7 +227,7 @@ function Signin() {
                     <section className="">
                         <div className="h-[96px] md:h-[196px] lg:h-[296px] md:ml-[-15%] lg:ml-[-8%] w-[105vw] 4xl:-ml-[25%] bg-[url('/hero-banner.png')] bg-cover bg-center bg-no-repeat" />
 
-                        <div className="py-3 md:px-[15%] lg:px-[25%]  xl:px-[30%] md:py-10 mx-auto">
+                        <div className="py-3 px-2 md:px-[15%] lg:px-[25%]  xl:px-[30%] md:py-10 mx-auto">
                             <h2 className="text-xl md:text-2xl text-3.5xl font-bold">
                                 Log in to{' '}
                                 <span className="text-primary-600">
