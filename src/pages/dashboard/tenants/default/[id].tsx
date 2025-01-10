@@ -20,8 +20,8 @@ import { extractAndCapitalizeWords } from 'utils/helper';
 import useLandlord from 'hooks/useLandlord';
 import toast from 'react-hot-toast';
 import useProperty from 'hooks/useProperty';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+// import 'slick-carousel/slick/slick.css';
+// import 'slick-carousel/slick/slick-theme.css';
 // import Slider from 'react-slick';
 
 interface DetailsProps {

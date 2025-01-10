@@ -1,3 +1,4 @@
+import Loader from 'components/base/Loader';
 import TextArea from 'antd/es/input/TextArea';
 import Button from 'components/base/Button';
 import ToolTip from 'components/base/Tooltip';
@@ -5,7 +6,7 @@ import Checkbox from 'components/base/form/Checkbox';
 import Input from 'components/base/form/Input';
 import Select from 'components/base/form/Select';
 import { useAppStore } from 'hooks/useAppStore';
-import { useRef, useState } from 'react';
+import { ReactElement, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { createDefaultTenant } from 'services/newServices/tenant';
 import Image from 'next/image';
@@ -19,13 +20,17 @@ import {
     convertDataUrlToImageFile,
     generateRandomAlphanumeric,
 } from 'utils/helper';
+import HomeLayout from 'layouts/home';
 
-export default function VerifyForm() {
+
+function Default() {
     const [images, setImages] = useState<File[]>([]);
     const [imageList, setImageList] = useState<string[]>([]);
     const imageRef = useRef<HTMLInputElement>(null);
     const states = useAppStore();
-    const landlordId = states?.user?.id;
+    // generate id 
+    const id = generateRandomAlphanumeric(10);
+    const landlordId = states?.user?.id || id;
     const [formState, setFormState] = useState({
         propertyAddress: '',
         complaints: '',
@@ -155,7 +160,8 @@ export default function VerifyForm() {
     };
 
     return (
-        <form className="bg-white p-10">
+        <>
+            <form className="bg-white p-10" style={{margin: '10px'}}>
             <section className="grid grid-cols-2 gap-6">
                 <Input
                     label="Tenant Name"
@@ -333,8 +339,7 @@ export default function VerifyForm() {
                 }
                 checked={formState.agreed}
                 onChange={() => updateFormState('agreed', !formState.agreed)}
-                // register={{ ...register('agreed') }}
-                // error={errors.agreed}
+
             />
 
             <div className="w-1/2  mx-auto mb-10 mt-16">
@@ -344,5 +349,12 @@ export default function VerifyForm() {
                 </Button>
             </div>
         </form>
+        </>
     );
 }
+
+Default.getLayout = function getLayout(page: ReactElement) {
+    return <HomeLayout showFooter={true}>{page}</HomeLayout>;
+};
+
+export default Default;

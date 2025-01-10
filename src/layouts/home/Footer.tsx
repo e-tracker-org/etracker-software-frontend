@@ -127,6 +127,14 @@ const Footer = () => {
                         </li>
                         <li>
                             <Link
+                                href="/default/register"
+                                className="text-sm font-normal text-black"
+                            >
+                                Check Default Tenants
+                            </Link>
+                        </li>
+                        <li>
+                            <Link
                                 href="/#"
                                 className="text-sm font-normal text-black"
                             >
