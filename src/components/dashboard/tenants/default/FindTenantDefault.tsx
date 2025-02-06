@@ -13,7 +13,7 @@ const FindTenantDefault = ({ tenants }: { tenants: any }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
-    console.log('tenants:', tenants);
+    // console.log('tenants:', tenants);
 
     // add below in use effect
     if (!tenants) return renderEmptyState();

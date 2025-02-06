@@ -1,7 +1,8 @@
 import { useAppStore } from 'hooks/useAppStore';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
-import nigeriaStates from 'nigeria-states-lgas';
+// import NigeriaStates from 'nigeria-states-lgas';
+import statesAndLgas from "../../libs/nigerian-states.json"; 
 import Dropzone from 'react-dropzone';
 import { FC, useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -68,7 +69,14 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
         resolver: yupResolver(schema),
     });
 
-    const NigeriaState = watch('state');
+    const [selectedState, setSelectedState] = useState("");
+    const [lgas, setLgas] = useState<string[]>([]);
+
+    const handleStateChange = (event) => {
+        const state = event.target.value;
+        setSelectedState(state);
+        setLgas(statesAndLgas[state as keyof typeof statesAndLgas] || []); 
+    };
 
     const onSubmit = async (data: any) => {
         const formData = new FormData();
@@ -323,39 +331,41 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
                     />
                     <Select
                         label="State"
-                        placeholder="State"
+                        placeholder="Select a State"
                         selectDivClassName="bg-white"
                         required
-                        register={{ ...register('state') }}
+                        register={{ ...register("state") }}
                         error={errors.state}
+                        onChange={handleStateChange}
                     >
                         <option disabled value="">
-                            State
+                            Select State
                         </option>
-                        {nigeriaStates
-                            .states()
-                            .map((state: string, i: number) => (
-                                <option key={i} value={state}>
-                                    {state}
-                                </option>
-                            ))}
+                        {Object.keys(statesAndLgas).map((state, i) => (
+                            <option key={i} value={state}>
+                                {state}
+                            </option>
+                        ))}
                     </Select>
+
+                    {/* LGA Dropdown */}
                     <Select
                         label="City"
-                        placeholder="City"
+                        placeholder="Select a City"
                         selectDivClassName="bg-white"
                         required
-                        register={{ ...register('city') }}
+                        register={{ ...register("city") }}
                         error={errors.city}
+                        disabled={!selectedState} 
                     >
-                        {NigeriaState &&
-                            nigeriaStates
-                                .lgas(NigeriaState)
-                                ?.map((lga: string, i: number) => (
-                                    <option key={i} value={lga}>
-                                        {lga}
-                                    </option>
-                                ))}
+                        <option disabled value="">
+                            Select City
+                        </option>
+                        {lgas.map((lga, i) => (
+                            <option key={i} value={lga}>
+                                {lga}
+                            </option>
+                        ))}
                     </Select>
                     <Select
                         label="Apartment Type"

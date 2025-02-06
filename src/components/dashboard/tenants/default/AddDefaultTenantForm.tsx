@@ -5,7 +5,7 @@ import Checkbox from 'components/base/form/Checkbox';
 import Input from 'components/base/form/Input';
 import Select from 'components/base/form/Select';
 import { useAppStore } from 'hooks/useAppStore';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { createDefaultTenant } from 'services/newServices/tenant';
 import Image from 'next/image';
@@ -19,6 +19,7 @@ import {
     convertDataUrlToImageFile,
     generateRandomAlphanumeric,
 } from 'utils/helper';
+import { fetchAndFilterUsersByAccountType } from 'services/newServices/user';
 
 export default function VerifyForm() {
     const [images, setImages] = useState<File[]>([]);
@@ -45,7 +46,40 @@ export default function VerifyForm() {
         uploadProfileLoading,
     } = useFileUploadHandler('DEFAULT', 'default_image');
 
+    const [tenants, setTenants] = useState([]); // State to store the list of tenants
+    const [selectedTenant, setSelectedTenant] = useState(null); // State to store the selected tenant
+
+    // Fetch tenants on component mount
+    useEffect(() => {
+        const getTenants = async () => {
+            const tenantsList = await fetchAndFilterUsersByAccountType();
+            setTenants(tenantsList);
+        };
+
+        getTenants();
+    }, []);
+
+    // Handle tenant selection
+    const handleTenantSelect = (tenantId) => {
+        const tenant = tenants.find(t => t.id === tenantId);
+        setSelectedTenant(tenant);
+
+        // Populate form fields with tenant data
+        if (tenant) {
+            setFormState({
+                ...formState,
+                tenantName: tenant.firstname + ' ' + tenant.lastname,
+                tenantPhone: tenant.phone,
+                tenantEmail: tenant.email,
+                // tenantNIN: tenant.nin,
+                tenantGender: tenant.gender,
+            });
+        }
+    };
+
     console.log(imageList, 'imageList');
+
+    console.log(tenants, 'tenants');
 
     const updateFormState = (key: string, value: any) => {
         setFormState({ ...formState, [key]: value });
@@ -79,12 +113,12 @@ export default function VerifyForm() {
         }
 
         if (formState.tenantNIN.length < 11) {
-            toast.error('Invalid NIN number');
+            toast.error('NIN should be 11 characters!');
             return;
         }
 
         if (formState.landlordNIN.length < 11) {
-            toast.error('Invalid NIN number');
+            toast.error('NIN should be 11 characters!');
             return;
         }
 
@@ -95,7 +129,7 @@ export default function VerifyForm() {
         };
 
         const addDefault = await createDefaultTenant(data);
-        console.log(addDefault, 'Default response');
+        // console.log(addDefault, 'Default response');
 
         if (addDefault) {
             toast.success('Tenant default added successfully');
@@ -157,6 +191,21 @@ export default function VerifyForm() {
     return (
         <form className="bg-white p-10">
             <section className="grid grid-cols-2 gap-6">
+                <Select
+                    label="Select Tenant"
+                    // required
+                    value={selectedTenant?.id || ''}
+                    onChange={(e) => handleTenantSelect(e.target.value)}
+                    className="bg-white"
+                >
+                    <option value="">Select a tenant</option>
+                    {tenants.map(tenant => (
+                        <option key={tenant.id} value={tenant.id}>
+                            {tenant.firstname} {tenant.lastname}
+                        </option>
+                    ))}
+                </Select>
+
                 <Input
                     label="Tenant Name"
                     required

@@ -106,6 +106,7 @@ export default function FindTenants() {
         }
 
         try {
+            console.log(searchTerm, 'searchTerm');
             const tenantHist = await findOneHistoryByEmail(searchTerm);
             if (!tenantHist) {
                 toast.success('No tenant history found');
@@ -123,7 +124,7 @@ export default function FindTenants() {
                     (property: any) =>
                         tenantHist.propertyId.includes(property.id)
                 );
-                console.log(filteredProperties, 'filteredProperties');
+                console.log( 'filteredProperties',filteredProperties);
                 // Set the filtered properties to state
                 setTenantlProperty(filteredProperties);
             }
@@ -139,7 +140,7 @@ export default function FindTenants() {
             }
         } catch (error) {
             console.error('Error retrieving history:', error);
-            toast.error('Error retrieving history');
+            toast.error('Tenant has no history');
         }
     };
 

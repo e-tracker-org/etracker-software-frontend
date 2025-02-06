@@ -34,7 +34,7 @@ export default function AddTenant() {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
 
-    console.log(states?.propertyId, 'selectedPropertyId');
+    // console.log(states?.propertyId, 'selectedPropertyId');
     const [selectedTenants, setSelectedTenants] = useState<User[]>([]);
     const [tenantDropdownItems, setTenantDropdownItems] = useState<User[]>([]);
 
