@@ -22,6 +22,8 @@ import {
 import { fetchAndFilterUsersByAccountType } from 'services/newServices/user';
 
 export default function VerifyForm() {
+    const [tenants, setTenants] = useState([] as any); // State to store the list of tenants
+    const [selectedTenant, setSelectedTenant] = useState({} as any); // State to store the selected tenant
     const [images, setImages] = useState<File[]>([]);
     const [imageList, setImageList] = useState<string[]>([]);
     const imageRef = useRef<HTMLInputElement>(null);
@@ -46,8 +48,6 @@ export default function VerifyForm() {
         uploadProfileLoading,
     } = useFileUploadHandler('DEFAULT', 'default_image');
 
-    const [tenants, setTenants] = useState([]); // State to store the list of tenants
-    const [selectedTenant, setSelectedTenant] = useState(null); // State to store the selected tenant
 
     // Fetch tenants on component mount
     useEffect(() => {
@@ -60,8 +60,8 @@ export default function VerifyForm() {
     }, []);
 
     // Handle tenant selection
-    const handleTenantSelect = (tenantId) => {
-        const tenant = tenants.find(t => t.id === tenantId);
+    const handleTenantSelect = (tenantId: string) => {
+        const tenant = tenants.find((t: { id: string; }) => t.id === tenantId);
         setSelectedTenant(tenant);
 
         // Populate form fields with tenant data
@@ -199,6 +199,7 @@ export default function VerifyForm() {
                     className="bg-white"
                 >
                     <option value="">Select a tenant</option>
+                    {/* @ts-ignore */}
                     {tenants.map(tenant => (
                         <option key={tenant.id} value={tenant.id}>
                             {tenant.firstname} {tenant.lastname}

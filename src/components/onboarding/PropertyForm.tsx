@@ -72,7 +72,7 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
     const [selectedState, setSelectedState] = useState("");
     const [lgas, setLgas] = useState<string[]>([]);
 
-    const handleStateChange = (event) => {
+    const handleStateChange = (event: { target: { value: any; }; }) => {
         const state = event.target.value;
         setSelectedState(state);
         setLgas(statesAndLgas[state as keyof typeof statesAndLgas] || []); 
@@ -356,7 +356,7 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
                         required
                         register={{ ...register("city") }}
                         error={errors.city}
-                        disabled={!selectedState} 
+                        // disabled={!selectedState} 
                     >
                         <option disabled value="">
                             Select City
