@@ -178,6 +178,7 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
                                     <th className="px-6 ">Date Created</th>
                                     <th className="px-6 ">Email</th>
                                     <th className="px-6 ">Phone Number</th>
+                                    <th className="px-6 ">Address</th>
                                     {/* <th className="px-6 ">
                                         Agreement Start Date
                                     </th>
@@ -276,6 +277,9 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
                                                 </td>
                                                 <td className="py-6 px-14 ">
                                                     {tenant?.userData?.phone}
+                                                </td>
+                                                <td className="py-6 px-14 ">
+                                                    {tenant?.userData?.address}
                                                 </td>
                                                 {/* Add more columns as needed */}
                                             </tr>

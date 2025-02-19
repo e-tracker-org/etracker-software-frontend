@@ -73,7 +73,7 @@ export default function FindTenants() {
     const [tenantHistory, setTenantHistory] = useState([]);
     const [tenantDefault, setTenantDefault] = useState([]);
     const [allDefault, setAllDefault] = useState([]);
-    console.log(tenantHistory, 'tenantHistory');
+    console.log(tenantHistory, 'tenantHistorys');
 
     useEffect(() => {
         setLoading(true);

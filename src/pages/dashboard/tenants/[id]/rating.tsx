@@ -28,7 +28,6 @@ function TenantRating({ tenant, show }: any) {
     // const updateUser = UserService.updateUser;
     const tenantRating = tenant?.rating ?? 0;
 
-    console.log('tenant', tenant);
 
     useEffect(() => {
         if (tenant) {

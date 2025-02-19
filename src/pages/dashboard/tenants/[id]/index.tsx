@@ -162,6 +162,8 @@ export default function TenantDetails() {
         }
     };
 
+    console.log(tenant, 'tenant here');
+
     return (
         <div>
             <header className="flex justify-between items-center mb-5">
@@ -278,6 +280,18 @@ export default function TenantDetails() {
                             <DetailsCard
                                 label="Email Address"
                                 content={tenant.email}
+                                className="w-full sm:w-auto" // Adjust width for small screens
+                            />
+                        </div>
+                        <div className="flex flex-col gap-4 sm:flex-row mb-4">
+                            <DetailsCard
+                                label="Address"
+                                content={tenant.fullAddress}
+                                className="w-full sm:w-auto" // Adjust width for small screens
+                            />
+                            <DetailsCard
+                                label="Closest Landmark"
+                                content={tenant.landmark}
                                 className="w-full sm:w-auto" // Adjust width for small screens
                             />
                         </div>
