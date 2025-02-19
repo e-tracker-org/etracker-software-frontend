@@ -162,7 +162,7 @@ export default function TenantDetails() {
         }
     };
 
-    console.log(tenant, 'tenant here');
+    console.log(tenant, 'tenantss');
 
     return (
         <div>
@@ -283,6 +283,7 @@ export default function TenantDetails() {
                                 className="w-full sm:w-auto" // Adjust width for small screens
                             />
                         </div>
+
                         <div className="flex flex-col gap-4 sm:flex-row mb-4">
                             <DetailsCard
                                 label="Address"

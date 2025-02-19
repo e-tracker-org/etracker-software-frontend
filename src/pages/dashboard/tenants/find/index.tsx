@@ -307,6 +307,18 @@ export default function FindTenants() {
                                             content={tenant.email}
                                         />
                                     </div>
+                                    <div className="flex flex-col mt-4 gap-4 sm:flex-row mb-4">
+                                        <DetailsCard
+                                            label="Address"
+                                            content={tenant.fullAddress}
+                                            className="w-full sm:w-auto" // Adjust width for small screens
+                                        />
+                                        <DetailsCard
+                                            label="Closest Landmark"
+                                            content={tenant.landmark}
+                                            className="w-full sm:w-auto" // Adjust width for small screens
+                                        />
+                                    </div>
                                 </div>
                             </DetailsRowCard>
                             <DetailsRowCard title="Property History">
