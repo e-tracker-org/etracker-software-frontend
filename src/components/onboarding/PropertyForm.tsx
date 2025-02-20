@@ -75,6 +75,7 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
     const handleStateChange = (event: { target: { value: any; }; }) => {
         const state = event.target.value;
         setSelectedState(state);
+
         setLgas(statesAndLgas[state as keyof typeof statesAndLgas] || []); 
     };
 
@@ -263,7 +264,7 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
     useEffect(() => {
         // Patches or edit existing proerpty details for kyc
         const property = getMyProperties?.data?.data[0];
-        console.log('propertytttt', property);
+        // console.log('propertytttt', property);
         if (page && page === 'kyc' && property?.id) {
             setProperties(getMyProperties?.data?.data);
             const defaultValues = {

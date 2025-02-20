@@ -26,9 +26,8 @@ const TenantTable = ({
     const router = useRouter();
 
     // add below in use effect
-    console.log(tenants, 'tenants');
     const filteredTenants = tenants.filter((tenant) => {
-        console.log('filter', filter)
+
         if (filter === 'all') return true;
         // @ts-ignore
         return tenant.status.toLowerCase() === filter.toLowerCase();

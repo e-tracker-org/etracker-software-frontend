@@ -294,7 +294,7 @@ export default function VerifyForm() {
                     // error={errors.gender}
                     className="bg-white"
                 >
-                    <option value="">Select gender</option>
+                    <option value="">{formState.tenantGender || 'Select gender'}</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                 </Select>

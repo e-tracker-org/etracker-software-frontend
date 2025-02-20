@@ -21,7 +21,6 @@ export default function Tenants() {
         async function fetchData() {
             try {
                 const tenantData = await getLandlordTenant(states?.user?.id);
-                console.log('okay', tenantData);
                 setTenants(tenantData);
                 setLoading(false);
             } catch (error) {

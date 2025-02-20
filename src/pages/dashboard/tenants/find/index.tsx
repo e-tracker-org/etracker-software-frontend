@@ -11,7 +11,6 @@ import {
     getDefaultTenant,
     getLandlordTenant,
 } from 'services/newServices/tenant';
-// import { GenericResponse } from 'services';
 import { getAllTenants } from 'services/newServices/tenant';
 import { fetchAndFilterUsersByAccountType } from 'services/newServices/user';
 import Image from 'next/image';
@@ -67,13 +66,12 @@ export default function FindTenants() {
     const [tenants, setTenants] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const [searchedTenant, setSearchedTenant] = useState<User[] | null>(null); // Initialize with null
+    const [searchedTenant, setSearchedTenant] = useState<User[] | null>(null);
     const [generalProperty, setGeneralProperty] = useState([]);
-    const [tenantProperty, setTenantlProperty] = useState([]);
+    const [tenantProperty, setTenantProperty] = useState([]);
     const [tenantHistory, setTenantHistory] = useState([]);
     const [tenantDefault, setTenantDefault] = useState([]);
     const [allDefault, setAllDefault] = useState([]);
-    console.log(tenantHistory, 'tenantHistorys');
 
     useEffect(() => {
         setLoading(true);
@@ -81,9 +79,6 @@ export default function FindTenants() {
             const tenantData = await fetchAndFilterUsersByAccountType();
             const general = await getAllGeneralProperties();
             const allTenantDefault = await getAllTenantDefault();
-
-            console.log(allTenantDefault, 'allTenantDefault');
-
             setTenants(tenantData);
             setGeneralProperty(general);
             setAllDefault(allTenantDefault);
@@ -92,6 +87,43 @@ export default function FindTenants() {
 
         fetchData();
     }, []);
+
+    // Function to fetch tenant history
+    const fetchTenantHistory = async (email: string) => {
+        try {
+            const tenant = tenants.find((t: any) => t.email === email);
+            if (!tenant) {
+                toast.success('No tenant found');
+                return;
+            }
+
+            // @ts-ignore
+            const tenantId = tenant.id;
+            const filteredProperties = generalProperty.filter((property: any) => 
+                property.tenant.some((t: any) => t.tenantId === tenantId)
+            );
+
+            setTenantProperty(filteredProperties);
+    
+        } catch (error) {
+            console.error('Error retrieving tenant details:', error);
+            toast.error('Error fetching tenant details');
+        }
+    };
+
+    // Function to fetch tenant default data
+    const fetchTenantDefault = async (email: string) => {
+        try {
+            const filteredDefaultTenants = allDefault.filter(
+                (defaultTenant: any) =>
+                    defaultTenant.tenantEmail === email
+            );
+            setTenantDefault(filteredDefaultTenants);
+        } catch (error) {
+            console.error('Error fetching default data:', error);
+            toast.error('Error retrieving default data');
+        }
+    };
 
     const searchTenant = async (searchTerm: string) => {
         const filteredTenant = tenants.filter((tenant: User) =>
@@ -106,15 +138,12 @@ export default function FindTenants() {
         }
 
         try {
-            console.log(searchTerm, 'searchTerm');
             const tenantHist = await findOneHistoryByEmail(searchTerm);
-            if (!tenantHist) {
-                toast.success('No tenant history found');
-                return;
-            }
+            // if (!tenantHist) {
+            //     toast.success('No tenant history found');
+            //     return;
+            // }
             setTenantHistory(tenantHist);
-
-            // Filter out the properties from the general property list
             if (
                 tenantHist &&
                 tenantHist.propertyId &&
@@ -124,18 +153,15 @@ export default function FindTenants() {
                     (property: any) =>
                         tenantHist.propertyId.includes(property.id)
                 );
-                console.log( 'filteredProperties',filteredProperties);
-                // Set the filtered properties to state
-                setTenantlProperty(filteredProperties);
+                setTenantProperty(filteredProperties);
             }
 
-            // Filter out the default tenants based on userId from tenantHistory
             if (tenantHist && tenantHist.tenantEmail) {
                 const filteredDefaultTenants = allDefault.filter(
                     (defaultTenant: any) =>
                         defaultTenant.tenantEmail === tenantHist.tenantEmail
                 );
-                console.log(filteredDefaultTenants, 'filteredDefaultTenants');
+                // console.log(filteredDefaultTenants, 'filteredDefaultTenants');
                 setTenantDefault(filteredDefaultTenants);
             }
         } catch (error) {
@@ -143,28 +169,6 @@ export default function FindTenants() {
             toast.error('Tenant has no history');
         }
     };
-
-    // useEffect(() => {
-    //     const fetchProperty = async () => {
-    //         try {
-    //             if (searchedTenant) {
-    //                 const property = searchedTenant[0].id;
-
-    //                 const propertyDetails = await getPropertyByTenantId(
-    //                     property
-    //                 );
-    //                 console.log(propertyDetails, 'propertyDetails');
-
-    //                 setTenantProperty(propertyDetails);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching property:', error);
-    //             toast.error('Error retrieving property details');
-    //         }
-    //     };
-
-    //     fetchProperty();
-    // }, [searchedTenant]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
@@ -273,6 +277,12 @@ export default function FindTenants() {
                                         </div>
                                     )}
                                 </div>
+                                <div className="flex gap-4 mt-4">
+                                {/* <DetailsRowCard title="Tenant Rating"> */}
+                                    <TenantRating tenant={tenant} />
+                                {/* </DetailsRowCard> */}
+                                
+                            </div>
                                 <div className="w-4/5">
                                     <div className="flex gap-4 mb-6">
                                         <DetailsCard
@@ -289,7 +299,6 @@ export default function FindTenants() {
                                             label="Gender"
                                             content="Male"
                                         />
-                                        {/* Assuming getFormattedDate is defined */}
                                         <DetailsCard
                                             label="Date of Birth"
                                             content={getFormattedDate(
@@ -311,16 +320,24 @@ export default function FindTenants() {
                                         <DetailsCard
                                             label="Address"
                                             content={tenant.fullAddress}
-                                            className="w-full sm:w-auto" // Adjust width for small screens
+                                            className="w-full sm:w-auto"
                                         />
                                         <DetailsCard
                                             label="Closest Landmark"
                                             content={tenant.landmark}
-                                            className="w-full sm:w-auto" // Adjust width for small screens
+                                            className="w-full sm:w-auto"
                                         />
                                     </div>
+                                    
                                 </div>
                             </DetailsRowCard>
+
+                            <Button
+                                    className="bg-blue-500 text-white"
+                                    onClick={() => fetchTenantHistory(tenant.email)}
+                                >
+                                    Get Tenant History
+                                </Button>
                             <DetailsRowCard title="Property History">
                                 {tenantProperty ? (
                                     <PropertyHistory
@@ -330,20 +347,24 @@ export default function FindTenants() {
                                     'No property history found'
                                 )}
                             </DetailsRowCard>
+                            <Button
+                                    className="bg-green-500 text-white"
+                                    onClick={() => fetchTenantDefault(tenant.email)}
+                                >
+                                   Check Default History
+                                </Button>
                             <DetailsRowCard title="Previous Default">
+                            
                                 {tenantDefault && tenantDefault.length > 0 ? (
                                     <FindTenantDefault
                                         tenants={tenantDefault}
                                     />
                                 ) : (
-                                    'No default found'
+                                    'No default history found'
                                 )}
                             </DetailsRowCard>
-                            <div className="flex items-center justify-center ">
-                                <DetailsRowCard title="Tenant Rating">
-                                    <TenantRating tenant={tenant} />
-                                </DetailsRowCard>
-                            </div>
+                            
+                           
                         </div>
                     ))
                 ) : (

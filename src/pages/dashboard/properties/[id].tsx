@@ -3,6 +3,7 @@ import { BiArrowBack } from 'react-icons/bi';
 import useAccountType from 'hooks/useAccountType';
 import { useAppStore } from 'hooks/useAppStore';
 import Dashboard from '..';
+import statesAndLgas from "../../../libs/nigerian-states.json";
 import Image from 'next/image';
 import { FC, ReactFragment, ReactNode, useEffect, useState } from 'react';
 import BackButton from 'components/base/BackButton';
@@ -19,7 +20,7 @@ import toast from 'react-hot-toast';
 import Input from 'components/base/form/Input';
 import Select from 'components/base/form/Select';
 import nigeriaStates from 'nigeria-states-lgas';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import TextArea from 'components/base/form/TextArea';
 
 interface DetailsProps {
@@ -91,6 +92,10 @@ export default function PropertyDetails() {
         is_active: property?.is_active,
     });
 
+    const [selectedState, setSelectedState] = useState("");
+    const [lgas, setLgas] = useState<string[]>([]);
+
+
     const handleEditable = (state: boolean) => {
         setEditable(state);
 
@@ -112,9 +117,9 @@ export default function PropertyDetails() {
         });
     };
 
-    const NigeriaState = formData?.location?.state;
+    // const NigeriaState = formData?.location?.state;
 
-    console.log(property, 'formData');
+    // console.log(property, 'formData');
 
     // @ts-ignore
     const openModal = (index) => {
@@ -227,10 +232,13 @@ export default function PropertyDetails() {
                     state: formData.location.state,
                 },
             });
+            // console.log(formData, 'formData');
+            // console.log(update, 'update');
             toast.success('Property updated successfully');
             setIsLoading(false);
             setEditable(false);
             // reload page
+            // return;
             router.reload();
         } catch (error) {
             console.error('Error updating property:', error);
@@ -238,6 +246,33 @@ export default function PropertyDetails() {
             toast.error('Error updating property. Please try again later.');
         }
     };
+
+    const handleCityChange = (event: { target: { value: any; }; }) => {
+        const city = event.target.value;
+        console.log(city, 'city');
+        setFormData({
+            ...formData,
+            location: {
+                ...formData.location,
+                city: city,
+            },
+        });
+    };
+
+    const handleStateChange = (event: { target: { value: any; }; }) => {
+        const state = event.target.value;
+        setSelectedState(state);
+        setFormData({
+            ...formData,
+            location: {
+                ...formData.location,
+                state: state,
+            },
+        });
+        setLgas(statesAndLgas[state as keyof typeof statesAndLgas] || []); 
+    };
+
+    console.log(property, 'property');
 
     return (
         <div className="h-auto">
@@ -523,34 +558,21 @@ export default function PropertyDetails() {
                                     content={
                                         editable ? (
                                             <Select
-                                                value={formData?.location?.city}
-                                                onChange={(e) =>
-                                                    handleChange(
-                                                        'city',
-                                                        e.target.value
-                                                    )
-                                                }
+                                                // label="City"
+                                                placeholder="Select a City"
                                                 selectDivClassName="bg-white"
+                                                required
+                                                value={formData?.location?.city}
+                                                onChange={(e) => handleCityChange(e)}
                                             >
                                                 <option disabled value="">
                                                     {formData?.location?.city}
                                                 </option>
-                                                {NigeriaState &&
-                                                    nigeriaStates
-                                                        .lgas(NigeriaState)
-                                                        ?.map(
-                                                            (
-                                                                lga: string,
-                                                                i: number
-                                                            ) => (
-                                                                <option
-                                                                    key={i}
-                                                                    value={lga}
-                                                                >
-                                                                    {lga}
-                                                                </option>
-                                                            )
-                                                        )}{' '}
+                                                {lgas.map((lga, i) => (
+                                                    <option key={i} value={lga}>
+                                                        {lga}
+                                                    </option>
+                                                ))}
                                             </Select>
                                         ) : (
                                             property?.location?.city
@@ -562,37 +584,24 @@ export default function PropertyDetails() {
                                 <DetailsCard
                                     label="State"
                                     content={
-                                        editable ? (
+                                        editable ? ( 
                                             <Select
-                                                value={
-                                                    formData?.location?.state
-                                                }
-                                                onChange={(e) =>
-                                                    handleChange(
-                                                        'state',
-                                                        e.target.value
-                                                    )
-                                                }
+                                                // label="State"
+                                                placeholder="Select a State"
                                                 selectDivClassName="bg-white"
+                                                required
+                                                register={{ ...register("state") }}
+                                                // error={errors.state}
+                                                onChange={handleStateChange}
                                             >
                                                 <option disabled value="">
-                                                    State
+                                                    {formData?.location?.state || "Select a State"}
                                                 </option>
-                                                {nigeriaStates
-                                                    .states()
-                                                    .map(
-                                                        (
-                                                            state: string,
-                                                            i: number
-                                                        ) => (
-                                                            <option
-                                                                key={i}
-                                                                value={state}
-                                                            >
-                                                                {state}
-                                                            </option>
-                                                        )
-                                                    )}
+                                                {Object.keys(statesAndLgas).map((state, i) => (
+                                                    <option key={i} value={state}>
+                                                        {state}
+                                                    </option>
+                                                ))}
                                             </Select>
                                         ) : (
                                             property?.location?.state
