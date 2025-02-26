@@ -216,14 +216,16 @@ export default function AddTenant() {
     }, [searchTerm]);
 
     const handleAddTenant = () => {
-        let propertyId;
+        let propId;
             if (id) {
-                propertyId = id;
+                propId = id;
             } else if (selectedPropertyId) {
-                propertyId = selectedPropertyId;
+                propId = selectedPropertyId;
             } else if (states?.propertyId) {
-                propertyId = states?.propertyId;
+                propId = states?.propertyId;
             }
+        // @ts-ignore
+        const propertyId: string = propId;
 
         if (!propertyId) {
             toast.error('No property selected');
