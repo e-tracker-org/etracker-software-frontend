@@ -41,7 +41,7 @@ export default function VeriifyTenants() {
         fetchData(); // Call fetchData again to refresh data
     };
 
-    console.log(tenants, 'tenants');
+    // console.log(tenants, 'tenants');
 
     return (
         <div className="">

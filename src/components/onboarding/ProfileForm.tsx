@@ -461,7 +461,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
                 loadingText="processing..."
                 className="mx-auto col-span-2 py-4 w-2/5"
             >
-                Next
+                Update
             </Button>
         </form>
     );

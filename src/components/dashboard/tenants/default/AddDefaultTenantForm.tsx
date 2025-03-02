@@ -20,12 +20,15 @@ import {
     generateRandomAlphanumeric,
 } from 'utils/helper';
 import { fetchAndFilterUsersByAccountType } from 'services/newServices/user';
+import { getAllGeneralProperties } from 'services/newServices/properties';
 
 export default function VerifyForm() {
     const [tenants, setTenants] = useState([] as any); // State to store the list of tenants
     const [selectedTenant, setSelectedTenant] = useState({} as any); // State to store the selected tenant
     const [images, setImages] = useState<File[]>([]);
     const [imageList, setImageList] = useState<string[]>([]);
+    const [properties, setProperties] = useState([]);
+    const [tenantProperty, setTenantProperty] = useState([]);
     const imageRef = useRef<HTMLInputElement>(null);
     const states = useAppStore();
     const landlordId = states?.user?.id;
@@ -59,11 +62,34 @@ export default function VerifyForm() {
         getTenants();
     }, []);
 
+    useEffect(() => {
+        const storedProperty = localStorage.getItem('filteredProperties');
+
+        const property = JSON.parse(storedProperty as any);
+
+        if (property) {
+            setProperties(property);
+            return;
+        }
+
+        async function fetchData() {
+            const propertyData = await getAllGeneralProperties();
+            setProperties(propertyData);
+        }
+        fetchData();
+    }, []);
+
     // Handle tenant selection
     const handleTenantSelect = (tenantId: string) => {
         const tenant = tenants.find((t: { id: string; }) => t.id === tenantId);
+        // use all properties and check if tenantID exists in the property and add property to state
+        const filteredProperties = properties.filter((property: any) =>
+            property.tenant.some((t: any) => t.tenantId === tenantId)
+        );
+        setTenantProperty(filteredProperties);
         setSelectedTenant(tenant);
-
+        console.log(tenant, 'tenant');
+        console.log(filteredProperties, 'filteredProperties');
         // Populate form fields with tenant data
         if (tenant) {
             setFormState({
@@ -71,15 +97,11 @@ export default function VerifyForm() {
                 tenantName: tenant.firstname + ' ' + tenant.lastname,
                 tenantPhone: tenant.phone,
                 tenantEmail: tenant.email,
-                // tenantNIN: tenant.nin,
+                tenantNIN: tenant.nin,
                 tenantGender: tenant.gender,
             });
         }
     };
-
-    console.log(imageList, 'imageList');
-
-    console.log(tenants, 'tenants');
 
     const updateFormState = (key: string, value: any) => {
         setFormState({ ...formState, [key]: value });
@@ -299,6 +321,23 @@ export default function VerifyForm() {
                     <option value="Female">Female</option>
                 </Select>
 
+                <section className="grid grid-cols-1 gap-6">
+                <Select
+                    label="Select Available Tenant Property"
+                    required
+                    value={formState.propertyAddress}
+                    onChange={(e) => updateFormState('propertyAddress', e.target.value)}
+                    className="bg-white col-span-2"
+                >
+                    <option value="">Select a property</option>
+                    {tenantProperty.map((property: any) => (
+                        <option key={property.id} value={property.address}>
+                            {property.name} - {property.address}
+                        </option>
+                    ))}
+                </Select>
+                </section>
+                
                 <Input
                     label="Property Address"
                     type="text"
@@ -311,7 +350,7 @@ export default function VerifyForm() {
                     }
                     // register={{ ...register('numberOfBath') }}
                     // error={errors.numberOfBath}
-                    inputClassName="bg-white col-span-2"
+                    inputClassName="bg-white col-span-1"
                 />
 
                 <textarea

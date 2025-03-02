@@ -62,7 +62,7 @@ const PropertyListingCard: FC<PropertyListingProp> = ({ property }) => {
                                             />
                                         </svg>
                                     }
-                                    featureText="2 units"
+                                    featureText={property?.apartmentType}
                                 />
                             </li>
                             <li>

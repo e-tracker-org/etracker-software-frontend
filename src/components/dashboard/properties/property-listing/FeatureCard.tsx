@@ -12,7 +12,7 @@ export const FeatureCard: FC<FeatureCardProp> = ({
     return (
         <div className="flex items-center sm:gap-2 lg:gap-5 w-full flex-wrap">
             {featureIcon}
-            <span className="sm:text-sm lg:text-xl">{featureText}</span>
+            <span className="sm:text-sm lg:text-xl ml-2 mr-2">{featureText}</span>
         </div>
     );
 };

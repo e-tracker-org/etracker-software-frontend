@@ -15,7 +15,6 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
     const router = useRouter();
     const modalRef = useRef<any>(null);
     const [openModal, setOpenModal] = useState<boolean>(false);
-
     const filteredTenants = states?.propertyId
         ? tenants.filter(
               (tenant: any) =>
@@ -279,7 +278,7 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
                                                     {tenant?.userData?.phone}
                                                 </td>
                                                 <td className="py-6 px-14 ">
-                                                    {tenant?.userData?.address}
+                                                    {tenant?.userData?.fullAddress}
                                                 </td>
                                                 {/* Add more columns as needed */}
                                             </tr>

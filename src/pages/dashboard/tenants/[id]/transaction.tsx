@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 import { formatMoney, getFormattedDate } from 'services/config/config';
 import { getTenantTransactions } from 'services/newServices/tenant';
 
-function TransactionHistory() {
+function TransactionHistory({tenantId}:any) {
+    console.log(tenantId, 'tenantId');
     const { query } = useRouter();
-    const id = query?.id as string;
+    const id = query?.id as string || tenantId as string;
 
     const [tenantTransaction, setTenantTransaction] = useState([]);
 

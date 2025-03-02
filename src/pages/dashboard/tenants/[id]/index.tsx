@@ -306,7 +306,7 @@ export default function TenantDetails() {
                 </div>
 
                 <DetailsRowCard title="Transaction History">
-                    <TransactionHistory />
+                    <TransactionHistory tenantId={id} />
                 </DetailsRowCard>
 
                 <DialogModal
