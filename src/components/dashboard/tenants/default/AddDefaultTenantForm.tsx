@@ -81,15 +81,21 @@ export default function VerifyForm() {
 
     // Handle tenant selection
     const handleTenantSelect = (tenantId: string) => {
+        setTenantProperty([]);
+        setFormState({
+            ...formState,
+            tenantName: '',
+            tenantPhone: '',
+            tenantEmail: '',
+            tenantNIN: '',
+            tenantGender: '',
+        })
         const tenant = tenants.find((t: { id: string; }) => t.id === tenantId);
-        // use all properties and check if tenantID exists in the property and add property to state
         const filteredProperties = properties.filter((property: any) =>
             property.tenant.some((t: any) => t.tenantId === tenantId)
         );
         setTenantProperty(filteredProperties);
         setSelectedTenant(tenant);
-        console.log(tenant, 'tenant');
-        console.log(filteredProperties, 'filteredProperties');
         // Populate form fields with tenant data
         if (tenant) {
             setFormState({
