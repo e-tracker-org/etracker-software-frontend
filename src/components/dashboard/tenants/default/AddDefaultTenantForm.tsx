@@ -21,6 +21,7 @@ import {
 } from 'utils/helper';
 import { fetchAndFilterUsersByAccountType } from 'services/newServices/user';
 import { getAllGeneralProperties } from 'services/newServices/properties';
+import { getSubscriptionStatus } from 'utils/subscriptionUtils';
 
 export default function VerifyForm() {
     const [tenants, setTenants] = useState([] as any); // State to store the list of tenants
@@ -115,6 +116,12 @@ export default function VerifyForm() {
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
+        if (subscriptionStatus !== 'active') {
+            toast.error('You need an active subscription to perform this action.');
+            return;
+        }
 
         if (!formState.agreed) {
             toast.error('Please agree to the terms and conditions');

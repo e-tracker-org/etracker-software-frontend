@@ -18,7 +18,6 @@ interface AddTenantReqProp {
 const TenantSearchItem: FC<TenantSearchProps> = ({ tenant, removeTenant }) => {
     const router = useRouter();
     const states = useAppStore();
-    console.log(tenant, 'tenant');
 
     return (
         <li className="flex justify-between">

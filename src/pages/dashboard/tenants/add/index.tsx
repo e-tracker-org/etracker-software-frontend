@@ -19,6 +19,7 @@ import useProperty from 'hooks/useProperty';
 import TenantSearchItem from 'components/dashboard/tenants/add/SearchItem';
 import { useQuery } from 'react-query';
 import { inviteTenant } from 'services/newServices/tenant';
+import { getSubscriptionStatus } from 'utils/subscriptionUtils';
 
 export default function AddTenant() {
     const states = useAppStore();
@@ -130,6 +131,14 @@ export default function AddTenant() {
     };
 
     const handleInviteTenant = async () => {
+
+        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
+        
+        if (subscriptionStatus !== 'active') {
+            toast.error('You need an active subscription to perform this action.');
+            return;
+        }
+
         try {
             setLoading(true);
             let propId;

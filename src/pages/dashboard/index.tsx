@@ -3,29 +3,26 @@ import { ReactElement } from 'react';
 import useAccountType from 'hooks/useAccountType';
 import TenantDash from './tenants/tenatDashboard';
 import LandlordDash from './landlordDashboard';
-import useProperty from 'hooks/useProperty';
 import { useAppStore } from 'hooks/useAppStore';
 
 export default function Dashboard() {
-    const { acctType } = useAccountType(); // we can revert this when we figure out why it isnt working.
+    const { acctType } = useAccountType();
     const states = useAppStore();
     // @ts-ignore
     const accountType = states?.user?.currentKyc?.accountType;
 
-    if (acctType) {
-        return (
-            <section>
-                {accountType === 1 ? <TenantDash /> : <LandlordDash />}
-            </section>
-        );
-    } else {
+    if (!acctType) {
         return <div>Loading...</div>;
     }
+
+    return (
+        <section>
+            {accountType === 1 ? <TenantDash /> : <LandlordDash />}
+        </section>
+    );
 }
 
 Dashboard.auth = true;
-// Dashboard.onboarded = true;
-
 Dashboard.getLayout = function getLayout(page: ReactElement) {
     return <DashboardLayout>{page}</DashboardLayout>;
 };

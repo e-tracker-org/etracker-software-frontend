@@ -11,6 +11,7 @@ export interface User {
     area: string;
     fullAddress: string;
     isUserVerified: boolean;
+    subscriptionStatus: string;
     createdAt: string;
     updatedAt: string;
     id: string;
@@ -32,6 +33,7 @@ export interface User2 {
     dob: string;
     country: string;
     area: string;
+    subscriptionStatus: string;
     fullAddress: string;
     isUserVerified: boolean;
     createdAt: string;

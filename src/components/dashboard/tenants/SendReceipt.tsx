@@ -7,6 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { useAppStore } from 'hooks/useAppStore';
 import { toast } from 'react-hot-toast';
+import { getSubscriptionStatus } from 'utils/subscriptionUtils';
 
 interface receiptData {
     category: string;
@@ -56,6 +57,14 @@ export default function SendReceipt({
     });
 
     const onSubmit = async (data: any) => {
+
+        // Check if the user is subscribed
+        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
+        if (subscriptionStatus !== 'active') {
+            toast.error('You need an active subscription to perform this action.');
+            return;
+        }
+        
         const formData = new FormData();
 
         const reqObj: receiptData = {

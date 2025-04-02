@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast';
 import { Router, useRouter } from 'next/router';
 import { getLandlordTenant } from 'services/newServices/tenant';
 import { getAllTenants } from 'services/newServices/tenant';
+import { getSubscriptionStatus } from 'utils/subscriptionUtils';
 
 interface NotifyTenantType {
     id: string;
@@ -72,6 +73,14 @@ export default function NotifyTenants() {
     }, [tenantIds, landlordTenants]);
 
     const handleSendMessage = async () => {
+
+        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
+        
+        if (subscriptionStatus !== 'active') {
+            toast.error('You need an active subscription to perform this action.');
+            return;
+        }
+        
         if (messageType === 'phone') {
             toast.error(
                 'Text message currently unavailable, send an email instead.'

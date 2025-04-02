@@ -21,6 +21,26 @@ export async function fetchAllUsers() {
     });
 }
 
+export async function checkSubscription(email) {
+    return request(`${API_URL}/payment/subscription/status?email=${encodeURIComponent(email) || email}`, {
+        method: 'get',
+        headers: {
+            Authorization: USER_TOKEN,
+        },
+    });
+    
+}
+
+export async function getVerificationRequests(userId) {
+    return request(`${API_URL}/payment/verification/requests?userId=${userId}`, {
+        method: 'get',
+        headers: {
+            Authorization: USER_TOKEN,
+        },
+    });
+    
+}
+
 export async function fetchAndFilterUsersByAccountType() {
     const allUsersResponse = await fetchAllUsers();
     const filteredUsers = allUsersResponse.filter((user) =>

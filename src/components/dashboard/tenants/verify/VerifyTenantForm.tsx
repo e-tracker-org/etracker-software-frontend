@@ -1,156 +1,252 @@
+import { useState, FormEvent, useEffect } from 'react';
+
+declare global {
+  interface Window {
+    PaystackPop: {
+      setup: (options: any) => void;
+    };
+  }
+}
+
+import axios from 'axios';
 import Button from 'components/base/Button';
-import ToolTip from 'components/base/Tooltip';
 import Checkbox from 'components/base/form/Checkbox';
 import Input from 'components/base/form/Input';
+import { API_URL } from 'services/config/config';
+import { useRouter } from 'next/router';
+import { useAppStore } from 'hooks/useAppStore';
+import { toast } from 'react-hot-toast';
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  nin: string;
+  email: string;
+  phoneNumber: string;
+  agreed: boolean;
+}
+
+interface FormErrors {
+  firstName?: string;
+  lastName?: string;
+  nin?: string;
+  email?: string;
+  phoneNumber?: string;
+  agreed?: string;
+}
 
 export default function VerifyForm() {
-    return (
-        <form className="bg-white p-10 ">
-            <section className="grid grid-cols-2 gap-6">
-                <Input
-                    label="First name"
-                    required
-                    placeholder="Enter first name"
-                    asterisk
-                    // register={{ ...register('name') }}
-                    // error={errors.name}
-                    inputClassName="bg-white"
-                />
-                <Input
-                    label="Last name"
-                    required
-                    placeholder="Enter last name"
-                    asterisk
-                    // register={{ ...register('address') }}
-                    // error={errors.address}
-                    inputClassName="bg-white"
-                />
+  const router = useRouter();
+  const states = useAppStore();
+  const [tenantData, setTenantData] = useState<any>(null);
+  const [formData, setFormData] = useState<FormData>({
+    firstName: '',
+    lastName: '',
+    nin: '',
+    email: '',
+    phoneNumber: '',
+    agreed: false,
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [loading, setLoading] = useState<boolean>(false);
+  const [paystackLoaded, setPaystackLoaded] = useState<boolean>(false);
 
-                <Input
-                    label="National identificaton number"
-                    type="number"
-                    required
-                    placeholder="Enter NIN number"
-                    asterisk
-                    // register={{ ...register('numberOfRooms') }}
-                    // error={errors.numberOfRooms}
-                    inputClassName="bg-white"
-                />
-                <Input
-                    label="Email address"
-                    type="email"
-                    required
-                    placeholder="Enter email address"
-                    asterisk
-                    // register={{ ...register('numberOfBath') }}
-                    // error={errors.numberOfBath}
-                    inputClassName="bg-white"
-                />
-                <Input
-                    label="Phone number"
-                    type="number"
-                    required
-                    placeholder="Enter phone number"
-                    asterisk
-                    // register={{ ...register('numberOfBath') }}
-                    // error={errors.numberOfBath}
-                    inputClassName="bg-white"
-                />
-            </section>
+  useEffect(() => {
+    // Load tenant data from localStorage
+    const storedTenant = localStorage.getItem('selectedTenant');
+    if (storedTenant) {
+      const tenant = JSON.parse(storedTenant);
+      setTenantData(tenant);
+      setFormData({
+        firstName: tenant?.userData?.firstname || '',
+        lastName: tenant?.userData?.lastname || '',
+        nin: tenant?.tenantData?.nin || '',
+        email: tenant?.userData?.email || '',
+        phoneNumber: tenant?.userData?.phone || '',
+        agreed: false,
+      });
+    }
+  }, []);
 
-            <section className=" mt-10">
-                <header className=" mb-8">
-                    <div className="flex justify-between items-center mb-5">
-                        <h3 className="flex items-center gap-2 text-[22px] font-semibold">
-                            Payment Information
-                            <ToolTip
-                                className=""
-                                icon={
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="21"
-                                        viewBox="0 0 20 21"
-                                        fill="none"
-                                    >
-                                        <path
-                                            d="M9.16699 13H10.8337V14.6667H9.16699V13ZM9.16699 6.33333H10.8337V11.3333H9.16699V6.33333ZM10.0003 2.16667C5.39199 2.16667 1.66699 5.91667 1.66699 10.5C1.66699 12.7101 2.54497 14.8298 4.10777 16.3926C4.88159 17.1664 5.80025 17.7802 6.8113 18.199C7.82234 18.6178 8.90598 18.8333 10.0003 18.8333C12.2105 18.8333 14.3301 17.9554 15.8929 16.3926C17.4557 14.8298 18.3337 12.7101 18.3337 10.5C18.3337 9.40565 18.1181 8.32202 17.6993 7.31097C17.2805 6.29992 16.6667 5.38126 15.8929 4.60744C15.1191 3.83362 14.2004 3.21979 13.1894 2.801C12.1783 2.38221 11.0947 2.16667 10.0003 2.16667ZM10.0003 17.1667C8.23222 17.1667 6.53652 16.4643 5.28628 15.214C4.03604 13.9638 3.33366 12.2681 3.33366 10.5C3.33366 8.73189 4.03604 7.0362 5.28628 5.78595C6.53652 4.53571 8.23222 3.83333 10.0003 3.83333C11.7684 3.83333 13.4641 4.53571 14.7144 5.78595C15.9646 7.0362 16.667 8.73189 16.667 10.5C16.667 12.2681 15.9646 13.9638 14.7144 15.214C13.4641 16.4643 11.7684 17.1667 10.0003 17.1667Z"
-                                            fill="#131313"
-                                            fill-opacity="0.55"
-                                        />
-                                    </svg>
-                                }
-                                content="this is an explanation"
-                            />
-                        </h3>
-                    </div>
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!formData.agreed) {
+      setErrors({ agreed: 'You must agree to the terms' });
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const userEmail = states?.user?.email; 
+      const tenantId = tenantData?.tenantData?.id;
+      const response = await axios.post<{ 
+        authorization_url: string, 
+        reference: string,
+        access_code: string 
+      }>(
+        `${API_URL}/payment/verify`,
+        {
+          userId: states?.user?.id,
+          userEmail,
+          tenantId,
+          ...formData,
+        }
+      );
+  
+      const { authorization_url, reference, access_code } = response.data;
+      
+      if (paystackLoaded && authorization_url) {
+        const paystackOptions = {
+          key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+          email: userEmail,
+          amount: 1000 * 100,
+          ref: reference,
+          callback: (response: any) => {
+            if (response.reference !== reference) {
+              toast.error('Payment verification failed. Please contact support.');
+              // alert('Payment verification failed. Please contact support.');
+              return;
+            }
+            toast.success('Payment successful! Tenant verification process will begin shortly.');
+            // alert('Payment successful! Verification process will begin shortly.');
+          },
+          onClose: () => {
+            alert('Payment window closed');
+          },
+        };
+  
+        const handler = (window as any).PaystackPop.setup(paystackOptions);
+        handler.openIframe();
+        
+      } else {
+        alert('Payment processor is not ready. Please try again.');
+      }
+      
+    } catch (error: any) {
+      console.error('Error initializing payment:', error);
+      toast.error('Payment initialization failed');
+      // alert(error.response?.data?.error || 'Payment initialization failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    if (typeof window.PaystackPop !== 'undefined') {
+      setPaystackLoaded(true);
+      return;
+    }
 
-                    <p>Add your card details below</p>
-                </header>
-                <div className="grid grid-cols-2 gap-6">
-                    <Input
-                        label="Card Number"
-                        required
-                        type="number"
-                        placeholder="000 0000 0000 0000"
-                        asterisk
-                        // register={{ ...register('name') }}
-                        // error={errors.name}
-                        inputClassName="bg-white"
-                    />
-                    <Input
-                        label="Cardholder's name"
-                        required
-                        placeholder="Enter name"
-                        asterisk
-                        // register={{ ...register('address') }}
-                        // error={errors.address}
-                        inputClassName="bg-white"
-                    />
-                </div>
-                <div className="w-3/5 grid grid-cols-2 gap-6">
-                    <Input
-                        label="Expiry date"
-                        type="date"
-                        required
-                        placeholder="MM/YY"
-                        asterisk
-                        // register={{ ...register('numberOfRooms') }}
-                        // error={errors.numberOfRooms}
-                        inputClassName="bg-white"
-                    />
-                    <Input
-                        label="CVV"
-                        type="number"
-                        required
-                        placeholder="CVV"
-                        asterisk
-                        // register={{ ...register('numberOfBath') }}
-                        // error={errors.numberOfBath}
-                        inputClassName="bg-white"
-                    />
-                </div>
-            </section>
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.async = true;
+    script.onload = () => {
+      setPaystackLoaded(true);
+    };
+    script.onerror = () => {
+      console.error('Failed to load Paystack script');
+      setPaystackLoaded(false);
+    };
+    document.body.appendChild(script);
 
-            <Checkbox
-                className="mt-8"
-                label={
-                    <p>
-                        By submitting this tenant verification request, You
-                        agree with our{' '}
-                        <span className="text-[#2F42EDD9] text-xs md:text-sm">
-                            Terms and Conditions.
-                        </span>
-                    </p>
-                }
-                checked={true}
-                // register={{ ...register('agreed') }}
-                // error={errors.agreed}
-            />
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
-            <div className="w-1/2  mx-auto mb-10 mt-16">
-                <Button className="w-full py-4">Submit Request</Button>
+  if (!tenantData) {
+    return <div className="bg-white p-10">Loading tenant data...</div>;
+  }
+
+  return (
+    <form className="bg-white p-10" onSubmit={handleSubmit}>
+      <section className="grid grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            First name
+          </label>
+          <div className="p-2 bg-gray-100 rounded-md">
+            {formData.firstName}
+          </div>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Last name
+          </label>
+          <div className="p-2 bg-gray-100 rounded-md">
+            {formData.lastName}
+          </div>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            National identification number
+          </label>
+          {/* {formData.nin ? (
+            <div className="p-2 bg-gray-100 rounded-md">
+              {formData.nin}
             </div>
-        </form>
-    );
-}
+          ) : ( */}
+            <Input
+              label="Enter Tenants NIN"
+              type="text"
+              required
+              min={11}
+              placeholder="Enter NIN"
+              value={formData.nin}
+              onChange={(e) => setFormData({ ...formData, nin: e.target.value })}
+              inputClassName="bg-white"
+            />
+          {/* )} */}
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Email address
+          </label>
+          <div className="p-2 bg-gray-100 rounded-md">
+            {formData.email}
+          </div>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Phone number
+          </label>
+          <div className="p-2 bg-gray-100 rounded-md">
+            {formData.phoneNumber}
+          </div>
+        </div>
+      </section>
+
+      <Checkbox
+        className="mt-8"
+        label={
+          <p>
+            By submitting this tenant verification request, You agree with our{' '}
+            <span className="text-[#2F42EDD9] text-xs md:text-sm">
+              Terms and Conditions.
+            </span>
+          </p>
+        }
+         // @ts-ignore
+        name="agreed"
+        checked={formData.agreed}
+        // @ts-ignore
+        onChange={(e) => setFormData({...formData, agreed: e.target.checked})}
+        error={errors.agreed}
+      />
+
+      {errors.agreed && (
+        <p className="text-red-500 text-xs mt-1">{errors.agreed}</p>
+      )}
+
+      <div className="w-1/2 mx-auto mb-10 mt-16">
+        <Button className="w-full py-4" type="submit" disabled={loading || !paystackLoaded}>
+          {loading ? 'Processing...' : 'Proceed to Payment'}
+        </Button>
+      </div>
+    </form>
+  );
+};

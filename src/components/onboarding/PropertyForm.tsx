@@ -20,6 +20,7 @@ import { Property, PropertySchema, UploadedFile } from 'interfaces';
 import { CustomFile } from 'interfaces/CustomFile';
 import Loader from 'components/base/Loader';
 import { useRouter } from 'next/router';
+import { getSubscriptionStatus } from 'utils/subscriptionUtils';
 type ImageList = Array<{ base64: string; preview: string }>;
 
 const schema = yup.object({
@@ -80,6 +81,11 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
     };
 
     const onSubmit = async (data: any) => {
+        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
+        if (subscriptionStatus !== 'active') {
+            toast.error('You need an active subscription to perform this action.');
+            return;
+        }
         const formData = new FormData();
         console.log('NoImageId>>>', images);
         // Create an array to store all the image upload promises

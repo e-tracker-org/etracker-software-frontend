@@ -20,8 +20,6 @@ export default function VeriifyTenants() {
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState('all');
 
-    console.log(tenants, 'tenantData');
-
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -48,8 +46,19 @@ export default function VeriifyTenants() {
             <DashboardHeader title="Verify Tenants">
                 <div className="flex justify-between">
                     <p className="pt-4 w-2/5 text-[18px] font-medium">
-                        Review tenants profile before lease approval.
+                        Review tenants profile before lease approval.<br />
+                        <small className="text-[12px] text-[red]">
+                            {' '}
+                            Note: You will be required to pay the sum of N1,000 for each verification request
+                        </small>
                     </p>
+{/* 
+                    <Button
+                        className="bg-[#2F42ED] text-white"
+                        onClick={() => router.push('/dashboard/tenants/verify/request')}
+                    >
+                        Request Tenant Verification
+                    </Button> */}
 
                     <div className="flex justify-end items-center gap-x-8">
                         <Dropdown
