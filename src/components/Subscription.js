@@ -153,7 +153,7 @@ const Subscription = ({ userEmail = '', onSuccess = () => {} }) => {
             )}
 
             <p className="mt-4 text-sm text-gray-500">
-                You'll be redirected to Paystack for secure payment processing.
+                You will be redirected to Paystack for secure payment processing.
             </p>
         </div>
     );

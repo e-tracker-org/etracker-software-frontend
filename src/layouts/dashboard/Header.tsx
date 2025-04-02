@@ -145,7 +145,7 @@ export default function Header({
                     <div className="absolute bg-red-50 border-b border-red-400 p-2 text-center">
                         <div className="flex items-center justify-center gap-4">
                             <p className="text-yellow-700 font-medium">
-                                You don't have an active subscription
+                                You do not have an active subscription
                             </p>
                             <Button 
                                 variant="primary" 
