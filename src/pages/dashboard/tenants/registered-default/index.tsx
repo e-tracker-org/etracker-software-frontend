@@ -3,13 +3,12 @@ import { useEffect, useState } from 'react';
 import Button from 'components/base/Button';
 import { useRouter } from 'next/router';
 import Dropdown from 'components/base/Dropdown';
-import TenantTable from 'components/dashboard/tenants/verify/TenantTable';
+import TenantTable from 'components/dashboard/tenants/default/TenantDefaultTable';
 import DashboardHeader from 'components/dashboard/Header';
 import { useAppStore } from 'hooks/useAppStore';
 import useTenant from 'hooks/useTenant';
-import { getLandlordTenant } from '../../../../services/newServices/tenant';
+import { getDefaultTenant } from '../../../../services/newServices/tenant';
 import { completeTask } from '../../../../services/newServices/tenant';
-import TenantsPaymentTable from 'components/dashboard/tenants/verify/TenantPaymentTable';
 
 export default function VeriifyTenants() {
     const router = useRouter();
@@ -24,8 +23,12 @@ export default function VeriifyTenants() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const tenantData = await getLandlordTenant(states?.user?.id);
-            setTenants(tenantData);
+            const tenantData = await getDefaultTenant(states?.user?.id);
+            const pendingTenants = tenantData.filter(
+                (tenant: any) => tenant.status === 'PENDING-APPROVAL'
+            );
+
+            setTenants(pendingTenants);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -35,34 +38,25 @@ export default function VeriifyTenants() {
 
     useEffect(() => {
         fetchData();
-    }, [states]);
+    }, [states, loading, filter]);
 
     const handleRemount = async () => {
         setShouldRemount((prevState) => !prevState);
         fetchData(); // Call fetchData again to refresh data
     };
 
+    // console.log(tenants, 'tenants');
+
     return (
         <div className="">
-            <DashboardHeader title="Verify Tenants">
+            <DashboardHeader title="Registered Default Tenants">
                 <div className="flex justify-between">
                     <p className="pt-4 w-2/5 text-[18px] font-medium">
-                        Review tenants profile before lease approval.<br />
-                        <small className="text-[12px] text-[red]">
-                            {' '}
-                            Note: You will be required to pay the sum of N1,000 for each verification request
-                        </small>
+                        Review all registered default tenants
                     </p>
-{/* 
-                    <Button
-                        className="bg-[#2F42ED] text-white"
-                        onClick={() => router.push('/dashboard/tenants/verify/request')}
-                    >
-                        Request Tenant Verification
-                    </Button> */}
 
                     <div className="flex justify-end items-center gap-x-8">
-                        <Dropdown
+                        {/* <Dropdown
                             title="All Request"
                             className="bg-white"
                             ulClassName="bg-white rounded-lg dropdown-shadow min-w-[220px] text-gray-700 font-medium"
@@ -75,39 +69,34 @@ export default function VeriifyTenants() {
                             </li>
                             <li
                                 className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer"
-                                onClick={() => setFilter('complete')}
+                                onClick={() => setFilter('approved')}
                             >
                                 Complete Request
                             </li>
                             <li
                                 className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer"
-                                onClick={() => setFilter('incomplete')}
+                                onClick={() => setFilter('pending-approval')}
                             >
                                 Pending Request
                             </li>
-                            <li
-                                className="py-5 px-5 border-b border-b-[#E7E5E5] cursor-pointer"
-                                onClick={() => setFilter('incomplete')}
-                            >
-                                Incomplete Request
-                            </li>
-                        </Dropdown>
 
-                        {/* <Button
+                        </Dropdown> */}
+
+                        <Button
                             className="flex items-center max-h-[47px] !text-base !font-bold px-8 py-3"
                             onClick={() => {
                                 router.push(
-                                    '/dashboard/tenants/verify/request'
+                                    '/dashboard/tenants/default/request'
                                 );
                             }}
                         >
-                            Verify Tenants
-                        </Button> */}
+                            Add Default
+                        </Button>
                     </div>
                 </div>
             </DashboardHeader>
 
-            <TenantsPaymentTable
+            <TenantTable
                 tenants={tenants}
                 shouldRemount={shouldRemount}
                 handleRemount={handleRemount}

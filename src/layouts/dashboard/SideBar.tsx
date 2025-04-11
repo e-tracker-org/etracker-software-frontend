@@ -204,7 +204,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                             );
                                         }}
                                     >
-                                        Verify Tenants
+                                        Tenant Credit Check
                                     </button>
                                 </li>
                                 <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
@@ -223,6 +223,24 @@ const Sidebar: React.FC<SidebarProps> = ({
                                         }}
                                     >
                                         Default Tenants
+                                    </button>
+                                </li>
+                                <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
+                                    <button
+                                        onClick={(
+                                            e: React.MouseEvent<
+                                                HTMLButtonElement,
+                                                MouseEvent
+                                            >
+                                        ) => {
+                                            e.preventDefault();
+                                            setTenantTabOpen(false);
+                                            router.push(
+                                                '/dashboard/tenants/registered-default'
+                                            );
+                                        }}
+                                    >
+                                        Registered Defaults
                                     </button>
                                 </li>
                             </ul>

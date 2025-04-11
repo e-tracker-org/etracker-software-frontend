@@ -1,72 +1,25 @@
+import Image from 'next/image';
 import { DialogModal } from 'components/base/DialogModal';
 import { completeTask } from 'services/newServices/tenant';
 import Button from 'components/base/Button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
+import renderEmptyState from 'pages/elements/EmptyState';
 
-interface TenantTableProps {
-    tenants: { [key: string]: string }[];
-    shouldRemount: boolean;
-    handleRemount: () => Promise<void>;
-    filter: string;
-}
-
-const TenantTable = ({
-    tenants,
-    shouldRemount,
-    handleRemount,
-    filter,
-}: TenantTableProps) => {
+const FindTenantDefault = ({ tenants }: { tenants: any }) => {
     const [selectedTenant, setSelectedTenant] = useState('');
     const [selectedTenantName, setSelectedTenantName] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    // console.log('tenants:', tenants);
 
-    const filteredTenants = tenants.filter((tenant) => {
-        if (filter === 'all') return true;
-        // @ts-ignore
-        return tenant.tenantData?.status.toLowerCase() === filter.toLowerCase();
-    });
-
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-
-    const handleTenantClick = (tenant: any) => {
-        localStorage.setItem('selectedTenant', JSON.stringify(tenant));
-        router.push('/verify/request');
-    };
-
-    const handlePaymentClick = (tenant: any, e: React.MouseEvent) => {
-        e.stopPropagation();
-        localStorage.setItem('selectedTenant', JSON.stringify(tenant));
-        router.push('/verify/request');
-    };
-
-    const handleConfirmAction = async () => {
-        setIsLoading(true);
-        try {
-            await completeTask(selectedTenant);
-            toast.success('Task completed successfully');
-            setIsLoading(false);
-            setIsModalOpen(false);
-            handleRemount();
-        } catch (error) {
-            console.error('Error completing task:', error);
-            toast.error('Failed to complete task');
-            setIsLoading(false);
-        }
-    };
-
+    // add below in use effect
+    if (!tenants) return renderEmptyState();
     return (
         <div
-            style={{ borderLeftColor: '#1F32EB', borderLeftWidth: 5 }}
+            // style={{ borderLeftColor: '#1F32EB', borderLeftWidth: 5 }}
             className="p-5 bg-white hidden-x-scrollbar rounded-md"
         >
             <table className="w-full table-auto whitespace-nowrap text-gray-700 border-separate border-spacing-x-5 border-spacing-y-8 font-medium text-center">
@@ -75,57 +28,48 @@ const TenantTable = ({
                         <th className="px-6 text-left">Name</th>
                         <th className="px-6">Email</th>
                         <th className="px-6">Phone Number</th>
-                        <th className="px-6">Tenant Status</th>
-                        <th className="px-6">Action</th>
+                        <th className="px-6">Default Status</th>
+                        <th className="px-6">Complaints</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    {filteredTenants.map((t: any, i: any) => (
+                    {tenants.map((t: any, i: any) => (
                         <tr
                             key={i}
                             className="cursor-pointer tr-hover"
-                            onClick={() => handleTenantClick(t)}
+                            // onClick={() => handleTenantClick(t)}
                         >
                             <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max">
                                 <span className="inline-block">
-                                    {t?.userData?.firstname}{' '}
-                                    {t?.userData?.lastname}
+                                    {t?.tenantName}{' '}
                                 </span>
                             </td>
-                            <td className="py-6 px-14">{t?.userData?.email}</td>
-                            <td className="py-6 px-14">{t?.userData?.phone}</td>
+                            <td className="py-6 px-14">{t?.tenantEmail}</td>
+                            <td className="py-6 px-14">{t?.tenantPhone}</td>
+
                             <td className="py-6 pr-6 pl-14">
                                 <span
                                     className={`py-1 px-[10px] rounded-lg capitalize ${
-                                        (t?.tenantData?.status === 'INCOMPLETE' &&
+                                        (t?.status === 'INCOMPLETE' &&
                                             'text-[#FA0F0F] bg-[#FFE9E9]') ||
-                                        (t?.tenantData?.status === 'COMPLETE' &&
+                                        (t?.status === 'APPROVED' &&
                                             'text-[#31AA06] bg-[#ECFFE9]') ||
-                                        (t?.tenantData?.status === 'PENDING' &&
+                                        (t?.status === 'PENDING-APPROVAL' &&
                                             'text-[#E07D08] bg-[#FFF5E9]')
                                     }`}
                                 >
-                                    {t?.tenantData?.status}
+                                    {t?.status}
                                 </span>
                             </td>
-                            <td className="py-6 pr-6 pl-14">
-                                <Button 
-                                    variant="primary"
-                                    // @ts-ignore
-                                    onClick={(e) => handlePaymentClick(t, e)}
-                                    className="py-2 px-4"
-                                >
-                                    Verify Tenant
-                                </Button>
-                            </td>
+                            <td className="py-6 px-14">{t?.complaints}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
             <DialogModal
                 openModal={isModalOpen}
-                closeModal={closeModal}
+                // closeModal={closeModal}
                 title={`Do you want to verify this Tenant: ${selectedTenantName} ?`}
                 contentClass="w-full !py-10"
                 className="rounded-md sm:ml-[40%] lg:ml-[10%] px-[3%] lg:!top-[10%]"
@@ -134,17 +78,20 @@ const TenantTable = ({
                     <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-16 mb-2">
                         <Button
                             type="button"
-                            onClick={closeModal}
+                            onClick={() => {
+                                // closeModal();
+                            }}
                             variant="default"
                             className="w-full py-4"
                         >
                             Cancel
                         </Button>
+
                         <Button
                             className="w-full py-4"
                             type="submit"
                             isLoading={isLoading}
-                            onClick={handleConfirmAction}
+                            // onClick={handleConfirmAction}
                         >
                             Confirm
                         </Button>
@@ -155,4 +102,4 @@ const TenantTable = ({
     );
 };
 
-export default TenantTable;
+export default FindTenantDefault;

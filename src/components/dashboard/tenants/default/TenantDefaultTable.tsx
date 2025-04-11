@@ -1,7 +1,8 @@
+import Image from 'next/image';
 import { DialogModal } from 'components/base/DialogModal';
-import { completeTask } from 'services/newServices/tenant';
+import { completeTask, deleteDefaultTenant } from 'services/newServices/tenant';
 import Button from 'components/base/Button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/router';
 
@@ -12,7 +13,7 @@ interface TenantTableProps {
     filter: string;
 }
 
-const TenantTable = ({
+const TenantDefaultTable = ({
     tenants,
     shouldRemount,
     handleRemount,
@@ -24,11 +25,20 @@ const TenantTable = ({
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
+    // add below in use effect
     const filteredTenants = tenants.filter((tenant) => {
+
         if (filter === 'all') return true;
         // @ts-ignore
-        return tenant.tenantData?.status.toLowerCase() === filter.toLowerCase();
+        return tenant.status.toLowerCase() === filter.toLowerCase();
     });
+
+    useEffect(() => {
+        if (shouldRemount) {
+            handleRemount();
+        }
+
+    })
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -39,27 +49,40 @@ const TenantTable = ({
     };
 
     const handleTenantClick = (tenant: any) => {
-        localStorage.setItem('selectedTenant', JSON.stringify(tenant));
-        router.push('/verify/request');
-    };
+        localStorage.setItem('selectedDefaultTenant', JSON.stringify(tenant));
 
-    const handlePaymentClick = (tenant: any, e: React.MouseEvent) => {
-        e.stopPropagation();
-        localStorage.setItem('selectedTenant', JSON.stringify(tenant));
-        router.push('/verify/request');
+        router.push(`/dashboard/tenants/default/${tenant?.id}`);
     };
 
     const handleConfirmAction = async () => {
         setIsLoading(true);
         try {
             await completeTask(selectedTenant);
+            // Handle success
+            console.log('Task completed successfully');
             toast.success('Task completed successfully');
+            // Update tenant list to trigger useEffect
             setIsLoading(false);
-            setIsModalOpen(false);
+            setIsModalOpen(false); // Close the modal after completing the action
             handleRemount();
         } catch (error) {
+            // Handle error
             console.error('Error completing task:', error);
             toast.error('Failed to complete task');
+            setIsLoading(false);
+        }
+    };
+
+    const handleRemoveTenant = async (tenantId: string) => {
+        setIsLoading(true);
+        try {
+            await deleteDefaultTenant(tenantId);
+            toast.success('Tenant removed successfully');
+            handleRemount();
+        } catch (error) {
+            console.error('Error removing tenant:', error);
+            toast.error('Failed to remove tenant');
+        } finally {
             setIsLoading(false);
         }
     };
@@ -75,8 +98,9 @@ const TenantTable = ({
                         <th className="px-6 text-left">Name</th>
                         <th className="px-6">Email</th>
                         <th className="px-6">Phone Number</th>
-                        <th className="px-6">Tenant Status</th>
-                        <th className="px-6">Action</th>
+                        <th className="px-6">Default Status</th>
+                        <th className="px-6">Complaints</th>
+                        <th className="px-6">Actions</th>
                     </tr>
                 </thead>
 
@@ -85,38 +109,49 @@ const TenantTable = ({
                         <tr
                             key={i}
                             className="cursor-pointer tr-hover"
-                            onClick={() => handleTenantClick(t)}
+                           
                         >
                             <td className="py-6 pl-6 pr-14 text-left flex gap-x-4 w-max">
                                 <span className="inline-block">
-                                    {t?.userData?.firstname}{' '}
-                                    {t?.userData?.lastname}
+                                    {t?.tenantName}{' '}
                                 </span>
                             </td>
-                            <td className="py-6 px-14">{t?.userData?.email}</td>
-                            <td className="py-6 px-14">{t?.userData?.phone}</td>
+                            <td className="py-6 px-14">{t?.tenantEmail}</td>
+                            <td className="py-6 px-14">{t?.tenantPhone}</td>
+
                             <td className="py-6 pr-6 pl-14">
                                 <span
                                     className={`py-1 px-[10px] rounded-lg capitalize ${
-                                        (t?.tenantData?.status === 'INCOMPLETE' &&
+                                        (t?.status ===
+                                            'INCOMPLETE' &&
                                             'text-[#FA0F0F] bg-[#FFE9E9]') ||
-                                        (t?.tenantData?.status === 'COMPLETE' &&
+                                        (t?.status === 'APPROVED' &&
                                             'text-[#31AA06] bg-[#ECFFE9]') ||
-                                        (t?.tenantData?.status === 'PENDING' &&
+                                        (t?.status === 'PENDING-APPROVAL' &&
                                             'text-[#E07D08] bg-[#FFF5E9]')
                                     }`}
                                 >
-                                    {t?.tenantData?.status}
+                                    {t?.status}
                                 </span>
                             </td>
-                            <td className="py-6 pr-6 pl-14">
-                                <Button 
+                            <td className="py-6 px-14">
+                                {t?.complaints}
+                            </td>
+                            <td className="py-6 px-14">
+                                <Button
                                     variant="primary"
-                                    // @ts-ignore
-                                    onClick={(e) => handlePaymentClick(t, e)}
                                     className="py-2 px-4"
+                                    onClick={() => handleTenantClick(t)}
                                 >
-                                    Verify Tenant
+                                    View
+                                </Button>
+                                <Button
+                                    variant="default"
+                                    className="py-2 px-4"
+                                    isLoading={isLoading}
+                                    onClick={() => handleRemoveTenant(t?.id)}
+                                >
+                                    Remove
                                 </Button>
                             </td>
                         </tr>
@@ -134,12 +169,15 @@ const TenantTable = ({
                     <div className="flex w-4/6 gap-5 col-span-2 mx-auto mt-16 mb-2">
                         <Button
                             type="button"
-                            onClick={closeModal}
+                            onClick={() => {
+                                closeModal();
+                            }}
                             variant="default"
                             className="w-full py-4"
                         >
                             Cancel
                         </Button>
+
                         <Button
                             className="w-full py-4"
                             type="submit"
@@ -151,8 +189,9 @@ const TenantTable = ({
                     </div>
                 </div>
             </DialogModal>
+            
         </div>
     );
 };
 
-export default TenantTable;
+export default TenantDefaultTable;

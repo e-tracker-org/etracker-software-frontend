@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react';
 import Button from 'components/base/Button';
 import { useRouter } from 'next/router';
 import Dropdown from 'components/base/Dropdown';
-import TenantTable from 'components/dashboard/tenants/default/TenantTable';
+import TenantTable from 'components/dashboard/tenants/default/TenantDefaultTable';
 import DashboardHeader from 'components/dashboard/Header';
 import { useAppStore } from 'hooks/useAppStore';
 import useTenant from 'hooks/useTenant';
 import { getDefaultTenant } from '../../../../services/newServices/tenant';
 import { completeTask } from '../../../../services/newServices/tenant';
+import TenantDefaultTable from 'components/dashboard/tenants/default/TenantDefaultTable';
 
 export default function VeriifyTenants() {
     const router = useRouter();
@@ -92,7 +93,7 @@ export default function VeriifyTenants() {
                 </div>
             </DashboardHeader>
 
-            <TenantTable
+            <TenantDefaultTable
                 tenants={tenants}
                 shouldRemount={shouldRemount}
                 handleRemount={handleRemount}

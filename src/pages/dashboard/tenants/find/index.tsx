@@ -15,7 +15,7 @@ import { getAllTenants } from 'services/newServices/tenant';
 import { fetchAndFilterUsersByAccountType } from 'services/newServices/user';
 import Image from 'next/image';
 import { extractAndCapitalizeWords } from 'utils/helper';
-import { getFormattedDate } from 'services/config/config';
+import { API_URL, getFormattedDate } from 'services/config/config';
 import TenantRating from '../[id]/rating';
 import toast from 'react-hot-toast';
 import Button from 'components/base/Button';
@@ -28,6 +28,8 @@ import { getAllGeneralProperties } from 'services/newServices/properties';
 import { findOneHistoryByEmail } from 'services/newServices/history';
 import FindTenantDefault from 'components/dashboard/tenants/default/FindTenantDefault';
 import TransactionHistory from '../[id]/transaction';
+import { getSubscriptionStatus } from 'utils/subscriptionUtils';
+import axios from 'axios';
 
 interface DetailsProps {
     label?: string;
@@ -73,6 +75,7 @@ export default function FindTenants() {
     const [tenantHistory, setTenantHistory] = useState([]);
     const [tenantDefault, setTenantDefault] = useState([]);
     const [allDefault, setAllDefault] = useState([]);
+    const [paystackLoaded, setPaystackLoaded] = useState<boolean>(false);
 
     useEffect(() => {
         setLoading(true);
@@ -127,47 +130,108 @@ export default function FindTenants() {
     };
 
     const searchTenant = async (searchTerm: string) => {
+        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
+        
+        if (subscriptionStatus == 'active') {
+            // If not subscribed, show payment option
+            const userEmail = states?.user?.email;
+    
+            try {
+                const response = await axios.post<{
+                    authorization_url: string;
+                    reference: string;
+                    access_code: string;
+                }>(`${API_URL}/payment/search-tenant`, {
+                    userId: states?.user?.id,
+                    searchTerm,
+                    email: userEmail,
+                    amount: 1000 * 100,
+                });
+                
+                // console.log('Payment response:', response.data);
+                const { authorization_url, reference } = response.data;
+    
+                if (paystackLoaded && authorization_url) {
+                    // Store search term for use after payment
+                    const paymentSuccessHandler = (response: any) => {
+                        if (response.reference !== reference) {
+                            toast.error('Payment failed. Please try again.');
+                            return;
+                        }
+    
+                        toast.success('Payment successful! Below is the tenant information.');
+                        
+                        // Use setTimeout to avoid making callback async
+                        setTimeout(() => {
+                            performTenantSearch(searchTerm)
+                                .catch(error => {
+                                    console.error('Search failed after payment:', error);
+                                    toast.error('Search failed after payment');
+                                });
+                        }, 0);
+                    };
+    
+                    const paystackOptions = {
+                        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+                        email: userEmail,
+                        amount: 1000 * 100,
+                        ref: reference,
+                        callback: paymentSuccessHandler,
+                        onClose: () => {
+                            alert('Payment window closed');
+                        },
+                    };
+            
+                    const handler = (window as any).PaystackPop.setup(paystackOptions);
+                    handler.openIframe();
+                } else {
+                    toast.error('Payment processor is not ready. Please try again.');
+                }
+            } catch (error: any) {
+                console.error('Error initializing payment:', error);
+                toast.error('Payment initialization failed');
+            }
+            
+            return;
+        }
+    
+        // If already subscribed, perform search directly
+        await performTenantSearch(searchTerm);
+    };
+    
+    // Helper function to perform the actual search
+    const performTenantSearch = async (searchTerm: string) => {
         const filteredTenant = tenants.filter((tenant: User) =>
             tenant.email.toLowerCase().includes(searchTerm.toLowerCase())
         );
-
+    
         if (filteredTenant.length === 0) {
             toast.error('Email does not belong to a tenant');
             return;
         } else {
             setSearchedTenant(filteredTenant);
         }
-
+    
         try {
             const tenantHist = await findOneHistoryByEmail(searchTerm);
-            // if (!tenantHist) {
-            //     toast.success('No tenant history found');
-            //     return;
-            // }
             setTenantHistory(tenantHist);
-            if (
-                tenantHist &&
-                tenantHist.propertyId &&
-                tenantHist.propertyId.length > 0
-            ) {
-                const filteredProperties = generalProperty.filter(
-                    (property: any) =>
-                        tenantHist.propertyId.includes(property.id)
+    
+            if (tenantHist?.propertyId?.length > 0) {
+                const filteredProperties = generalProperty.filter((property: any) =>
+                    tenantHist.propertyId.includes(property.id)
                 );
                 setTenantProperty(filteredProperties);
             }
-
-            if (tenantHist && tenantHist.tenantEmail) {
+    
+            if (tenantHist?.tenantEmail) {
                 const filteredDefaultTenants = allDefault.filter(
                     (defaultTenant: any) =>
                         defaultTenant.tenantEmail === tenantHist.tenantEmail
                 );
-                // console.log(filteredDefaultTenants, 'filteredDefaultTenants');
                 setTenantDefault(filteredDefaultTenants);
             }
         } catch (error) {
             console.error('Error retrieving history:', error);
-            // toast.error('Tenant has no history');
         }
     };
 
@@ -194,8 +258,31 @@ export default function FindTenants() {
         setSearchedTenant(null);
     };
 
+    useEffect(() => {
+        if (typeof window.PaystackPop !== 'undefined') {
+          setPaystackLoaded(true);
+          return;
+        }
+    
+        const script = document.createElement('script');
+        script.src = 'https://js.paystack.co/v1/inline.js';
+        script.async = true;
+        script.onload = () => {
+          setPaystackLoaded(true);
+        };
+        script.onerror = () => {
+          console.error('Failed to load Paystack script');
+          setPaystackLoaded(false);
+        };
+        document.body.appendChild(script);
+    
+        return () => {
+          document.body.removeChild(script);
+        };
+      }, []);
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
         {/* Header */}
         <DashboardHeader title="Find Tenant" />
     

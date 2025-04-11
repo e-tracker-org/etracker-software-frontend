@@ -162,7 +162,7 @@ export default function TenantDetails() {
         }
     };
 
-    console.log(tenant, 'tenantss');
+    // console.log(tenant, 'tenantss');
 
     return (
         <div>

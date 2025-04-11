@@ -109,6 +109,17 @@ export async function createDefaultTenant(body) {
     });
 }
 
+// delete tenant default
+export async function deleteDefaultTenant(tenantId) {
+    return request(`${API_URL}/tenants/default/delete-default/${tenantId}`, {
+        method: 'delete',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: USER_TOKEN,
+        },
+    });
+}
+
 export async function updateTenantRating(body, tenantId) {
     return request(`${API_URL}/tenants/update-rating/${tenantId}`, {
         method: 'put',

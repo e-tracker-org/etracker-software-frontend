@@ -81,11 +81,11 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
     };
 
     const onSubmit = async (data: any) => {
-        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
-        if (subscriptionStatus !== 'active') {
-            toast.error('You need an active subscription to perform this action.');
-            return;
-        }
+        // const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
+        // if (subscriptionStatus !== 'active') {
+        //     toast.error('You need an active subscription to perform this action.');
+        //     return;
+        // }
         const formData = new FormData();
         console.log('NoImageId>>>', images);
         // Create an array to store all the image upload promises
@@ -126,7 +126,7 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
         const kycStage = page === 'kyc' ? { kycStage: 3 } : {};
         const category = page && page === 'kyc' ? { category: 'KYC' } : {};
 
-        console.log('newProperty>>>>', newProperty);
+        // console.log('newProperty>>>>', newProperty);
 
         const requestObj: PropertySchema = {
             ...newProperty,
