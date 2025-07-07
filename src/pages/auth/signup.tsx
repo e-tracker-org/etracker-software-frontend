@@ -88,8 +88,8 @@ function SignUp() {
             })
             .catch((error) => {
                 console.log(error);
-
-                toast.error(error?.message);
+                toast.error("Something went wrong, please try again")
+                // toast.error(error?.message);
             });
     };
 

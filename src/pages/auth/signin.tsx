@@ -199,7 +199,9 @@ function Signin() {
                 // toast.success(data.message ?? 'Login successful');
             })
             .catch((error) => {
-                error && toast.error(error?.message);
+                error && 
+                toast.error("Something went wrong please try again");
+                // toast.error(error?.message);
             });
 
         // mutate(values);

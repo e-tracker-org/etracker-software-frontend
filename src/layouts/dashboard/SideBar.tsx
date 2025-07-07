@@ -186,10 +186,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                                             );
                                         }}
                                     >
-                                        Find Tenant
+                                        Tenant Credit Check
                                     </button>
                                 </li>
-                                <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
+                                {/* <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
                                     <button
                                         onClick={(
                                             e: React.MouseEvent<
@@ -206,7 +206,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                     >
                                         Tenant Credit Check
                                     </button>
-                                </li>
+                                </li> */}
                                 <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
                                     <button
                                         onClick={(
