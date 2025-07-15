@@ -113,7 +113,7 @@ const LandlordDash: FC = () => {
 
         setOccupiedCount(occupied);
         setVacantCount(vacant);
-    }, [getProperties]);
+    }, [getMyProperties?.data.data]);
 
     const totalProperties = occupiedCount + vacantCount;
     const occupiedPercentage = (occupiedCount / totalProperties) * 100;
@@ -135,7 +135,7 @@ const LandlordDash: FC = () => {
         if (states?.user?.id) {
             fetchData();
         }
-    }, [states]);
+    }, [states, getMyProperties?.data.data]);
 
     const handleNavigate = (route: string) => {
         router.push(route);
