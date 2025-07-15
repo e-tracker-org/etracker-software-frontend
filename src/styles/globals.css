@@ -97,88 +97,76 @@ body {
     box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
 }
 
-.propertyCard{
-    margin-top: 200px;
-}
-
-/* increase on mobile */
-@media (max-width: 768px) {
-    .propertyCard{
-        margin-top: 600px;
-    }
-}
-
 .hero-section {
     background-color: #f8fafc;
     padding: 4rem 0;
-  }
-  
-  .hero-content {
+}
+
+.hero-content {
     background-color: #ffffff;
     border-radius: 1rem;
     padding: 2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .properties-section {
+}
+
+.properties-section {
     margin: 4rem 0;
-  }
-  
-  .properties-grid {
+}
+
+.properties-grid {
     display: grid;
     gap: 1.5rem;
-  }
-  
-  .services-section {
+}
+
+.services-section {
     background-color: #f8fafc;
     padding: 4rem 0;
-  }
-  
-  .services-grid {
+}
+
+.services-grid {
     display: grid;
     gap: 2rem;
-  }
-  
-  .service-card {
+}
+
+.service-card {
     background-color: #ffffff;
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
-  }
-  
-  .service-image {
+}
+
+.service-image {
     height: 8rem;
     margin-bottom: 1rem;
     position: relative;
-  }
-  
-  .service-card h3 {
+}
+
+.service-card h3 {
     font-size: 1.25rem;
     font-weight: bold;
-  }
-  .hero-section {
+}
+.hero-section {
     position: relative;
     margin-bottom: 6rem;
-  }
-  
-  .hero-section .absolute {
+}
+
+.hero-section .absolute {
     position: absolute;
     inset: 0;
     background-size: cover;
     background-position: center;
-  }
-  
-  .hero-section .relative {
+}
+
+.hero-section .relative {
     position: relative;
     z-index: 10;
-  }
-  
-  .hero-section .bg-white {
+}
+
+.hero-section .bg-white {
     background-color: #fff;
     border-radius: 1rem;
     padding: 2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
-  }
-    
+}

@@ -3,6 +3,7 @@ import { TfiLocationPin } from 'react-icons/tfi';
 import { SlHome } from 'react-icons/sl';
 import { useEffect, useState } from 'react';
 import { getAllGeneralProperties } from 'services/newServices/properties';
+import { Property } from 'interfaces';
 
 export default function PropertySearch() {
     const [propType, setPropType] = useState('rent');
@@ -10,7 +11,7 @@ export default function PropertySearch() {
     const [city, setCity] = useState('');
     const [type, setType] = useState('');
     const [price, setPrice] = useState('');
-    const [properties, setProperties] = useState([]);
+    const [properties, setProperties] = useState<Property[]>([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -71,18 +72,20 @@ export default function PropertySearch() {
 
         const [minPrice, maxPrice] = parsePriceRange(price);
 
-        const filteredProperties = properties.filter((property) => {
-            // @ts-ignore
+        const filteredProperties = properties.filter((property: Property) => {
             const cityMatch =
                 !city ||
-                property.location.city.toLowerCase() === city.toLowerCase();
-            // @ts-ignore
+                (property.location?.city &&
+                    property.location.city.toLowerCase() ===
+                        city.toLowerCase());
             const typeMatch =
                 !type ||
-                property.apartmentType.toLowerCase() === type.toLowerCase();
-            // @ts-ignore
+                (property.apartmentType &&
+                    property.apartmentType.toLowerCase() ===
+                        type.toLowerCase());
             const priceMatch =
-                property.price >= minPrice && property.price <= maxPrice;
+                !price ||
+                (property.price >= minPrice && property.price <= maxPrice);
 
             return cityMatch && typeMatch && priceMatch;
         });
@@ -111,20 +114,15 @@ export default function PropertySearch() {
     const extractedInfoArray = extractPropertyInfoFromArray(properties);
 
     return (
-        <nav
-            style={{ paddingTop: 20 }}
-            className="absolute  z-10 right-0 left-0 bottom-[-72%] md:bottom-[-50%] lg:bottom-[-15%] mx-auto 
-         bg-white rounded-md shadow-xl p-9 w-[94%] md:w-[90%] lg:w-[80%] 2xl:w-[60%]
-        "
-        >
-            <div className="flex font-semibold">
+        <div className="relative z-10 mx-auto bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-100 p-8 w-[95%] md:w-[90%] lg:w-[85%] xl:w-[75%] 2xl:w-[65%] -mt-8">
+            {/* Property Type Tabs */}
+            <div className="flex bg-gray-50 rounded-2xl p-2 mb-8 w-fit mx-auto">
                 <button
                     type="button"
                     disabled
                     onClick={() => setPropType('buy')}
                     data-active={propType === 'buy'}
-                    className="data-[active='true']:text-primary-600  text-gray-800 bg-[#F2F1F1] transition-all delay-150
-            data-[active='true']:bg-white data-[active='true']:drop-shadow-t-xs  py-3 data-[active='true']:py-[10px]  px-4 data-[active='true']:px-[45px]"
+                    className="relative px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 data-[active='true']:bg-white data-[active='true']:text-primary-600 data-[active='true']:shadow-lg text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Buy
                 </button>
@@ -133,8 +131,7 @@ export default function PropertySearch() {
                     disabled
                     onClick={() => setPropType('sell')}
                     data-active={propType === 'sell'}
-                    className="data-[active='true']:text-primary-600  text-gray-800 bg-[#F2F1F1] transition-all delay-150
-            data-[active='true']:bg-white data-[active='true']:drop-shadow-t-xs  py-3 data-[active='true']:py-[10px]  px-4 data-[active='true']:px-[45px]"
+                    className="relative px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 data-[active='true']:bg-white data-[active='true']:text-primary-600 data-[active='true']:shadow-lg text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Sell
                 </button>
@@ -142,116 +139,122 @@ export default function PropertySearch() {
                     type="button"
                     onClick={() => setPropType('rent')}
                     data-active={propType === 'rent'}
-                    className="data-[active='true']:text-primary-600  text-gray-800 bg-[#F2F1F1] transition-all delay-150
-            data-[active='true']:bg-white data-[active='true']:drop-shadow-t-xs  py-3 data-[active='true']:py-[10px]  px-4 data-[active='true']:px-[45px]"
+                    className="relative px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 data-[active='true']:bg-white data-[active='true']:text-primary-600 data-[active='true']:shadow-lg text-gray-600 hover:text-gray-800"
                 >
                     Rent
                 </button>
             </div>
-            <div className="flex flex-col lg:flex-row gap-y-5 py-5 items-center">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-0 gap-y-5 md:gap-0 flex-1">
-                    <div className="px-2 py-1 border md:border-r-gray-200 mr-5">
-                        <label
-                            htmlFor="state"
-                            className="flex items-center gap-3 text-sm font-bold text-gray-400"
-                        >
-                            <TfiLocationPin className="stroke-gray-400" />
-                            <span>Location</span>
+
+            {/* Search Form */}
+            <div className="flex flex-col xl:flex-row gap-6 items-end">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 flex-1 w-full">
+                    {/* Location Field */}
+                    <div className="w-full">
+                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                            <TfiLocationPin className="w-4 h-4 text-primary-500" />
+                            Location
                         </label>
-                        <div className="pr-3">
-                            <select
-                                name="state"
-                                defaultValue=""
-                                onChange={(e) => setCity(e.target.value)}
-                                className="text-black bg-transparent font-medium mx-auto py-2 pr-1 focus:outline-none md:min-w-[90px] w-full"
-                            >
-                                <option value="">Select</option>
-                                {extractedInfoArray?.map(
-                                    (state: any, i: any) => (
-                                        <option key={i} value={state?.location}>
-                                            {state?.location}
-                                        </option>
-                                    )
-                                )}
-                            </select>
-                        </div>
+                        <select
+                            name="state"
+                            defaultValue=""
+                            onChange={(e) => setCity(e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 appearance-none"
+                        >
+                            <option value="">Select City</option>
+                            {extractedInfoArray?.map((state: any, i: any) => (
+                                <option key={i} value={state?.location}>
+                                    {state?.location}
+                                </option>
+                            ))}
+                        </select>
                     </div>
-                    <div className="px-2 py-1 border md:border-r-gray-200 mr-5">
-                        <label
-                            htmlFor="type"
-                            className="flex items-center gap-3 text-sm font-bold text-gray-400"
-                        >
-                            <SlHome className="stroke-gray-400" />
-                            <span>Type</span>
+
+                    {/* Property Type Field */}
+                    <div className="w-full">
+                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                            <SlHome className="w-4 h-4 text-primary-500" />
+                            Property Type
                         </label>
-                        <div className="pr-3">
-                            <select
-                                name="type"
-                                onChange={(e) => setType(e.target.value)}
-                                defaultValue=""
-                                className="text-black bg-transparent font-medium mx-auto py-2 pr-1 focus:outline-none md:min-w-[90px] w-full"
-                            >
-                                <option value="">Select</option>
-                                <option value="flat">Flat</option>
-                                <option value="mini-flat">Mini Flat</option>
-                                <option value="one-bed">One Bedroom</option>
-                                <option value="two-bed">Two Bedroom</option>
-                                <option value="three-bed">Three Bedroom</option>
-                                <option value="four-bed">Four Bedroom</option>
-                                <option value="Bungalow">Bungalow</option>
-                                <option value="Duplex">Duplex</option>
-                            </select>
-                        </div>
+                        <select
+                            name="type"
+                            onChange={(e) => setType(e.target.value)}
+                            defaultValue=""
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 appearance-none"
+                        >
+                            <option value="">Select Type</option>
+                            <option value="flat">Flat</option>
+                            <option value="mini-flat">Mini Flat</option>
+                            <option value="one-bed">One Bedroom</option>
+                            <option value="two-bed">Two Bedroom</option>
+                            <option value="three-bed">Three Bedroom</option>
+                            <option value="four-bed">Four Bedroom</option>
+                            <option value="Bungalow">Bungalow</option>
+                            <option value="Duplex">Duplex</option>
+                        </select>
                     </div>
-                    <div className="px-2 py-1 border md:border-r-gray-200 mr-5">
-                        <label
-                            htmlFor="price"
-                            className="flex items-center gap-3 text-sm font-bold text-gray-400"
-                        >
-                            <span>₦</span>
-                            <span>Price</span>
+
+                    {/* Price Range Field */}
+                    <div className="w-full">
+                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                            <span className="w-4 h-4 text-primary-500 font-bold">
+                                ₦
+                            </span>
+                            Price Range
                         </label>
-                        <div className="pr-3">
-                            <select
-                                name="price"
-                                onChange={(e) => setPrice(e.target.value)}
-                                defaultValue=""
-                                className="text-black bg-transparent mx-auto font-medium py-2 pr-1 focus:outline-none md:min-w-[90px] w-full"
-                            >
-                                <option value="">Select</option>
-                                <option value="100k-1M">100-1M</option>
-                                <option value="1M - 500M">1M - 500M</option>
-                            </select>
-                        </div>
+                        <select
+                            name="price"
+                            onChange={(e) => setPrice(e.target.value)}
+                            defaultValue=""
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 appearance-none"
+                        >
+                            <option value="">Select Range</option>
+                            <option value="100k-1M">₦100K - ₦1M</option>
+                            <option value="1M-500M">₦1M - ₦500M</option>
+                        </select>
                     </div>
-                    <div className="px-2 py-1 border mr-5 ">
-                        <label
-                            htmlFor="bedroom"
-                            className="flex items-center gap-3 text-sm font-bold text-gray-400"
-                        >
-                            <IoBedOutline className="stroke-gray-400" />
-                            <span>Bedroom</span>
+
+                    {/* Bedrooms Field */}
+                    <div className="w-full">
+                        <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                            <IoBedOutline className="w-4 h-4 text-primary-500" />
+                            Bedrooms
                         </label>
-                        <div className="pr-3">
-                            <input
-                                onChange={(e) =>
-                                    setBedRooms(parseInt(e.target.value))
-                                }
-                                value={bedRooms}
-                                type="number"
-                                name="bedroom"
-                                className="text-black bg-transparent font-medium mx-auto py-2 px-1 focus:outline-none md:min-w-[90px] w-full"
-                            />
-                        </div>
+                        <input
+                            onChange={(e) =>
+                                setBedRooms(parseInt(e.target.value) || 1)
+                            }
+                            value={bedRooms}
+                            type="number"
+                            min="1"
+                            max="10"
+                            name="bedroom"
+                            placeholder="1"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        />
                     </div>
                 </div>
+
+                {/* Search Button */}
                 <button
-                    onClick={() => handleSearch()}
-                    className="block h-12 bg-primary-600 rounded-lg px-8 py-2 text-white font-semibold lg:mx-auto"
+                    onClick={handleSearch}
+                    className="group bg-gradient-to-r from-primary-600 to-blue-600 hover:from-primary-700 hover:to-blue-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl shadow-lg flex items-center gap-2 min-w-[140px] justify-center"
                 >
-                    Search
+                    <span>Search</span>
+                    <svg
+                        className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                    </svg>
                 </button>
             </div>
-        </nav>
+        </div>
     );
 }

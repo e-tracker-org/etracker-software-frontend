@@ -33,7 +33,8 @@ export default function Header({
     const [isOpen, setIsOpen] = useState(false);
     const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+    const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] =
+        useState(false);
     const states = useAppStore();
     const modalRef = useRef<any>(null);
     const route = useRouter();
@@ -47,7 +48,6 @@ export default function Header({
 
     useEffect(() => {
         const fetchSubscriptionStatus = async () => {
-
             if (states?.user?.email) {
                 setLoading(true);
                 const status = await getSubscriptionStatus(states.user.email);
@@ -55,7 +55,7 @@ export default function Header({
                 setLoading(false);
             }
         };
-    
+
         fetchSubscriptionStatus();
     }, [states?.user?.email]);
 
@@ -81,14 +81,17 @@ export default function Header({
         setIsSubscriptionModalOpen(false);
         if (states?.user?.email) {
             checkSubscription(states?.user?.email)
-                .then(response => setSubscriptionStatus(response.data))
-                .catch(error => console.error(error));
+                .then((response) => setSubscriptionStatus(response.data))
+                .catch((error) => console.error(error));
         }
         // toast.success('Subscription successful!');
     };
 
     const handleClickOutside = (event: MouseEvent) => {
-        if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        if (
+            modalRef.current &&
+            !modalRef.current.contains(event.target as Node)
+        ) {
             setIsOpen(false);
         }
     };
@@ -104,7 +107,9 @@ export default function Header({
         if (accountId) {
             switchAccountAsync(accountId)
                 .then((data) => {
-                    states?.setActiveAccount(data?.data?.currentKyc?.accountType);
+                    states?.setActiveAccount(
+                        data?.data?.currentKyc?.accountType
+                    );
                     states?.setActiveKyc(data?.data?.currentKyc);
                     const newKycStage = data?.data?.currentKyc?.nextStage;
                     states?.setStep(newKycStage);
@@ -140,17 +145,20 @@ export default function Header({
 
     return (
         <>
-            <header className="py-4 px-[5%] border-0 md:border-b z-50 sticky top-0 bg-white min-h-[96px] flex items-center">
-                {!loading && !hasActiveSubscription &&  (
-                    <div className="absolute bg-red-50 border-b border-red-400 p-2 text-center">
-                        <div className="flex items-center justify-center gap-4">
-                            <p className="text-yellow-700 font-medium">
-                                You do not have an active subscription
-                            </p>
-                            <Button 
-                                variant="primary" 
+            <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+                {!loading && !hasActiveSubscription && (
+                    <div className="bg-gradient-to-r from-red-50 to-orange-50 border-b border-red-200 px-4 py-3">
+                        <div className="max-w-7xl mx-auto flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                                <p className="text-red-700 font-medium text-sm">
+                                    You do not have an active subscription
+                                </p>
+                            </div>
+                            <Button
+                                variant="primary"
                                 onClick={openSubscriptionModal}
-
+                                className="text-sm px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
                             >
                                 Subscribe Now
                             </Button>
@@ -158,96 +166,137 @@ export default function Header({
                     </div>
                 )}
 
-                <div className="hidden md:flex justify-between items-center w-full mt-4">
-                    <div className="relative w-1/2 4xl:h-3/5">
-                    </div>
-                    <div className="flex items-center gap-6">
-                        <Dropdown
-                            onClick={toggleOpen}
-                            title={
-                                <div className="inline-flex items-center gap-6 mr-2">
-                                    <div className="w-10 h-10 relative rounded-full overflow-clip">
-                                        {uploadedFiles?.data?.data[0]?.urls[0] ? (
-                                            loadinguploadFiles ? (
-                                                <Spinner className="h-10 w-10 mt-2" />
-                                            ) : (
-                                                <Image
-                                                    src={`${uploadedFiles?.data?.data[0]?.urls[0]}`}
-                                                    alt=""
-                                                    fill
-                                                />
-                                            )
-                                        ) : (
-                                            <label className="pt-10">
-                                                <svg
-                                                    width="40"
-                                                    height="40"
-                                                    viewBox="0 0 44 43"
-                                                    fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        d="M21.9998 0.166626C24.8288 0.166626 27.5419 1.29043 29.5423 3.29082C31.5427 5.29121 32.6665 8.00432 32.6665 10.8333C32.6665 13.6623 31.5427 16.3754 29.5423 18.3758C27.5419 20.3762 24.8288 21.5 21.9998 21.5C19.1709 21.5 16.4578 20.3762 14.4574 18.3758C12.457 16.3754 11.3332 13.6623 11.3332 10.8333C11.3332 8.00432 12.457 5.29121 14.4574 3.29082C16.4578 1.29043 19.1709 0.166626 21.9998 0.166626ZM21.9998 26.8333C33.7865 26.8333 43.3332 31.6066 43.3332 37.5V42.8333H0.666504V37.5C0.666504 31.6066 10.2132 26.8333 21.9998 26.8333Z"
-                                                        fill="#131313"
-                                                        fillOpacity="0.65"
+                <div className="px-[5%] py-4 max-w-7xl mx-auto">
+                    <div className="hidden md:flex justify-between items-center w-full">
+                        <div className="flex-1"></div>
+                        <div className="flex items-center gap-6">
+                            <Dropdown
+                                onClick={toggleOpen}
+                                title={
+                                    <div className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors duration-200">
+                                        <div className="w-10 h-10 relative rounded-full overflow-hidden ring-2 ring-gray-100">
+                                            {uploadedFiles?.data?.data[0]
+                                                ?.urls[0] ? (
+                                                loadinguploadFiles ? (
+                                                    <div className="w-full h-full bg-gray-100 animate-pulse flex items-center justify-center">
+                                                        <Spinner className="h-6 w-6" />
+                                                    </div>
+                                                ) : (
+                                                    <Image
+                                                        src={`${uploadedFiles?.data?.data[0]?.urls[0]}`}
+                                                        alt="Profile"
+                                                        fill
+                                                        className="object-cover"
                                                     />
-                                                </svg>
-                                            </label>
-                                        )}
+                                                )
+                                            ) : (
+                                                <div className="w-full h-full bg-primary-100 flex items-center justify-center">
+                                                    <span className="text-primary-600 font-semibold text-lg">
+                                                        {states?.user?.firstname
+                                                            ?.charAt(0)
+                                                            ?.toUpperCase()}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="font-semibold text-gray-900">
+                                                {states?.user?.firstname}
+                                            </span>
+                                            <span className="text-xs text-gray-500">
+                                                View Profile
+                                            </span>
+                                        </div>
+                                        <svg
+                                            className="w-4 h-4 text-gray-400"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M19 9l-7 7-7-7"
+                                            />
+                                        </svg>
                                     </div>
-                                    <span>{states?.user?.firstname}</span>
-                                </div>
-                            }
-                            className="text-[#13131399]"
-                        >
-                            <li className="">
-                                <Link
-                                    className=" hover:bg-gray-200 py-2 px-4 block whitespace-no-wrap"
-                                    href="/dashboard"
-                                >
-                                    Dashboard
-                                </Link>
-                            </li>
-                            <li className="">
-                                <a
-                                    className="hover:bg-gray-200 py-2 px-4 whitespace-no-wrap flex items-center gap-4"
-                                    href="#"
-                                    onClick={states?.signout}
-                                >
-                                    <FiLogOut />
-                                    <span>Sign Out</span>
-                                </a>
-                            </li>
-                        </Dropdown>
+                                }
+                                className="border-0"
+                            >
+                                <li>
+                                    <Link
+                                        className="hover:bg-gray-50 py-3 px-4 block whitespace-nowrap transition-colors duration-200 rounded-lg mx-2 flex items-center gap-3"
+                                        href="/dashboard"
+                                    >
+                                        <svg
+                                            className="w-4 h-4 text-gray-500"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+                                            />
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M8 5a2 2 0 012-2h4a2 2 0 012 2v0H8v0z"
+                                            />
+                                        </svg>
+                                        Dashboard
+                                    </Link>
+                                </li>
+                                <li>
+                                    <a
+                                        className="hover:bg-red-50 py-3 px-4 whitespace-nowrap flex items-center gap-3 transition-colors duration-200 rounded-lg mx-2 text-red-600"
+                                        href="#"
+                                        onClick={states?.signout}
+                                    >
+                                        <FiLogOut className="w-4 h-4" />
+                                        <span>Sign Out</span>
+                                    </a>
+                                </li>
+                            </Dropdown>
+                        </div>
                     </div>
+
+                    <nav className="flex justify-between items-center md:hidden">
+                        <Link href="/" className="flex-shrink-0">
+                            <Image
+                                src="/logo.svg"
+                                alt="e-tracka logo"
+                                width={144}
+                                height={34}
+                                className="h-8 w-auto"
+                            />
+                        </Link>
+
+                        <button
+                            onClick={toggleSidenav}
+                            className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                            title="Open menu"
+                        >
+                            <HiOutlineMenuAlt3 className="w-8 h-8 text-gray-700" />
+                        </button>
+                    </nav>
                 </div>
 
-                <nav className="w-full flex justify-between items-center md:hidden mt-4">
-                    <Link href="/">
-                        <Image
-                            src="/logo.svg"
-                            alt="e-tracka logo"
-                            width={144}
-                            height={34}
-                        />
-                    </Link>
-
-                    <HiOutlineMenuAlt3
-                        onClick={toggleSidenav}
-                        role="button"
-                        title="menu"
-                        stroke="currentColor"
-                        className="w-8 h-8"
-                    />
-                </nav>
-
                 {isOpen && (
-                    <div ref={modalRef}>
+                    <div
+                        ref={modalRef}
+                        className="absolute top-full right-4 z-50"
+                    >
                         <SwitchAccountCard
                             handleSwitchAccount={handleSwitchAccount}
                         />
                     </div>
                 )}
+
                 <DialogModal
                     openModal={isSubscriptionModalOpen}
                     closeModal={closeSubscriptionModal}
@@ -256,8 +305,8 @@ export default function Header({
                     className="rounded-md sm:ml-[40%] lg:ml-[10%] px-[3%] lg:!top-[10%]"
                 >
                     <div onClick={(e) => e.stopPropagation()}>
-                        <Subscription 
-                            userEmail={states?.user?.email || ''} 
+                        <Subscription
+                            userEmail={states?.user?.email || ''}
                             onSuccess={closeSubscriptionModal}
                         />
                     </div>
