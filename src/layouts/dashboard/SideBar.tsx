@@ -16,7 +16,6 @@ import { useRouter } from 'next/router';
 import { urlSegment, roleMenus, goBackToKyc, goBackToKyc2 } from 'utils/helper';
 import { Role } from 'utils/enums';
 import SideBarIcon from './SideBarIcon';
-import Link from 'next/link';
 import Dropdown from 'components/base/Dropdown';
 import { KycStatus } from 'interfaces';
 
@@ -31,39 +30,33 @@ const Sidebar: React.FC<SidebarProps> = ({
     isSidenavOpen,
     setSidenavOpen,
 }) => {
-    const [open, setOpen] = useState(true);
     const [tenantTabOpen, setTenantTabOpen] = useState(false);
     const [activeMenu, setActiveMenu] = useState('dashboard');
-    const [urlParam, setUrlParam] = useState<string | undefined>();
+    const [urlParam, setUrlParam] = useState<string>('dashboard');
     const states = useAppStore();
     const router = useRouter();
     const { asPath } = router;
     const menus = roleMenus[role];
 
-    const toggleSideBar = () => setOpen((prev) => !prev);
-
     useEffect(() => {
-        const param = urlSegment(asPath);
-        setUrlParam(param);
-        const menuName = param?.toLowerCase() || 'dashboard';
-        setActiveMenu(menuName);
-    }, [asPath]);
+        const path = router.asPath;
+        const segment = path.split('/')[2] || 'dashboard';
+        setActiveMenu(segment.toLowerCase());
+        setUrlParam(segment.toLowerCase());
+    }, [router.asPath]);
 
-    const handleNavigation = async (path: string, menu: string) => {
-        setActiveMenu(menu.toLowerCase());
+    const handleNavigation = (path: string, menu: string) => {
         if (menu.toLowerCase() === 'tenants') {
             states?.resetTenantState();
         }
 
         setSidenavOpen(false);
+        setActiveMenu(menu.toLowerCase());
+        setUrlParam(menu.toLowerCase());
 
-        try {
-            // Use only router.push for navigation
-            await router.push(path, undefined, { shallow: false });
-        } catch (error) {
-            console.error('Navigation error:', error);
-            // Fallback to window.location if router navigation fails
-            window.location.href = path;
+        // Don't navigate if we're already on this path
+        if (router.asPath !== path) {
+            router.push(path);
         }
     };
 
@@ -73,16 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 isSidenavOpen ? 'translate-x-0' : '-translate-x-full'
             } md:translate-x-0 w-80 md:min-w-[234px] md:w-[234px] h-screen border-r border-gray-200 bg-white transition-all duration-300 ease-in-out fixed z-[100] shadow-xl md:shadow-none flex flex-col`}
         >
-            {/* Mobile header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100 md:hidden">
-                <Link href="/">
-                    <Image
-                        src="/logo.svg"
-                        alt="e-tracka logo"
-                        width={120}
-                        height={28}
-                    />
-                </Link>
                 <button
                     onClick={() => setSidenavOpen(false)}
                     className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -103,26 +87,21 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </button>
             </div>
 
-            {/* Desktop header */}
             <div className="hidden md:block p-6 pb-4">
-                <Link href="/">
-                    <Image
-                        src="/logo.svg"
-                        alt="e-tracka logo"
-                        width={144}
-                        height={34}
-                    />
-                </Link>
+                <Image
+                    src="/logo.svg"
+                    alt="e-tracka logo"
+                    width={144}
+                    height={34}
+                />
             </div>
 
-            {/* Scrollable content area */}
             <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 md:py-2">
                 <nav className="space-y-2">
                     {states?.activeKyc?.status === KycStatus.INCOMPLETE &&
                     urlParam !== 'kyc' ? (
                         <div className="mb-4">
                             <ActiveLink
-                                href="/onboarding/kyc"
                                 Classname="!bg-blue-50 !text-blue-600 border border-blue-200 rounded-lg"
                                 onClick={() =>
                                     goBackToKyc('kyc', states, router)
@@ -245,7 +224,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                     ))}
                 </nav>
 
-                {/* Logout button */}
                 <div className="mt-8 pt-6 border-t border-gray-100">
                     <button
                         onClick={() => {
@@ -278,39 +256,18 @@ const Sidebar: React.FC<SidebarProps> = ({
 
 const ActiveLink = ({
     children,
-    href,
     onClick,
     Classname,
 }: {
     children: ReactNode;
-    href?: string;
     onClick?: () => void;
     Classname?: string;
 }) => {
-    const router = useRouter();
-
-    const handleClick = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (onClick) {
-            onClick();
-        } else if (href) {
-            // If no onClick provided but href exists, navigate directly
-            try {
-                await router.push(href, undefined, { shallow: false });
-            } catch (error) {
-                console.error('Navigation error:', error);
-                window.location.href = href;
-            }
-        }
-    };
-
     return (
         <button
             type="button"
             className={`flex items-center gap-3 text-sm md:text-base font-medium px-4 py-3 w-full transition-colors duration-200 ${Classname}`}
-            onClick={handleClick}
+            onClick={onClick}
         >
             {children}
         </button>

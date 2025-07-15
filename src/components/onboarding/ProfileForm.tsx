@@ -279,7 +279,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
                                 onClick={onCrop}
                                 className="bg-white px-4 py-2 rounded-2xl inline-block mt-2"
                             >
-                                Crop
+                                Save
                             </button>
                             <div className="w-[80px]">
                                 <h4 className="text-white font-medium">

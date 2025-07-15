@@ -1,35 +1,47 @@
-//@ts-ignore
 import { Property } from 'interfaces';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useMemo, useState, useEffect } from 'react';
 import Header from './Header';
 import PropertyListingCard from './PropertyListingCard';
 import { useAppStore } from 'hooks/useAppStore';
-import Loader from 'components/base/Loader';
 
 interface PropertyProp {
     properties: Property[] | undefined;
 }
 
 const Property: FC<PropertyProp> = ({ properties }) => {
-    const states = useAppStore();
+    const searchParam = useAppStore<string>((state) => state.searchParam || '');
+    const [filterDetails, setFilterDetails] = useState(null);
 
-    const getFilterDetailsFromLocalStorage = () => {
+    // Move localStorage access to useEffect
+    useEffect(() => {
         const filterDetailsString = localStorage.getItem('filterDetails');
         if (filterDetailsString) {
-            return JSON.parse(filterDetailsString);
+            try {
+                const parsed = JSON.parse(filterDetailsString);
+                setFilterDetails(parsed);
+            } catch (e) {
+                console.error('Error parsing filter details:', e);
+            }
         }
-        return null;
-    };
+    }, []);
 
-    const applyFilter = (properties: Property[]) => {
-        const filterDetailsFromLocalStorage =
-            getFilterDetailsFromLocalStorage();
+    const filteredProperties = useMemo(() => {
+        if (!properties) return [];
 
-        const filteredProperties = properties.filter((property: Property) => {
-            if (filterDetailsFromLocalStorage) {
-                const { state, propertyActive, apartmentType } =
-                    filterDetailsFromLocalStorage;
+        // First apply search filter
+        let filtered = searchParam
+            ? properties.filter((property: Property) =>
+                  property.name
+                      .toLowerCase()
+                      .includes(searchParam.toLowerCase())
+              )
+            : properties;
 
+        // Then apply other filters
+        if (filterDetails) {
+            const { state, propertyActive, apartmentType } = filterDetails;
+
+            filtered = filtered.filter((property: Property) => {
                 if (
                     state &&
                     !property.location.state
@@ -58,48 +70,36 @@ const Property: FC<PropertyProp> = ({ properties }) => {
                 ) {
                     return false;
                 }
-            }
 
-            return true;
-        });
+                return true;
+            });
+        }
 
-        return filteredProperties;
-    };
+        return filtered;
+    }, [properties, searchParam, filterDetails]);
 
-    const searchedProperty = properties?.filter((property: any) =>
-        property.name.toLowerCase().includes(states?.searchParam.toLowerCase())
-    );
-
-    const displayProperties = states?.searchParam
-        ? searchedProperty
-        : properties;
-
-    const filteredProperties = applyFilter(displayProperties || []);
+    // Add a loading state for initial render
+    if (typeof window === 'undefined') {
+        return <div className="w-full" />;
+    }
 
     return (
-        <>
-            <div className="w-full">
-                <Header
-                    propertyCount={
-                        filteredProperties ? filteredProperties.length : 0
-                    }
-                />
-                <section className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 w-full mb-10 min-h-[300px] ">
-                    {Array.isArray(filteredProperties) &&
-                    filteredProperties.length ? (
-                        filteredProperties.map((property) => (
-                            <div key={property?.id} className="w-full">
-                                <PropertyListingCard property={property} />
-                            </div>
-                        ))
-                    ) : (
-                        <p className="flex justify-center items-center text-center text-xl w-full">
-                            No property record found
-                        </p>
-                    )}
-                </section>
-            </div>
-        </>
+        <div className="w-full">
+            <Header propertyCount={filteredProperties.length} />
+            <section className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 w-full mb-10 min-h-[300px] ">
+                {filteredProperties.length > 0 ? (
+                    filteredProperties.map((property) => (
+                        <div key={property?.id} className="w-full">
+                            <PropertyListingCard property={property} />
+                        </div>
+                    ))
+                ) : (
+                    <p className="flex justify-center items-center text-center text-xl w-full">
+                        No property record found
+                    </p>
+                )}
+            </section>
+        </div>
     );
 };
 

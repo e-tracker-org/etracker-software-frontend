@@ -1,25 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useBoundStore } from 'store';
+import { UserAction } from '../store/userSlice';
+import { OnboardingAction } from '../store/onboardingSlice';
+import { DashboardAction } from '../store/dashboardSlice';
+import { TenantAction } from '../store/tenantSlice';
 
-/* This hook prevents rehydration error that occurs while using zustand
- The rehydration error occurs when mounting the react component and the 
- server html markup differs from the client rendered page
- The useState and useEffect ensures the component is remounted after hydration
- For more read: https://dev.to/abdulsamad/how-to-use-zustands-persist-middleware-in-nextjs-4lb5
-*/
-export const useAppSelector = <T, F>(
-    store: (callback: (state: T) => unknown) => unknown,
+type StoreState = UserAction &
+    OnboardingAction &
+    DashboardAction &
+    TenantAction;
+
+export const useAppSelector = <T extends StoreState, F>(
+    store: (callback: (state: T) => F) => F,
     callback: (state: T) => F
 ) => {
-    const result = store(callback) as F;
-    const [data, setData] = useState<F>();
+    const result = store(callback);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
-        setData(result);
-    }, [result]);
+        if (typeof window !== 'undefined') {
+            setIsInitialized(true);
+        }
+    }, []);
 
-    return data;
+    const memoizedResult = useMemo(() => {
+        if (!isInitialized) {
+            return undefined;
+        }
+        return result;
+    }, [isInitialized, result]);
+
+    return memoizedResult;
 };
 
-export const useAppStore = () =>
-    useAppSelector(useBoundStore, (state) => state);
+export const useAppStore = <T = StoreState,>(
+    selector?: (state: StoreState) => T
+): T => {
+    return useBoundStore(selector || ((state) => state as T));
+};

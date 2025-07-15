@@ -54,16 +54,9 @@ function Signin() {
     const { tenantId, propertyId } = router.query;
     const { confirmTenant, isConfirmTenantLoading } = useLandlord();
 
-    // check if user is already logged in
-    useEffect(() => {
-        if (states?.isAuthenticated && !isNavigating) {
-            setIsNavigating(true);
-            router.push('/dashboard');
-        }
-    }, [states?.isAuthenticated, router, isNavigating]);
-
+    // Properly destructure the verify account mutation
     const {
-        mutate,
+        mutate: verifyAccountMutate,
         isLoading: isVerifyLoading,
         isSuccess,
     } = useMutation({
@@ -79,6 +72,36 @@ function Signin() {
         },
         retry: 2,
     });
+
+    // Consolidate navigation logic into a single function
+    const handleNavigation = async (path: string) => {
+        if (isNavigating) return;
+        setIsNavigating(true);
+        try {
+            await router.push(path);
+        } catch (error) {
+            console.error('Navigation error:', error);
+            setIsNavigating(false);
+        }
+    };
+
+    // Modify useEffect for auth check
+    useEffect(() => {
+        if (states?.isAuthenticated && !isNavigating) {
+            handleNavigation('/dashboard');
+        }
+    }, [states?.isAuthenticated]);
+
+    // Modify useEffect for token check
+    useEffect(() => {
+        if (states?.token && !router.asPath.includes('?') && !isNavigating) {
+            if (states?.user?.accountTypes?.includes(states?.activeAccount)) {
+                handleNavigation('/dashboard');
+            } else {
+                handleNavigation('/dashboard/properties');
+            }
+        }
+    }, [states?.token]);
 
     const togglePasswordRecovery = () => {
         setIsForgottenPassword((prev) => !prev);
@@ -114,145 +137,91 @@ function Signin() {
             values.propertyId = propertyId;
         }
 
-        states?.setActiveKyc(undefined);
-        states?.setActiveAccount(undefined);
-        loginAsync(values)
-            //@ts-ignore
-            .then((data: any) => {
-                states?.setStartKycScreen('');
-                reset();
+        try {
+            states?.setActiveKyc(undefined);
+            states?.setActiveAccount(undefined);
+            const data = await loginAsync(values);
 
-                if (!!data?.data?.tokens) {
-                    //Sets user token in local storage from the zustan state
-                    states?.setUser({
-                        token: data?.data?.tokens,
-                        user: data?.data.user,
-                        isAuthenticated: true,
-                    });
+            if (data?.data?.tokens) {
+                states?.setUser({
+                    token: data?.data?.tokens,
+                    user: data?.data.user,
+                    isAuthenticated: true,
+                });
 
+                // Handle different navigation scenarios
+                if (
+                    data?.data?.user?.accountTypes?.length === 0 &&
+                    !data?.data?.user?.currentKyc
+                ) {
                     // New user onboarding
-                    if (
-                        data?.data?.user?.accountTypes?.length === 0 &&
-                        !data?.data?.user?.currentKyc
-                    ) {
-                        // Handle new user onboarding
-                        setIsNavigating(true);
-                        window.location.href = '/onboarding';
-                        return;
-                    }
+                    await handleNavigation('/onboarding');
+                    return;
+                }
 
-                    // ongoing Kyc active
-                    if (
-                        data?.data?.user?.currentKyc &&
-                        data?.data?.user?.currentKyc?.status ===
-                            KycStatus.INCOMPLETE
-                    ) {
-                        // Handle incomplete KYC
-                        setIsNavigating(true);
-                        return router.push('/onboarding/kyc');
-                    }
+                if (
+                    data?.data?.user?.currentKyc?.status ===
+                    KycStatus.INCOMPLETE
+                ) {
+                    // Incomplete KYC
+                    await handleNavigation('/onboarding/kyc');
+                    return;
+                }
 
-                    // Ongoing KYC but completed and awaiting approval
-                    if (
-                        data?.data?.user?.currentKyc &&
-                        data?.data?.user?.currentKyc?.status ===
-                            KycStatus.COMPLETE
-                    ) {
-                        // Handle completed KYC
-                        states?.setActiveKyc(data?.data?.user?.currentKyc);
-                        states?.setScreen('');
-                        states?.setActiveAccount(
-                            data?.data?.user?.currentKyc?.accountType
-                        );
-                    }
+                if (
+                    data?.data?.user?.currentKyc?.status === KycStatus.COMPLETE
+                ) {
+                    // Completed KYC
+                    states?.setActiveKyc(data?.data?.user?.currentKyc);
+                    states?.setScreen('');
+                    states?.setActiveAccount(
+                        data?.data?.user?.currentKyc?.accountType
+                    );
+                }
 
-                    if (tenantId && propertyId) {
-                        setIsNavigating(true);
-                        return confirmTenant({
+                if (tenantId && propertyId) {
+                    try {
+                        const res = await confirmTenant({
                             tenantId: tenantId.toString(),
                             propertyId: propertyId.toString(),
-                        })
-                            .then((res) => {
-                                console.log('ressssss', res);
-                                //@ts-ignore
-                                const landlordId = res.data?.current_owner; // Extract landlord ID from response data
-                                if (landlordId) {
-                                    // After confirming tenant, create history
-                                    return createHistory(
-                                        tenantId.toString(), // Pass user ID
-                                        data.data.user.email, // Pass user email
-                                        landlordId, // Pass landlord ID
-                                        propertyId.toString() // Pass property ID
-                                    )
-                                        .then((historyRes) => {
-                                            console.log(
-                                                'History created:',
-                                                historyRes
-                                            );
-                                            return router.push(
-                                                '/dashboard/properties'
-                                            );
-                                        })
-                                        .catch((historyError) => {
-                                            setIsNavigating(false);
-                                            toast.error(historyError.message);
-                                            throw historyError;
-                                        });
-                                }
-                            })
-                            .catch((errors) => {
-                                setIsNavigating(false);
-                                toast.error(errors.message);
-                                throw errors;
-                            });
-                    } else {
-                        // Don't set showMessage if we're about to navigate
-                        setIsNavigating(true);
-                        return new Promise((resolve) => {
-                            setTimeout(() => {
-                                router
-                                    .push('/dashboard/properties')
-                                    .then(resolve);
-                            }, 100);
                         });
+
+                        const landlordId = res?.data?.current_owner;
+                        if (landlordId) {
+                            await createHistory(
+                                tenantId.toString(),
+                                data.data.user.email,
+                                landlordId,
+                                propertyId.toString()
+                            );
+                            await handleNavigation('/dashboard/properties');
+                        }
+                    } catch (error: any) {
+                        setIsNavigating(false);
+                        toast.error(error.message);
+                        throw error;
                     }
+                } else {
+                    await handleNavigation('/dashboard/properties');
                 }
-                // Remove duplicate setShowMessage - it's already set above when needed
-            })
-            .catch((error) => {
-                console.log('Login error:', error);
-                setIsNavigating(false);
-                // Show the specific error message on the form
-                const errorMsg =
-                    error?.response?.data?.message ||
-                    error?.message ||
-                    'Something went wrong please try again';
-                setErrorMessage(errorMsg);
-            });
+            }
+        } catch (error: any) {
+            console.error('Login error:', error);
+            setIsNavigating(false);
+            const errorMsg =
+                error?.response?.data?.message ||
+                error?.message ||
+                'Something went wrong please try again';
+            setErrorMessage(errorMsg);
+        }
     };
 
+    // Update the useEffect to use verifyAccountMutate
     useEffect(() => {
         if (router?.query?.token) {
-            mutate({ token: router.query.token as string });
+            verifyAccountMutate({ token: router.query.token as string });
         }
-    }, [router?.query?.token, mutate]);
-
-    useEffect(() => {
-        if (states?.token && !router.asPath.includes('?') && !isNavigating) {
-            setIsNavigating(true);
-            if (states?.user?.accountTypes?.includes(states?.activeAccount)) {
-                router.push('/dashboard');
-            } else {
-                router.push('/dashboard/properties');
-            }
-        }
-    }, [
-        states?.token,
-        states?.user?.accountTypes,
-        states?.activeAccount,
-        router,
-        isNavigating,
-    ]);
+    }, [router?.query?.token, verifyAccountMutate]);
 
     return (
         <>

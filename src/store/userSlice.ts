@@ -42,23 +42,44 @@ export const userSlice: StateCreator<UserState, [], [], UserAction> = (
     get
 ) => ({
     ...initialState,
-    setUser: async (payload) => {
-        set((state) => ({ ...state, ...payload }));
+    setUser: (payload) => {
+        // Check if this is actually a change
+        const currentState = get();
+        const isNewUser =
+            JSON.stringify(currentState.user) !== JSON.stringify(payload.user);
+        const isNewToken = currentState.token !== payload.token;
+
+        if (isNewUser || isNewToken) {
+            set((state) => ({
+                ...state,
+                ...payload,
+                isAuthenticated: !!payload.token,
+            }));
+        }
     },
 
     setActiveKyc: (payload?: CurrentKyc | undefined) => {
-        set((state) => ({
-            ...state,
-            activeKyc: payload,
-        }));
+        const currentState = get();
+        if (
+            JSON.stringify(currentState.activeKyc) !== JSON.stringify(payload)
+        ) {
+            set((state) => ({
+                ...state,
+                activeKyc: payload,
+            }));
+        }
     },
 
     setStep: (payload: number) => {
-        set((state) => ({
-            ...state,
-            step: payload,
-        }));
+        const currentState = get();
+        if (currentState.step !== payload) {
+            set((state) => ({
+                ...state,
+                step: payload,
+            }));
+        }
     },
+
     goto: (title: string, count: number) => {
         const currentKycStage = get()?.activeKyc?.nextStage ?? 1;
         if (
@@ -68,25 +89,29 @@ export const userSlice: StateCreator<UserState, [], [], UserAction> = (
             count <= +currentKycStage &&
             !get()?.startKycScreen
         ) {
-            set({ step: count });
+            set((state) => ({ ...state, step: count }));
         }
     },
+
     setStartKycScreen: (payload: string) => {
         set((state) => ({
             ...state,
             startKycScreen: payload,
         }));
     },
+
     setActiveAccount: (payload: number | undefined) => {
-        set((state) => ({
-            ...state,
-            activeAccount: payload,
-        }));
+        const currentState = get();
+        if (currentState.activeAccount !== payload) {
+            set((state) => ({
+                ...state,
+                activeAccount: payload,
+            }));
+        }
     },
+
     signout: () => {
-        // Clear local storage
         localStorage.clear();
-        // clear bound-store
         localStorage.removeItem('bound-store');
         set(initialState);
     },

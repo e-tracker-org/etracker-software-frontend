@@ -53,36 +53,56 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         setSidenavOpen((isSidenavOpen) => !isSidenavOpen);
     };
 
-    // const closeSidenav = () => {
-    //     setSidenavOpen(false);
-    // };
-
     useEffect(() => {
-        if (userProfile) {
-            const userData = userProfile;
-            states?.setUser({ user: userData });
-            if (userData?.currentKyc) {
-                states?.setActiveKyc(userData?.currentKyc);
-                states?.setStep(userData?.currentKyc?.nextStage);
-            } else {
-                if (
-                    !states?.activeKyc &&
-                    userData?.accountTypes.includes(states?.activeAccount)
-                ) {
-                    states?.setActiveKyc(undefined);
-                    states?.setStep(1);
-                    // router.push('/dashboard');
-                    if (router.asPath.split('/')[1] === 'onboarding') {
-                        router.push('/dashboard');
+        let mounted = true;
+
+        const initializeUser = async () => {
+            if (!isLoading && mounted) {
+                if (userProfile) {
+                    // Check if user data actually changed to prevent unnecessary updates
+                    const currentUser = states?.user;
+                    const userChanged =
+                        JSON.stringify(currentUser) !==
+                        JSON.stringify(userProfile);
+
+                    if (userChanged) {
+                        states?.setUser({ user: userProfile });
+                    }
+
+                    // Handle KYC status only if needed
+                    const hasCurrentKyc = !!userProfile?.currentKyc;
+                    const hasActiveKyc = !!states?.activeKyc;
+
+                    if (hasCurrentKyc && !hasActiveKyc) {
+                        states?.setActiveKyc(userProfile.currentKyc);
+                        states?.setStep(userProfile.currentKyc.nextStage);
+                    } else if (
+                        !hasCurrentKyc &&
+                        !hasActiveKyc &&
+                        userProfile?.accountTypes?.includes(
+                            states?.activeAccount
+                        )
+                    ) {
+                        states?.setActiveKyc(undefined);
+                        states?.setStep(1);
+                    }
+                } else {
+                    // Only redirect if we're not already on the signin page
+                    if (router.pathname !== '/auth/signin') {
+                        states?.signout();
+                        states?.resetTenantState();
+                        router.replace('/auth/signin');
                     }
                 }
             }
-        } else if (!isLoading) {
-            states?.signout();
-            states?.resetTenantState();
-            router.push('/auth/signin');
-        }
-    }, [userProfile, isLoading, states?.activeKyc, router, states]);
+        };
+
+        initializeUser();
+
+        return () => {
+            mounted = false;
+        };
+    }, [userProfile, isLoading]);
 
     useEffect(() => {
         if (acctType && acctType.accountType) {
@@ -112,7 +132,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     return isLoading ? (
         <Loader loading={isLoading} />
     ) : (
-        <section>
+        <section className="min-h-screen bg-gray-50">
             <DialogModal
                 openModal={isOpen}
                 showClose={false}
@@ -144,7 +164,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     isSidenavOpen={isSidenavOpen}
                     toggleSidenav={toggleSidenav}
                 />
-                <main className="bg-white md:bg-[#F5F5F5] pt-2 pb-16 px-[3.5%] min-h-[calc(100vh-80px)]">
+                <main className="bg-gray-50 pt-6 pb-16 px-4 md:px-8 min-h-[calc(100vh-80px)]">
                     {children}
                 </main>
             </section>
