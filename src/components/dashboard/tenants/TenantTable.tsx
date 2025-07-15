@@ -4,7 +4,7 @@ import { useAppStore } from 'hooks/useAppStore';
 import { User } from 'interfaces';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import SendReceipt from './SendReceipt';
 import { getFormattedDate } from 'services/config/config';
@@ -39,15 +39,18 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
         ? searchedTenants
         : filteredTenants;
 
-    const handleClickOutside = (event: MouseEvent) => {
-        if (
-            modalRef.current &&
-            !modalRef.current.contains(event.target as Node)
-        ) {
-            setOpenModal(false);
-            states?.resetTenantState();
-        }
-    };
+    const handleClickOutside = useCallback(
+        (event: MouseEvent) => {
+            if (
+                modalRef.current &&
+                !modalRef.current.contains(event.target as Node)
+            ) {
+                setOpenModal(false);
+                states?.resetTenantState();
+            }
+        },
+        [states]
+    );
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
@@ -55,7 +58,7 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);
+    }, [handleClickOutside]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.stopPropagation();
@@ -105,7 +108,12 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
             // Remove the search parameter from the state
             states?.setSearchParam('');
         }
-    }, [states?.searchParam, displayTenants.length, filteredTenants.length]);
+    }, [
+        states?.searchParam,
+        displayTenants.length,
+        filteredTenants.length,
+        states,
+    ]);
 
     return (
         <div className="relative">
@@ -278,7 +286,10 @@ const TenantTable = ({ tenants, borderLeft = false, showCheckbox = false }) => {
                                                     {tenant?.userData?.phone}
                                                 </td>
                                                 <td className="py-6 px-14 ">
-                                                    {tenant?.userData?.fullAddress}
+                                                    {
+                                                        tenant?.userData
+                                                            ?.fullAddress
+                                                    }
                                                 </td>
                                                 {/* Add more columns as needed */}
                                             </tr>

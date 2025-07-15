@@ -53,7 +53,7 @@ function Signin() {
         if (states?.isAuthenticated) {
             router.push('/dashboard');
         }
-    }, [states]);
+    }, [states, router]);
 
     const {
         mutate,
@@ -114,11 +114,10 @@ function Signin() {
                         isAuthenticated: true,
                     });
 
-                     // New user onboarding
+                    // New user onboarding
                     if (
-                        data?.data?.user?.accountTypes?.length  === 0 &&
+                        data?.data?.user?.accountTypes?.length === 0 &&
                         !data?.data?.user?.currentKyc
-                        
                     ) {
                         // Handle new user onboarding
                         // Code for new user onboarding here
@@ -136,8 +135,6 @@ function Signin() {
                         // Code for incomplete KYC here
                         return router.push('/onboarding/kyc');
                     }
-
-                   
 
                     // Ongoing KYC but completed and awaiting approval
                     if (
@@ -199,8 +196,7 @@ function Signin() {
                 // toast.success(data.message ?? 'Login successful');
             })
             .catch((error) => {
-                error && 
-                toast.error("Something went wrong please try again");
+                error && toast.error('Something went wrong please try again');
                 // toast.error(error?.message);
             });
 
@@ -211,7 +207,7 @@ function Signin() {
         if (router?.query?.token) {
             mutate({ token: router.query.token as string });
         }
-    }, [router?.query]);
+    }, [router?.query, mutate]);
 
     useEffect(() => {
         if (states?.token) {
@@ -221,7 +217,7 @@ function Signin() {
                 <NavLink href="/dashboard/properties" />;
             }
         }
-    }, [states?.token]);
+    }, [states?.token, states?.user?.accountTypes, states?.activeAccount]);
 
     return (
         <>

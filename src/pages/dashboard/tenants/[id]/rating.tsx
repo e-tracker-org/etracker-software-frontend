@@ -24,16 +24,17 @@ function TenantRating({ tenant, show }: any) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [value, setValue] = useState(5);
-    
+
     // const updateUser = UserService.updateUser;
     const tenantRating = tenant?.rating ?? 0;
-
 
     useEffect(() => {
         if (tenant) {
             let ratingValue = 0;
             // @ts-ignore
-            const fileCount = Number(localStorage.getItem('selectedTenantFilesCount'));
+            const fileCount = Number(
+                localStorage.getItem('selectedTenantFilesCount')
+            );
 
             if (tenant?.profileImage == '' && tenant?.isUserVerified == false) {
                 ratingValue = 10;
@@ -52,7 +53,7 @@ function TenantRating({ tenant, show }: any) {
 
             setRating(ratingValue + tenantRating);
         }
-    }, [tenant]);
+    }, [tenant, tenantRating]);
 
     const handleRating = async () => {
         setIsLoading(true);
@@ -70,10 +71,10 @@ function TenantRating({ tenant, show }: any) {
                     const storedTenant = localStorage.getItem('selectedTenant');
                     if (storedTenant) {
                         const tenant = JSON.parse(storedTenant);
-    
+
                         tenant.userData.rating =
                             tenant.userData.rating + updatedRating;
-    
+
                         localStorage.setItem(
                             'selectedTenant',
                             JSON.stringify(tenant)
@@ -84,11 +85,10 @@ function TenantRating({ tenant, show }: any) {
                     toast.success('Tenant rating updated successfully');
                     window.location.reload();
                 } else {
-                    console.error("localStorage is not available in this environment.");
+                    console.error(
+                        'localStorage is not available in this environment.'
+                    );
                 }
-               
-
-                
             } else {
                 toast.error('User profile update failed:');
                 console.error('User profile update failed:', response.message);

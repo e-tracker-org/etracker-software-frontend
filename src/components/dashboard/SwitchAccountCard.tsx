@@ -39,7 +39,7 @@ const SwitchAccountCard: FC<SwitchAccountProps> = ({ handleSwitchAccount }) => {
             )[0];
             newAccount && setAccount(newAccount);
         }
-    }, [states?.activeAccount, account]);
+    }, [states?.activeAccount, account, accountTypes?.data, states?.activeKyc]);
 
     // useEffect(() => {
     //     if (!openModal) {

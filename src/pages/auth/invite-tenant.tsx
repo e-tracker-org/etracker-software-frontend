@@ -72,7 +72,7 @@ function SignUp() {
         if (states?.isAuthenticated) {
             router.push('/dashboard');
         }
-    }, [states]);
+    }, [states, router]);
 
     const { addLandlordTenant } = useLandlord();
 

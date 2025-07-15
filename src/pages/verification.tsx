@@ -25,7 +25,7 @@ export default function Verification() {
         if (router?.query?.token) {
             mutate({ token: router.query.token as string });
         }
-    }, [router?.query]);
+    }, [router?.query, mutate]);
 
     return (
         <>

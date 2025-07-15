@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    useCallback,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from 'react-query';
 import * as yup from 'yup';
@@ -193,7 +199,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
         }
     };
 
-    const setImgProfile = async () => {
+    const setImgProfile = useCallback(async () => {
         if (uploadedFiles?.data?.data[0]?.urls.length) {
             const dataUrl = uploadedFiles?.data?.data[0]?.urls[0];
             console.log(dataUrl, 'dataUrl');
@@ -202,7 +208,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
             // const profileImg = await base64ToURL(dataUrl);
             setProfileImage(dataUrl);
         }
-    };
+    }, [uploadedFiles?.data?.data]);
 
     useEffect(() => {
         const defaultValues = {
@@ -222,11 +228,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
         Object.entries(defaultValues).forEach(([key, value]) => {
             setValue(key, value);
         });
-    }, [states?.user]);
+    }, [states?.user, setValue]);
 
     useEffect(() => {
         setImgProfile();
-    }, [uploadedFiles?.data.data[0]?.urls[0]]);
+    }, [setImgProfile]);
 
     return (
         <form

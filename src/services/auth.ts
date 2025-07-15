@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { getCookie, setCookies } from 'cookies-next';
+import { getCookie, setCookie } from 'cookies-next';
 import { GenericResponse, http } from './http';
 import {
     LoginRequestProp,

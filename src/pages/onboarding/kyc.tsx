@@ -67,7 +67,7 @@ export default function KycOnboarding() {
             states?.setActiveAccount(states?.user?.currentKyc?.accountType);
             // setAccounType(states?.user?.currentKyc?.accountType);
         }
-    }, [states?.activeKyc?.accountType, accountTypes?.data]);
+    }, [states?.activeKyc?.accountType, accountTypes?.data, states]);
 
     useEffect(() => {
         if (states?.activeAccount) {

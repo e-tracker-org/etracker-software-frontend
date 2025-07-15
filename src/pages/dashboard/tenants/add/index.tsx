@@ -131,11 +131,14 @@ export default function AddTenant() {
     };
 
     const handleInviteTenant = async () => {
+        const subscriptionStatus = await getSubscriptionStatus(
+            states?.user?.email || ''
+        );
 
-        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
-        
         if (subscriptionStatus !== 'active') {
-            toast.error('You need an active subscription to perform this action.');
+            toast.error(
+                'You need an active subscription to perform this action.'
+            );
             return;
         }
 
@@ -222,17 +225,17 @@ export default function AddTenant() {
 
             fetchTenantDropdownItems();
         }
-    }, [searchTerm]);
+    }, [searchTerm, getLandlordTenants]);
 
     const handleAddTenant = () => {
         let propId;
-            if (id) {
-                propId = id;
-            } else if (selectedPropertyId) {
-                propId = selectedPropertyId;
-            } else if (states?.propertyId) {
-                propId = states?.propertyId;
-            }
+        if (id) {
+            propId = id;
+        } else if (selectedPropertyId) {
+            propId = selectedPropertyId;
+        } else if (states?.propertyId) {
+            propId = states?.propertyId;
+        }
         // @ts-ignore
         const propertyId: string = propId;
 

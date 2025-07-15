@@ -1,28 +1,28 @@
 import { useAppStore } from 'hooks/useAppStore';
 import { useRouter } from 'next/router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 const IdleTimeout = ({ timeoutSeconds }: { timeoutSeconds: number }) => {
     const logoutTimer = useRef<NodeJS.Timeout | null>(null);
     const states = useAppStore();
     const router = useRouter();
 
-    const startLogoutTimer = () => {
-        logoutTimer.current = setTimeout(logout, timeoutSeconds * 1000);
-    };
+    const logout = useCallback(() => {
+        // Perform the logout action here
+        // e.g., clear session data, redirect to login page, etc.
+        states?.signout();
+    }, [states]);
 
-    const resetLogoutTimer = () => {
+    const startLogoutTimer = useCallback(() => {
+        logoutTimer.current = setTimeout(logout, timeoutSeconds * 1000);
+    }, [logout, timeoutSeconds]);
+
+    const resetLogoutTimer = useCallback(() => {
         if (logoutTimer.current) {
             clearTimeout(logoutTimer.current);
             startLogoutTimer();
         }
-    };
-
-    const logout = () => {
-        // Perform the logout action here
-        // e.g., clear session data, redirect to login page, etc.
-        states?.signout();
-    };
+    }, [startLogoutTimer]);
 
     useEffect(() => {
         startLogoutTimer();
@@ -43,7 +43,7 @@ const IdleTimeout = ({ timeoutSeconds }: { timeoutSeconds: number }) => {
                 clearTimeout(logoutTimer.current);
             }
         };
-    }, []);
+    }, [resetLogoutTimer, startLogoutTimer]);
 
     return <></>; // Placeholder component, can be omitted
 };

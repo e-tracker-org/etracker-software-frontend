@@ -185,7 +185,9 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
     };
 
     const createFileList = (fileName: string): FileList => {
-        const file = new File([], fileName, { type: 'application/octet-stream' }); // Create an empty file with the given file name
+        const file = new File([], fileName, {
+            type: 'application/octet-stream',
+        }); // Create an empty file with the given file name
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
@@ -229,7 +231,7 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
             setFiles((prevFiles) => [...prevFiles, ...updatedDocs]);
             setHandleFileChangeCalled(false); // Reset the flag after useEffect runs
         }
-    }, [uploadedFiles, handleFileChangeCalled, states?.step]);
+    }, [uploadedFiles, handleFileChangeCalled, states?.step, files]);
 
     return (
         <section className="h-screen py-18 mt-20">
@@ -261,24 +263,26 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                             selectDivClassName="bg-white"
                             onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                 const selectedTypeID: any[] = [];
-                                    console.log(e.target.value, 'value>>>', selectedTypeID);
-                                    setIdType(e.target.value);
-                                    const selectedOption =
-                                        e.target.selectedOptions[0];
-                                    if (selectedOption)
-                                        selectedTypeID.push(
-                                            selectedOption.getAttribute(
-                                                'data-id'
-                                            )
-                                        );
+                                console.log(
+                                    e.target.value,
+                                    'value>>>',
+                                    selectedTypeID
+                                );
+                                setIdType(e.target.value);
+                                const selectedOption =
+                                    e.target.selectedOptions[0];
+                                if (selectedOption)
+                                    selectedTypeID.push(
+                                        selectedOption.getAttribute('data-id')
+                                    );
 
-                                    setTypeIDs(selectedTypeID);
+                                setTypeIDs(selectedTypeID);
                             }}
                             // register={{
                             //     onChange: (
                             //         e: ChangeEvent<HTMLSelectElement>
                             //     ) => {
-                                    
+
                             //         const selectedTypeID: any[] = [];
                             //         console.log(e.target.value, 'value>>>', selectedTypeID);
                             //         setIdType(e.target.value);
@@ -299,17 +303,18 @@ export const DocumentUpload: FC<DocumentFormProps> = ({ page }) => {
                             <option selected value="">
                                 Select
                             </option>
-                            {fileTypes && fileTypeOptions.map((ftype, i) => {
-                                return (
-                                    <option
-                                        key={i}
-                                        value={ftype.id}
-                                        data-id={ftype?.typeID}
-                                    >
-                                        {ftype.name}
-                                    </option>
-                                );
-                            })}
+                            {fileTypes &&
+                                fileTypeOptions.map((ftype, i) => {
+                                    return (
+                                        <option
+                                            key={i}
+                                            value={ftype.id}
+                                            data-id={ftype?.typeID}
+                                        >
+                                            {ftype.name}
+                                        </option>
+                                    );
+                                })}
                         </Select>
                         {Number(selectedIdType?.askForDocID) > 0 && (
                             <Input

@@ -80,7 +80,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             states?.resetTenantState();
             router.push('/auth/signin');
         }
-    }, [userProfile, isLoading, states?.activeKyc]);
+    }, [userProfile, isLoading, states?.activeKyc, router, states]);
 
     useEffect(() => {
         if (acctType && acctType.accountType) {
