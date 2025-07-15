@@ -46,7 +46,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         setIsOpen(false);
     };
 
-    const toggleSidenav = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+    const toggleSidenav = (
+        e: React.MouseEvent<HTMLButtonElement | SVGElement, MouseEvent>
+    ) => {
         e.preventDefault();
         setSidenavOpen((isSidenavOpen) => !isSidenavOpen);
     };
@@ -123,17 +125,26 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     />
                 </div>
             </DialogModal>
+
+            {/* Mobile backdrop overlay */}
+            {isSidenavOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-[99] md:hidden"
+                    onClick={() => setSidenavOpen(false)}
+                />
+            )}
+
             <Sidebar
                 role={role}
                 isSidenavOpen={isSidenavOpen}
                 setSidenavOpen={setSidenavOpen}
             />
-            <section className="ml-0 md:ml-[234px] w-full md:w-[calc(100%-234px)]">
+            <section className="ml-0 md:ml-[234px] min-h-screen transition-all duration-300">
                 <Header
                     isSidenavOpen={isSidenavOpen}
                     toggleSidenav={toggleSidenav}
                 />
-                <main className="bg-white md:bg-[#F5F5F5] min-h-[calc(100vh-96px)] pt-4 pb-16 px-[3.5%]">
+                <main className="bg-white md:bg-[#F5F5F5] pt-2 pb-16 px-[3.5%] min-h-[calc(100vh-80px)]">
                     {children}
                 </main>
             </section>

@@ -16,16 +16,14 @@ import {
     HiOutlineLockClosed,
     HiOutlineEye,
     HiOutlineEyeOff,
+    HiOutlineMail,
 } from 'react-icons/hi';
-import NavLink from 'components/base/NavLink';
 import { useMutation } from 'react-query';
 import { useAppStore } from 'hooks/useAppStore';
-import { AxiosError } from 'axios';
 import { MutationKey } from 'react-query';
 import Loader from 'components/base/Loader';
 import { KycStatus } from 'interfaces';
 import useLandlord from 'hooks/useLandlord';
-import Footer from 'layouts/home/Footer';
 import { createHistory } from 'services/newServices/history';
 
 const schema = yup.object({
@@ -41,7 +39,9 @@ const schema = yup.object({
 function Signin() {
     const [isForgottenPassword, setIsForgottenPassword] = useState(false);
     const [showMessage, setShowMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
     const mutationKey: MutationKey = 'userLogin';
     const [isError, setIsError] = useState(false);
     const { mutateAsync: loginAsync, isLoading } = useMutation(
@@ -56,10 +56,11 @@ function Signin() {
 
     // check if user is already logged in
     useEffect(() => {
-        if (states?.isAuthenticated) {
+        if (states?.isAuthenticated && !isNavigating) {
+            setIsNavigating(true);
             router.push('/dashboard');
         }
-    }, [states?.isAuthenticated, router]);
+    }, [states?.isAuthenticated, router, isNavigating]);
 
     const {
         mutate,
@@ -70,7 +71,6 @@ function Signin() {
         onSuccess(data: any) {
             setIsError(false);
             setShowMessage(data?.message + '! you can login');
-            // toast.error(data?.message, { id: 'info' });
             router.push('/auth/signin');
         },
         onError(error: any) {
@@ -104,6 +104,12 @@ function Signin() {
     const onSubmit = async (values: any) => {
         console.log('routeQuery>>>', router.query);
 
+        // Prevent multiple submissions
+        if (isLoading || isNavigating) return;
+
+        // Clear previous error message
+        setErrorMessage('');
+
         if (propertyId) {
             values.propertyId = propertyId;
         }
@@ -130,9 +136,9 @@ function Signin() {
                         !data?.data?.user?.currentKyc
                     ) {
                         // Handle new user onboarding
-                        // Code for new user onboarding here
+                        setIsNavigating(true);
                         window.location.href = '/onboarding';
-                        // return router.push('/onboarding');
+                        return;
                     }
 
                     // ongoing Kyc active
@@ -142,7 +148,7 @@ function Signin() {
                             KycStatus.INCOMPLETE
                     ) {
                         // Handle incomplete KYC
-                        // Code for incomplete KYC here
+                        setIsNavigating(true);
                         return router.push('/onboarding/kyc');
                     }
 
@@ -161,6 +167,7 @@ function Signin() {
                     }
 
                     if (tenantId && propertyId) {
+                        setIsNavigating(true);
                         return confirmTenant({
                             tenantId: tenantId.toString(),
                             propertyId: propertyId.toString(),
@@ -171,7 +178,7 @@ function Signin() {
                                 const landlordId = res.data?.current_owner; // Extract landlord ID from response data
                                 if (landlordId) {
                                     // After confirming tenant, create history
-                                    createHistory(
+                                    return createHistory(
                                         tenantId.toString(), // Pass user ID
                                         data.data.user.email, // Pass user email
                                         landlordId, // Pass landlord ID
@@ -182,35 +189,46 @@ function Signin() {
                                                 'History created:',
                                                 historyRes
                                             );
-                                            router.push(
+                                            return router.push(
                                                 '/dashboard/properties'
                                             );
                                         })
                                         .catch((historyError) => {
+                                            setIsNavigating(false);
                                             toast.error(historyError.message);
+                                            throw historyError;
                                         });
                                 }
                             })
                             .catch((errors) => {
+                                setIsNavigating(false);
                                 toast.error(errors.message);
+                                throw errors;
                             });
                     } else {
-                        setShowMessage(data?.message);
-                        setTimeout(() => {
-                            router.push('/dashboard/properties');
-                        }, 2000);
+                        // Don't set showMessage if we're about to navigate
+                        setIsNavigating(true);
+                        return new Promise((resolve) => {
+                            setTimeout(() => {
+                                router
+                                    .push('/dashboard/properties')
+                                    .then(resolve);
+                            }, 100);
+                        });
                     }
                 }
-                setShowMessage(data?.message);
-
-                // toast.success(data.message ?? 'Login successful');
+                // Remove duplicate setShowMessage - it's already set above when needed
             })
             .catch((error) => {
-                error && toast.error('Something went wrong please try again');
-                // toast.error(error?.message);
+                console.log('Login error:', error);
+                setIsNavigating(false);
+                // Show the specific error message on the form
+                const errorMsg =
+                    error?.response?.data?.message ||
+                    error?.message ||
+                    'Something went wrong please try again';
+                setErrorMessage(errorMsg);
             });
-
-        // mutate(values);
     };
 
     useEffect(() => {
@@ -220,7 +238,8 @@ function Signin() {
     }, [router?.query?.token, mutate]);
 
     useEffect(() => {
-        if (states?.token) {
+        if (states?.token && !router.asPath.includes('?') && !isNavigating) {
+            setIsNavigating(true);
             if (states?.user?.accountTypes?.includes(states?.activeAccount)) {
                 router.push('/dashboard');
             } else {
@@ -232,6 +251,7 @@ function Signin() {
         states?.user?.accountTypes,
         states?.activeAccount,
         router,
+        isNavigating,
     ]);
 
     return (
@@ -239,212 +259,265 @@ function Signin() {
             {isVerifyLoading ? (
                 <Loader loading={isVerifyLoading} />
             ) : (
-                <>
-                    <section className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-                        {/* Hero Banner - Enhanced with overlay */}
-                        <div className="relative h-[120px] md:h-[200px] lg:h-[280px] md:ml-[-15%] lg:ml-[-8%] w-[105vw] 4xl:-ml-[25%] bg-[url('/hero-banner.png')] bg-cover bg-center bg-no-repeat">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-indigo-900/20"></div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                <div className="min-h-screen flex">
+                    {/* Left Side - Image Panel */}
+                    <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-blue-900 to-indigo-900">
+                        <div className="absolute inset-0">
+                            <Image
+                                src="https://images.pexels.com/photos/1446378/pexels-photo-1446378.jpeg"
+                                alt="Modern building architecture"
+                                fill
+                                className="object-cover"
+                                priority
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-indigo-900/30"></div>
                         </div>
 
-                        {/* Main Content Container */}
-                        <div className="relative -mt-8 md:-mt-12 lg:-mt-16">
-                            <div className="max-w-md mx-auto px-6 pb-12">
-                                {/* Card Container */}
-                                <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-                                    {/* Header Section */}
-                                    <div className="px-8 pt-8 pb-6 text-center">
-                                        <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                                            <HiOutlineLockClosed className="w-8 h-8 text-white" />
-                                        </div>
-                                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                                            Welcome Back
-                                        </h2>
-                                        <p className="text-gray-600 text-sm">
-                                            Sign in to your{' '}
-                                            <span className="font-semibold text-blue-600">
-                                                E-tracka
-                                            </span>{' '}
-                                            account
-                                        </p>
+                        {/* Content Overlay */}
+                        <div className="relative z-10 flex flex-col justify-center px-12 text-white">
+                            <div className="max-w-md">
+                                <h2 className="text-4xl font-bold mb-6">
+                                    Welcome Back
+                                </h2>
+                                <p className="text-xl text-blue-100 mb-8">
+                                    Access your property management dashboard
+                                    and continue managing your real estate
+                                    portfolio.
+                                </p>
+                                <div className="space-y-4">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
+                                        <span className="text-blue-100">
+                                            Quick property insights
+                                        </span>
                                     </div>
-
-                                    {/* Success/Error Message */}
-                                    {!!showMessage && (
-                                        <div className="mx-8 mb-6">
-                                            <div className="rounded-xl py-4 px-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 flex items-center justify-between">
-                                                <div className="flex items-center">
-                                                    <div className="w-2 h-2 bg-emerald-500 rounded-full mr-3"></div>
-                                                    <p className="text-emerald-800 text-sm font-medium">
-                                                        {showMessage}
-                                                    </p>
-                                                </div>
-                                                <button
-                                                    onClick={() =>
-                                                        setShowMessage('')
-                                                    }
-                                                    className="text-emerald-600 hover:text-emerald-800 font-bold text-lg leading-none"
-                                                >
-                                                    ×
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Form Section */}
-                                    <div className="px-8 pb-8">
-                                        <form
-                                            onSubmit={handleSubmit(onSubmit)}
-                                            className="space-y-6"
-                                        >
-                                            {/* Email Input */}
-                                            <div className="relative">
-                                                <Input
-                                                    label="Email Address"
-                                                    placeholder="Enter your email address"
-                                                    type="email"
-                                                    required
-                                                    error={errors.email}
-                                                    register={{
-                                                        ...register('email'),
-                                                    }}
-                                                    className="rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500 pl-12 h-14 text-base transition-all duration-200"
-                                                    rightElement={
-                                                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                                                            <HiOutlineUser className="w-5 h-5 text-gray-400" />
-                                                        </div>
-                                                    }
-                                                />
-                                            </div>
-
-                                            {/* Password Input */}
-                                            <div className="relative">
-                                                <Input
-                                                    label="Password"
-                                                    placeholder="Enter your password"
-                                                    type={
-                                                        showPassword
-                                                            ? 'text'
-                                                            : 'password'
-                                                    }
-                                                    required
-                                                    error={errors.password}
-                                                    register={{
-                                                        ...register('password'),
-                                                    }}
-                                                    className="rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500 pl-12 pr-12 h-14 text-base transition-all duration-200"
-                                                    rightElement={
-                                                        <>
-                                                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                                                                <HiOutlineLockClosed className="w-5 h-5 text-gray-400" />
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={
-                                                                    togglePasswordVisibility
-                                                                }
-                                                                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                                                            >
-                                                                {showPassword ? (
-                                                                    <HiOutlineEyeOff className="w-5 h-5" />
-                                                                ) : (
-                                                                    <HiOutlineEye className="w-5 h-5" />
-                                                                )}
-                                                            </button>
-                                                        </>
-                                                    }
-                                                />
-                                            </div>
-
-                                            {/* Forgot Password & Resend Token */}
-                                            <div className="flex items-center justify-between text-sm">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        if (
-                                                            typeof window !==
-                                                                'undefined' &&
-                                                            window.innerWidth >=
-                                                                768
-                                                        ) {
-                                                            togglePasswordRecovery();
-                                                        } else {
-                                                            handleMobileForgotPassword();
-                                                        }
-                                                    }}
-                                                    className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                                                >
-                                                    Forgot Password?
-                                                </button>
-                                                {isError && (
-                                                    <button
-                                                        type="button"
-                                                        className="text-amber-600 hover:text-amber-700 font-medium transition-colors"
-                                                    >
-                                                        Resend token
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            {/* Submit Button */}
-                                            <Button
-                                                className="w-full h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
-                                                title="Sign In"
-                                                isLoading={isLoading}
-                                                disabled={isLoading}
-                                            />
-
-                                            {/* Divider */}
-                                            <div className="flex items-center my-8">
-                                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-                                                <span className="px-4 text-gray-500 text-sm font-medium">
-                                                    or
-                                                </span>
-                                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-                                            </div>
-
-                                            {/* Google OAuth Button - Commented out */}
-                                            {/* <button
-                                                onClick={AuthService.OAuthLogin}
-                                                type="button"
-                                                className="w-full h-14 border-2 border-gray-200 rounded-xl flex items-center justify-center space-x-3 hover:bg-gray-50 transition-colors group"
-                                            >
-                                                <Image
-                                                    src="/google.svg"
-                                                    alt="Google"
-                                                    width={20}
-                                                    height={20}
-                                                />
-                                                <span className="text-gray-700 font-medium">Continue with Google</span>
-                                            </button> */}
-
-                                            {/* Sign Up Link */}
-                                            <div className="text-center pt-4">
-                                                <p className="text-gray-600 text-sm">
-                                                    Do not have an account?{' '}
-                                                    <Link
-                                                        href="/auth/signup"
-                                                        className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
-                                                    >
-                                                        Sign Up
-                                                    </Link>
-                                                </p>
-                                            </div>
-                                        </form>
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
+                                        <span className="text-blue-100">
+                                            Tenant communication tools
+                                        </span>
                                     </div>
-                                </div>
-
-                                {/* Footer Info */}
-                                <div className="text-center mt-8 px-4">
-                                    <p className="text-gray-500 text-xs">
-                                        Secure property management platform
-                                    </p>
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
+                                        <span className="text-blue-100">
+                                            Financial reporting
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </section>
-                    {/* <Footer /> */}
-                </>
+                    </div>
+
+                    {/* Right Side - Form Panel */}
+                    <div className="w-full lg:w-1/2 flex items-center justify-center p-4 bg-gray-50">
+                        <div className="w-full max-w-md">
+                            {/* Header */}
+                            <div className="text-center mb-8">
+                                <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                    <HiOutlineLockClosed className="w-8 h-8 text-white" />
+                                </div>
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                    Welcome Back
+                                </h1>
+                                <p className="text-gray-600">
+                                    Sign in to your{' '}
+                                    <span className="font-semibold text-blue-600">
+                                        E-tracka
+                                    </span>{' '}
+                                    account
+                                </p>
+                            </div>
+
+                            {/* Card */}
+                            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+                                {/* Success Message */}
+                                {!!showMessage && (
+                                    <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+                                        <div className="flex items-center">
+                                            <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                            <p className="text-green-800 text-sm font-medium">
+                                                {showMessage}
+                                            </p>
+                                            <button
+                                                onClick={() =>
+                                                    setShowMessage('')
+                                                }
+                                                className="ml-auto text-green-600 hover:text-green-800"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Error Message */}
+                                {!!errorMessage && (
+                                    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                                        <div className="flex items-center">
+                                            <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                            <p className="text-red-800 text-sm font-medium">
+                                                {errorMessage}
+                                            </p>
+                                            <button
+                                                onClick={() =>
+                                                    setErrorMessage('')
+                                                }
+                                                className="ml-auto text-red-600 hover:text-red-800"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Form */}
+                                <form
+                                    onSubmit={handleSubmit(onSubmit)}
+                                    className="space-y-6"
+                                >
+                                    {/* Email Input */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Email Address
+                                        </label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <HiOutlineMail className="h-5 w-5 text-gray-400" />
+                                            </div>
+                                            <input
+                                                type="email"
+                                                placeholder="Enter your email address"
+                                                {...register('email')}
+                                                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                            />
+                                        </div>
+                                        {errors.email && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {String(errors.email.message)}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Password Input */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Password
+                                        </label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <HiOutlineLockClosed className="h-5 w-5 text-gray-400" />
+                                            </div>
+                                            <input
+                                                type={
+                                                    showPassword
+                                                        ? 'text'
+                                                        : 'password'
+                                                }
+                                                placeholder="Enter your password"
+                                                {...register('password')}
+                                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={
+                                                    togglePasswordVisibility
+                                                }
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                            >
+                                                {showPassword ? (
+                                                    <HiOutlineEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                                                ) : (
+                                                    <HiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                                                )}
+                                            </button>
+                                        </div>
+                                        {errors.password && (
+                                            <p className="mt-1 text-sm text-red-600">
+                                                {String(
+                                                    errors.password.message
+                                                )}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Forgot Password Link */}
+                                    <div className="flex items-center justify-between">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (
+                                                    typeof window !==
+                                                        'undefined' &&
+                                                    window.innerWidth >= 768
+                                                ) {
+                                                    togglePasswordRecovery();
+                                                } else {
+                                                    handleMobileForgotPassword();
+                                                }
+                                            }}
+                                            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                                        >
+                                            Forgot Password?
+                                        </button>
+                                        {isError && (
+                                            <button
+                                                type="button"
+                                                className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+                                            >
+                                                Resend token
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {/* Submit Button */}
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading || isNavigating}
+                                        className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                                    >
+                                        {isLoading
+                                            ? 'Signing in...'
+                                            : isNavigating
+                                            ? 'Redirecting...'
+                                            : 'Sign In'}
+                                    </button>
+
+                                    {/* Divider */}
+                                    <div className="relative">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <div className="w-full border-t border-gray-300" />
+                                        </div>
+                                        <div className="relative flex justify-center text-sm">
+                                            <span className="px-2 bg-white text-gray-500">
+                                                or
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Sign Up Link */}
+                                    <div className="text-center">
+                                        <span className="text-sm text-gray-600">
+                                            Don't have an account?{' '}
+                                            <Link
+                                                href="/auth/signup"
+                                                className="font-medium text-blue-600 hover:text-blue-700"
+                                            >
+                                                Sign Up
+                                            </Link>
+                                        </span>
+                                    </div>
+                                </form>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="text-center mt-8">
+                                <p className="text-xs text-gray-500">
+                                    Secure property management platform
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
             {isForgottenPassword && (
                 <PasswordRecoveryModal

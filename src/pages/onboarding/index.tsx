@@ -54,7 +54,7 @@ export default function Onboarding() {
                                         states?.setActiveAccount(
                                             account?.typeID
                                         );
-                                        router.replace('/onboarding/kyc');
+                                        router.push('/onboarding/kyc');
                                     }}
                                 >
                                     <div className="ml-5">

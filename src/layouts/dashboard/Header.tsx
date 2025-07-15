@@ -22,7 +22,9 @@ import { getSubscriptionStatus } from 'utils/subscriptionUtils';
 type HeaderProps = {
     variant?: 'onboarding' | 'default';
     isSidenavOpen?: boolean;
-    toggleSidenav?: (e: React.MouseEvent<SVGElement, MouseEvent>) => void;
+    toggleSidenav?: (
+        e: React.MouseEvent<HTMLButtonElement | SVGElement, MouseEvent>
+    ) => void;
 };
 
 export default function Header({
@@ -166,7 +168,7 @@ export default function Header({
                     </div>
                 )}
 
-                <div className="px-[5%] py-4 max-w-7xl mx-auto">
+                <div className="px-[5%] py-3 max-w-7xl mx-auto">
                     <div className="hidden md:flex justify-between items-center w-full">
                         <div className="flex-1"></div>
                         <div className="flex items-center gap-6">
@@ -204,11 +206,11 @@ export default function Header({
                                                 {states?.user?.firstname}
                                             </span>
                                             <span className="text-xs text-gray-500">
-                                                View Profile
+                                                Click for menu
                                             </span>
                                         </div>
                                         <svg
-                                            className="w-4 h-4 text-gray-400"
+                                            className="w-4 h-4 text-gray-400 ml-2"
                                             fill="none"
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"
@@ -227,7 +229,30 @@ export default function Header({
                                 <li>
                                     <Link
                                         className="hover:bg-gray-50 py-3 px-4 block whitespace-nowrap transition-colors duration-200 rounded-lg mx-2 flex items-center gap-3"
+                                        href="/dashboard/profile"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <svg
+                                            className="w-4 h-4 text-gray-500"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                            />
+                                        </svg>
+                                        Profile
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        className="hover:bg-gray-50 py-3 px-4 block whitespace-nowrap transition-colors duration-200 rounded-lg mx-2 flex items-center gap-3"
                                         href="/dashboard"
+                                        onClick={() => setIsOpen(false)}
                                     >
                                         <svg
                                             className="w-4 h-4 text-gray-500"
@@ -252,14 +277,16 @@ export default function Header({
                                     </Link>
                                 </li>
                                 <li>
-                                    <a
-                                        className="hover:bg-red-50 py-3 px-4 whitespace-nowrap flex items-center gap-3 transition-colors duration-200 rounded-lg mx-2 text-red-600"
-                                        href="#"
-                                        onClick={states?.signout}
+                                    <button
+                                        className="hover:bg-red-50 py-3 px-4 whitespace-nowrap flex items-center gap-3 transition-colors duration-200 rounded-lg mx-2 text-red-600 w-full text-left"
+                                        onClick={() => {
+                                            setIsOpen(false);
+                                            states?.signout();
+                                        }}
                                     >
                                         <FiLogOut className="w-4 h-4" />
                                         <span>Sign Out</span>
-                                    </a>
+                                    </button>
                                 </li>
                             </Dropdown>
                         </div>
@@ -276,13 +303,46 @@ export default function Header({
                             />
                         </Link>
 
-                        <button
-                            onClick={toggleSidenav}
-                            className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                            title="Open menu"
-                        >
-                            <HiOutlineMenuAlt3 className="w-8 h-8 text-gray-700" />
-                        </button>
+                        <div className="flex items-center gap-4">
+                            {/* Mobile Profile Avatar */}
+                            <Link
+                                href="/dashboard/profile"
+                                className="flex items-center gap-3"
+                            >
+                                <div className="w-8 h-8 relative rounded-full overflow-hidden ring-2 ring-gray-100">
+                                    {uploadedFiles?.data?.data[0]?.urls[0] ? (
+                                        loadinguploadFiles ? (
+                                            <div className="w-full h-full bg-gray-100 animate-pulse flex items-center justify-center">
+                                                <Spinner className="h-4 w-4" />
+                                            </div>
+                                        ) : (
+                                            <Image
+                                                src={`${uploadedFiles?.data?.data[0]?.urls[0]}`}
+                                                alt="Profile"
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        )
+                                    ) : (
+                                        <div className="w-full h-full bg-primary-100 flex items-center justify-center">
+                                            <span className="text-primary-600 font-semibold text-sm">
+                                                {states?.user?.firstname
+                                                    ?.charAt(0)
+                                                    ?.toUpperCase()}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            </Link>
+
+                            <button
+                                onClick={toggleSidenav}
+                                className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                                title="Open menu"
+                            >
+                                <HiOutlineMenuAlt3 className="w-6 h-6 text-gray-700" />
+                            </button>
+                        </div>
                     </nav>
                 </div>
 

@@ -44,16 +44,16 @@ export default function MobileNav() {
                 onClick={() => setOpen((o) => !o)}
                 className={`fixed inset-0 xl:hidden z-50 transition-all duration-300 ${
                     open ? 'opacity-100 visible' : 'opacity-0 invisible'
-                } bg-black`}
+                } bg-black/70 backdrop-blur-sm`}
             >
                 <div
-                    className={`bg-white h-full w-80 max-w-[85vw] ml-auto shadow-2xl transform transition-transform duration-300 ease-out ${
+                    className={`bg-white h-screen w-80 max-w-[85vw] ml-auto shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${
                         open ? 'translate-x-0' : 'translate-x-full'
                     }`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                    <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-white">
                         <h2 className="text-lg font-semibold text-gray-900">
                             Menu
                         </h2>
@@ -78,7 +78,7 @@ export default function MobileNav() {
                     </div>
 
                     {/* Navigation Links */}
-                    <nav className="flex flex-col p-6 space-y-1">
+                    <nav className="flex flex-col p-6 space-y-1 bg-white flex-1">
                         <Link
                             href="/"
                             className="text-black font-medium capitalize nav-link px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors duration-200"
@@ -106,7 +106,7 @@ export default function MobileNav() {
                     </nav>
 
                     {/* Auth Buttons */}
-                    <div className="px-6 py-4 border-t border-gray-100 mt-auto">
+                    <div className="px-6 py-4 border-t border-gray-100 bg-white">
                         <div className="flex flex-col gap-3 mb-6">
                             <Link href="/auth/signup" className="nav-link">
                                 <button className="bg-primary-600 hover:bg-primary-700 rounded-xl px-6 py-3 text-white font-semibold w-full transition-colors duration-200">

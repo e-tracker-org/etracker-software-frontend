@@ -33,7 +33,7 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
     }, []);
 
     useEffect(() => {
-        setSearchTerm(states?.searchParam as string);
+        setSearchTerm(states?.searchParam || '');
     }, [states?.searchParam]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -96,7 +96,7 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
                         onClick={() => {
                             const isUserVerify = goBackToKyc2(states, router);
                             if (isUserVerify) {
-                                router.replace('/dashboard/properties/add');
+                                router.push('/dashboard/properties/add');
                             }
                             // if (
                             //     states?.activeKyc?.status ===
@@ -209,7 +209,7 @@ const Header = ({ propertyCount }: { propertyCount?: number }) => {
                             <path
                                 d="M21.3197 0.666504H0.653028C0.565785 0.673235 0.484313 0.712709 0.424962 0.777006C0.36561 0.841304 0.332769 0.925668 0.333028 1.01317V2.15984C0.332227 2.27737 0.354801 2.39388 0.399436 2.50261C0.444071 2.61134 0.509878 2.71011 0.593028 2.79317L8.59303 10.7932V17.4598L13.4264 19.8665V10.7798L21.4264 2.77984C21.5794 2.61475 21.6651 2.39829 21.6664 2.17317V1.01317C21.6664 0.921229 21.6298 0.833053 21.5648 0.76804C21.4998 0.703028 21.4116 0.666504 21.3197 0.666504Z"
                                 fill="#131313"
-                                fill-opacity="0.8"
+                                fillOpacity="0.8"
                             />
                         </svg>
                         <span>Filter</span>

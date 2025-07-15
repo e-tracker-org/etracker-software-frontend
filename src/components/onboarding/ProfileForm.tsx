@@ -71,6 +71,19 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
+        defaultValues: {
+            firstname: '',
+            lastname: '',
+            email: '',
+            phone: '',
+            fullAddress: '',
+            state: '',
+            area: '',
+            landmark: '',
+            dob: '',
+            gender: '',
+            country: '',
+        },
     });
 
     const editorRef = useRef<AvatarEditor>(null);
@@ -173,7 +186,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
             createKycProfileAsync(formDataObj)
                 .then((res) => {
                     const newKycStage =
-                        res?.data?.currentKyc?.kycStage + 1 ?? 1;
+                        (res?.data?.currentKyc?.kycStage ?? 0) + 1;
                     states?.setActiveKyc(res?.data?.currentKyc);
                     states?.setStep(newKycStage);
                     states?.setScreen('');
@@ -226,7 +239,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
         };
 
         Object.entries(defaultValues).forEach(([key, value]) => {
-            setValue(key, value);
+            if (value !== undefined && value !== null) {
+                setValue(key as keyof typeof defaultValues, value);
+            }
         });
     }, [states?.user, setValue]);
 

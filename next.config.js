@@ -6,7 +6,9 @@ const nextConfig = {
     sassOptions: {
         includePaths: [path.join(__dirname, 'styles')],
     },
-    images: { domains: ['i.pravatar.cc', 'res.cloudinary.com'] },
+    images: {
+        domains: ['i.pravatar.cc', 'res.cloudinary.com', 'images.pexels.com'],
+    },
     webpack(config) {
         config.module.rules.push({
             test: /\.svg$/,
