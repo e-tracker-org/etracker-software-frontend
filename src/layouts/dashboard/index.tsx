@@ -102,7 +102,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         return () => {
             mounted = false;
         };
-    }, [userProfile, isLoading]);
+    }, [userProfile, isLoading, router, states]);
 
     useEffect(() => {
         if (acctType && acctType.accountType) {

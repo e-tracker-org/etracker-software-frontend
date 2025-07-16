@@ -22,7 +22,7 @@ interface NotifyTenantType {
 export default function NotifyTenants() {
     const states = useAppStore();
     const router = useRouter();
-    const tenantIds = states?.selectedTenants as string | undefined;
+    const tenantIds = states?.selectedTenants;
     const {
         getTenants,
         getTenantLoading,
@@ -73,14 +73,17 @@ export default function NotifyTenants() {
     }, [tenantIds, landlordTenants]);
 
     const handleSendMessage = async () => {
+        const subscriptionStatus = await getSubscriptionStatus(
+            states?.user?.email || ''
+        );
 
-        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
-        
         if (subscriptionStatus !== 'active') {
-            toast.error('You need an active subscription to perform this action.');
+            toast.error(
+                'You need an active subscription to perform this action.'
+            );
             return;
         }
-        
+
         if (messageType === 'phone') {
             toast.error(
                 'Text message currently unavailable, send an email instead.'

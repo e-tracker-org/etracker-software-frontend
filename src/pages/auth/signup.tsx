@@ -411,9 +411,14 @@ function SignUp() {
                                 />
                                 <label className="ml-2 block text-sm text-gray-700">
                                     I agree to the{' '}
-                                    <span className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer">
+                                    <Link
+                                        href="/terms"
+                                        className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
                                         Terms and Conditions
-                                    </span>
+                                    </Link>
                                 </label>
                             </div>
                             {errors.agreed && (

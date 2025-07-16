@@ -84,48 +84,55 @@ const TenantDash: FC = () => {
 
     const allProperties = getProperties?.data.data;
 
+    // Updated FAQ array with role property
     const faqs = [
+        {
+            question: 'How can I search for rental properties on E-Tracka?',
+            answer: 'You can easily search for rental properties on E-Tracka by selecting your preferred location, property type, price range, and other filters. Our platform offers a user-friendly interface to help you find your next rental home efficiently.',
+            role: 'tenant',
+        },
         {
             question: 'Can I buy properties on E-Tracka?',
             answer: 'No, currently, E-Tracka focuses solely on rental properties. We provide a comprehensive platform for tenants to search for rental properties, check landlord backgrounds, and access property history.',
+            role: 'tenant',
         },
         {
             question: 'Do you offer services for property buyers or sellers?',
             answer: 'At the moment, E-Tracka specializes in rental property services. We do not facilitate property buying or selling transactions. However, we provide valuable tools and resources for tenants to find their ideal rental home.',
-        },
-        {
-            question: 'Can landlords list properties for sale on E-Tracka?',
-            answer: "E-Tracka's platform is designed exclusively for rental property listings. Landlords can list their rental properties to attract potential tenants, but we do not support property sales at this time.",
-        },
-        {
-            question: 'How can I search for rental properties on E-Tracka?',
-            answer: 'You can easily search for rental properties on E-Tracka by selecting your preferred location, property type, price range, and other filters. Our platform offers a user-friendly interface to help you find your next rental home efficiently.',
-        },
-        {
-            question:
-                'Do you provide assistance with property management for landlords?',
-            answer: 'Yes, E-Tracka offers tools and resources for landlords to manage their rental properties effectively. From tenant screening to rent collection, our platform supports various aspects of property management.',
+            role: 'tenant',
         },
         {
             question:
                 'Can tenants communicate directly with landlords through E-Tracka?',
             answer: 'Yes, tenants can communicate directly with landlords and property managers through our platform. We provide messaging features to facilitate seamless communication between tenants and landlords.',
+            role: 'tenant',
         },
         {
             question: 'Is E-Tracka available in all locations?',
             answer: 'E-Tracka aims to cover a wide range of locations to serve tenants and landlords effectively. While we may not be available in every area, we strive to expand our coverage based on demand and user feedback.',
+            role: 'tenant',
         },
         {
             question:
                 'How can I report issues with a rental property listed on E-Tracka?',
             answer: 'If you encounter any issues with a rental property listed on E-Tracka, please contact our support team. We take tenant feedback seriously and will address any concerns promptly.',
+            role: 'tenant',
         },
         {
             question:
                 "Are there any fees for using E-Tracka's rental services?",
             answer: "E-Tracka's rental services are free for tenants. There are no subscription fees or hidden charges. However, landlords may incur fees for premium features or additional services.",
+            role: 'tenant',
         },
     ];
+
+    // Only show tenant FAQs
+    const tenantFaqs = faqs.filter((faq) => faq.role === 'tenant');
+    // Accordion state
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const handleAccordion = (idx: number) => {
+        setOpenIndex(openIndex === idx ? null : idx);
+    };
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -209,26 +216,27 @@ const TenantDash: FC = () => {
                                 <div className="space-y-6">
                                     <button
                                         onClick={openModal}
-                                        className="w-full group focus:outline-none"
+                                        className="w-full group focus:outline-none transform transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-md rounded-xl"
                                     >
                                         <Help
                                             title="Read Our FAQs"
                                             icon={<FaqSvg />}
                                             bgColor="#DBFFCE"
-                                            className="transform transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-md rounded-xl"
                                         />
                                     </button>
-                                    <button
-                                        onClick={handleCopy}
-                                        className="w-full group focus:outline-none"
+                                    {/* Contact Support as mailto */}
+                                    <a
+                                        href="mailto:etracka@gmail.com"
+                                        className="w-full flex items-center justify-center gap-3 px-4 py-4 rounded-xl bg-[#FFF4CE] hover:bg-yellow-100 transition-all duration-300 shadow group focus:outline-none"
+                                        style={{ minHeight: '56px' }}
                                     >
-                                        <Help
-                                            title="Contact E-tracka Support"
-                                            icon={<SupportSvg />}
-                                            bgColor="#FFF4CE"
-                                            className="transform transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-md rounded-xl"
-                                        />
-                                    </button>
+                                        <span className="flex-shrink-0">
+                                            <SupportSvg />
+                                        </span>
+                                        <span className="font-medium text-base text-gray-800">
+                                            Contact E-tracka Support
+                                        </span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -342,27 +350,43 @@ const TenantDash: FC = () => {
                 contentClass="w-full max-w-3xl mx-auto"
                 className="rounded-2xl shadow-xl"
             >
+                <div className="flex items-center justify-between px-6 sm:px-8 pt-6 pb-2">
+                    <button
+                        onClick={closeModal}
+                        className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-base"
+                    >
+                        &larr; Go Back
+                    </button>
+                    <h2 className="text-xl font-bold text-center flex-1">
+                        FAQs for Tenants
+                    </h2>
+                </div>
                 <div className="px-6 sm:px-8 divide-y divide-gray-100">
-                    {faqs.map((faq, index) => (
-                        <div key={index} className="py-6">
-                            <h3 className="text-lg font-semibold mb-3">
-                                {faq.question}
-                            </h3>
-                            <p className="text-gray-600 leading-relaxed">
-                                {faq.answer}
-                            </p>
+                    {tenantFaqs.length === 0 && (
+                        <div className="py-6 text-center text-gray-500">
+                            No FAQs available.
+                        </div>
+                    )}
+                    {tenantFaqs.map((faq, idx) => (
+                        <div key={idx} className="py-2">
+                            <button
+                                className="w-full text-left flex justify-between items-center py-4 focus:outline-none"
+                                onClick={() => handleAccordion(idx)}
+                            >
+                                <span className="text-lg font-semibold">
+                                    {faq.question}
+                                </span>
+                                <span className="ml-4 text-blue-600">
+                                    {openIndex === idx ? '-' : '+'}
+                                </span>
+                            </button>
+                            {openIndex === idx && (
+                                <div className="mt-2 text-gray-700 bg-blue-50 rounded-lg p-4 animate-fade-in">
+                                    {faq.answer}
+                                </div>
+                            )}
                         </div>
                     ))}
-                </div>
-                <div className="flex justify-center mt-8 pb-8">
-                    <Button
-                        type="button"
-                        onClick={closeModal}
-                        variant="default"
-                        className="px-8 py-2.5 rounded-xl hover:shadow-md transition-all duration-300"
-                    >
-                        Close
-                    </Button>
                 </div>
             </DialogModal>
         </div>

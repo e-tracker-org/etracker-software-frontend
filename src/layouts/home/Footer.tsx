@@ -136,7 +136,7 @@ const Footer = () => {
                             </Link>
                             <Link
                                 className="text-sm text-gray-600 hover:text-primary-600"
-                                href="/"
+                                href="/terms"
                             >
                                 Terms of Service
                             </Link>

@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 import { goBackToKyc, urlSegment } from 'utils/helper';
 import IdleTimeout from 'components/base/IdleTimeOut';
 import Loader from 'components/base/Loader';
+import FAQChatbot from 'components/FAQChatbot';
 
 const DMSans = DM_Sans({
     subsets: ['latin'],
@@ -67,7 +68,7 @@ function Auth({
         return () => {
             mounted = false;
         };
-    }, [states?.token, router.pathname, isRouting]);
+    }, [states?.token, router.pathname, isRouting, router]);
 
     // Show loading state while routing
     if (isRouting) {
@@ -81,7 +82,7 @@ function Auth({
 
     return (
         <>
-            <IdleTimeout timeoutSeconds={20} />
+            <IdleTimeout timeoutSeconds={900} />
             {children}
         </>
     );
@@ -115,6 +116,7 @@ export default function App({ Component, pageProps }: AppWithSessionProps) {
                     )}
                     <BannersContainer />
                     <Toaster toastOptions={{ position: 'top-right' }} />
+                    <FAQChatbot />
                 </main>
             </Hydrate>
             <ReactQueryDevtools />

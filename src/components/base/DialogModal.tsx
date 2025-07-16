@@ -45,11 +45,12 @@ export const DialogModal: FC<DialogModalProps> = ({
         <div
             id="defaultModal"
             aria-hidden="true"
-            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50`}
+            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 touch-none`}
             onClick={closeModal}
         >
             <div
-                className={`bg-white  rounded-lg overflow-hidden ${className}`}
+                className={`bg-white  rounded-lg overflow-hidden ${className} max-h-screen overflow-y-auto w-full sm:w-auto`}
+                onClick={(e) => e.stopPropagation()}
             >
                 {/* Modal content */}
                 <div className="p-4">

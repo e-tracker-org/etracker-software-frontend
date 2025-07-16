@@ -10,19 +10,37 @@ interface PropertyProp {
 
 const Property: FC<PropertyProp> = ({ properties }) => {
     const searchParam = useAppStore<string>((state) => state.searchParam || '');
-    const [filterDetails, setFilterDetails] = useState(null);
+    interface FilterDetails {
+        state?: string;
+        propertyActive?: 'Active' | 'Off Market' | '';
+        apartmentType?: string;
+    }
+
+    const [filterDetails, setFilterDetails] = useState<FilterDetails | null>(
+        null
+    );
 
     // Move localStorage access to useEffect
     useEffect(() => {
-        const filterDetailsString = localStorage.getItem('filterDetails');
-        if (filterDetailsString) {
-            try {
-                const parsed = JSON.parse(filterDetailsString);
-                setFilterDetails(parsed);
-            } catch (e) {
-                console.error('Error parsing filter details:', e);
+        const readFilterDetails = () => {
+            const filterDetailsString = localStorage.getItem('filterDetails');
+            if (filterDetailsString) {
+                try {
+                    const parsed = JSON.parse(filterDetailsString);
+                    setFilterDetails(parsed);
+                } catch (e) {
+                    console.error('Error parsing filter details:', e);
+                }
+            } else {
+                setFilterDetails(null);
             }
-        }
+        };
+        readFilterDetails();
+        // Listen for filterChanged event
+        window.addEventListener('filterChanged', readFilterDetails);
+        return () => {
+            window.removeEventListener('filterChanged', readFilterDetails);
+        };
     }, []);
 
     const filteredProperties = useMemo(() => {
@@ -39,6 +57,7 @@ const Property: FC<PropertyProp> = ({ properties }) => {
 
         // Then apply other filters
         if (filterDetails) {
+            // @ts-ignore
             const { state, propertyActive, apartmentType } = filterDetails;
 
             filtered = filtered.filter((property: Property) => {
@@ -46,7 +65,7 @@ const Property: FC<PropertyProp> = ({ properties }) => {
                     state &&
                     !property.location.state
                         .toLowerCase()
-                        .includes(state.toLowerCase())
+                        .includes((state as string).toLowerCase())
                 ) {
                     return false;
                 }
@@ -64,6 +83,7 @@ const Property: FC<PropertyProp> = ({ properties }) => {
 
                 if (
                     apartmentType &&
+                    property.apartmentType &&
                     !property.apartmentType
                         .toLowerCase()
                         .includes(apartmentType.toLowerCase())

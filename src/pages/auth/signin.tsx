@@ -5,7 +5,7 @@ import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import toast from 'react-hot-toast';
-import { ReactElement, useState, useEffect } from 'react';
+import { ReactElement, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import PasswordRecoveryModal from 'components/PasswordRecoveryModal';
@@ -74,23 +74,26 @@ function Signin() {
     });
 
     // Consolidate navigation logic into a single function
-    const handleNavigation = async (path: string) => {
-        if (isNavigating) return;
-        setIsNavigating(true);
-        try {
-            await router.push(path);
-        } catch (error) {
-            console.error('Navigation error:', error);
-            setIsNavigating(false);
-        }
-    };
+    const handleNavigation = useCallback(
+        async (path: string) => {
+            if (isNavigating) return;
+            setIsNavigating(true);
+            try {
+                await router.push(path);
+            } catch (error) {
+                console.error('Navigation error:', error);
+                setIsNavigating(false);
+            }
+        },
+        [isNavigating, router]
+    );
 
     // Modify useEffect for auth check
     useEffect(() => {
         if (states?.isAuthenticated && !isNavigating) {
             handleNavigation('/dashboard');
         }
-    }, [states?.isAuthenticated]);
+    }, [states?.isAuthenticated, handleNavigation, isNavigating]);
 
     // Modify useEffect for token check
     useEffect(() => {
@@ -101,7 +104,14 @@ function Signin() {
                 handleNavigation('/dashboard/properties');
             }
         }
-    }, [states?.token]);
+    }, [
+        states?.token,
+        handleNavigation,
+        isNavigating,
+        router.asPath,
+        states?.activeAccount,
+        states?.user?.accountTypes,
+    ]);
 
     const togglePasswordRecovery = () => {
         setIsForgottenPassword((prev) => !prev);
@@ -137,83 +147,91 @@ function Signin() {
             values.propertyId = propertyId;
         }
 
-        try {
-            states?.setActiveKyc(undefined);
-            states?.setActiveAccount(undefined);
-            const data = await loginAsync(values);
+        states?.setActiveKyc(undefined);
+        states?.setActiveAccount(undefined);
+        // @ts-ignore: backend returns user and tokens
+        loginAsync(values)
+            .then((data: any) => {
+                states?.setStartKycScreen && states?.setStartKycScreen('');
+                reset();
 
-            if (data?.data?.tokens) {
-                states?.setUser({
-                    token: data?.data?.tokens,
-                    user: data?.data.user,
-                    isAuthenticated: true,
-                });
+                if (!!data?.data?.tokens) {
+                    states?.setUser({
+                        token: data?.data?.tokens,
+                        user: data?.data.user,
+                        isAuthenticated: true,
+                    });
 
-                // Handle different navigation scenarios
-                if (
-                    data?.data?.user?.accountTypes?.length === 0 &&
-                    !data?.data?.user?.currentKyc
-                ) {
-                    // New user onboarding
-                    await handleNavigation('/onboarding');
-                    return;
-                }
+                    if (
+                        data?.data?.user?.accountTypes?.length === 0 &&
+                        !data?.data?.user?.currentKyc
+                    ) {
+                        window.location.href = '/onboarding';
+                        return;
+                    }
 
-                if (
-                    data?.data?.user?.currentKyc?.status ===
-                    KycStatus.INCOMPLETE
-                ) {
-                    // Incomplete KYC
-                    await handleNavigation('/onboarding/kyc');
-                    return;
-                }
+                    if (
+                        data?.data?.user?.currentKyc &&
+                        data?.data?.user?.currentKyc?.status ===
+                            KycStatus.INCOMPLETE
+                    ) {
+                        router.push('/onboarding/kyc');
+                        return;
+                    }
 
-                if (
-                    data?.data?.user?.currentKyc?.status === KycStatus.COMPLETE
-                ) {
-                    // Completed KYC
-                    states?.setActiveKyc(data?.data?.user?.currentKyc);
-                    states?.setScreen('');
-                    states?.setActiveAccount(
-                        data?.data?.user?.currentKyc?.accountType
-                    );
-                }
+                    if (
+                        data?.data?.user?.currentKyc &&
+                        data?.data?.user?.currentKyc?.status ===
+                            KycStatus.COMPLETE
+                    ) {
+                        states?.setActiveKyc(data?.data?.user?.currentKyc);
+                        states?.setScreen && states?.setScreen('');
+                        states?.setActiveAccount &&
+                            states?.setActiveAccount(
+                                data?.data?.user?.currentKyc?.accountType
+                            );
+                    }
 
-                if (tenantId && propertyId) {
-                    try {
-                        const res = await confirmTenant({
+                    if (tenantId && propertyId) {
+                        confirmTenant({
                             tenantId: tenantId.toString(),
                             propertyId: propertyId.toString(),
-                        });
-
-                        const landlordId = res?.data?.current_owner;
-                        if (landlordId) {
-                            await createHistory(
-                                tenantId.toString(),
-                                data.data.user.email,
-                                landlordId,
-                                propertyId.toString()
-                            );
-                            await handleNavigation('/dashboard/properties');
-                        }
-                    } catch (error: any) {
-                        setIsNavigating(false);
-                        toast.error(error.message);
-                        throw error;
+                        })
+                            .then((res: any) => {
+                                const landlordId = res.data?.current_owner;
+                                if (landlordId) {
+                                    createHistory(
+                                        tenantId.toString(),
+                                        data.data.user.email,
+                                        landlordId,
+                                        propertyId.toString()
+                                    )
+                                        .then(() => {
+                                            router.push(
+                                                '/dashboard/properties'
+                                            );
+                                        })
+                                        .catch((historyError: any) => {
+                                            toast.error(historyError.message);
+                                        });
+                                }
+                            })
+                            .catch((errors: any) => {
+                                toast.error(errors.message);
+                            });
+                    } else {
+                        setShowMessage(data?.message);
+                        setTimeout(() => {
+                            router.push('/dashboard/properties');
+                        }, 2000);
                     }
-                } else {
-                    await handleNavigation('/dashboard/properties');
                 }
-            }
-        } catch (error: any) {
-            console.error('Login error:', error);
-            setIsNavigating(false);
-            const errorMsg =
-                error?.response?.data?.message ||
-                error?.message ||
-                'Something went wrong please try again';
-            setErrorMessage(errorMsg);
-        }
+                setShowMessage(data?.message);
+            })
+            .catch((error: any) => {
+                setIsNavigating(false);
+                toast.error('Something went wrong please try again');
+            });
     };
 
     // Update the useEffect to use verifyAccountMutate
@@ -466,7 +484,7 @@ function Signin() {
                                     {/* Sign Up Link */}
                                     <div className="text-center">
                                         <span className="text-sm text-gray-600">
-                                            Don't have an account?{' '}
+                                            Don&apos;t have an account?{' '}
                                             <Link
                                                 href="/auth/signup"
                                                 className="font-medium text-blue-600 hover:text-blue-700"

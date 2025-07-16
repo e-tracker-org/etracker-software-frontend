@@ -5,6 +5,7 @@ import Link from 'next/link';
 import PropertySearch from 'components/home/PropertySearch';
 import PropertyListingCard from 'components/dashboard/properties/property-listing/PropertyListingCard';
 import { getAllGeneralProperties } from 'services/newServices/properties';
+import { motion } from 'framer-motion';
 
 const SERVICES = [
     {
@@ -81,7 +82,13 @@ export default function Home() {
 
     return (
         <>
-            <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-primary-50">
+            <motion.section
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: 'easeOut' }}
+                className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-primary-50"
+            >
                 {/* Animated background elements */}
                 <div className="absolute inset-0">
                     <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl animate-pulse"></div>
@@ -308,17 +315,29 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* Search Section */}
-            <section className="relative bg-white py-8 md:py-12 lg:py-16 -mt-8 md:-mt-12 lg:-mt-16 z-10">
+            <motion.section
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
+                className="relative bg-white py-8 md:py-12 lg:py-16 -mt-8 md:-mt-12 lg:-mt-16 z-10"
+            >
                 <div className="max-w-7xl mx-auto px-6">
                     <PropertySearch />
                 </div>
-            </section>
+            </motion.section>
 
             {/* Properties Section */}
-            <section className="py-16 md:py-20 lg:py-24 bg-gradient-to-br from-white via-gray-50 to-white relative overflow-hidden">
+            <motion.section
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.2 }}
+                className="py-16 md:py-20 lg:py-24 bg-gradient-to-br from-white via-gray-50 to-white relative overflow-hidden"
+            >
                 {/* Decorative elements */}
                 <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white to-transparent"></div>
                 <div className="absolute top-20 right-20 w-64 h-64 bg-primary-100/30 rounded-full blur-3xl"></div>
@@ -399,13 +418,33 @@ export default function Home() {
                         </div>
                     </div>
 
-                    {/* Properties Grid */}
-                    <div className="relative">
+                    {/* Properties Grid - staggered cards */}
+                    <motion.div
+                        className="relative"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.2 }}
+                        variants={{
+                            visible: { transition: { staggerChildren: 0.15 } },
+                            hidden: {},
+                        }}
+                    >
                         {loading ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {[1, 2, 3].map((i) => (
-                                    <div
+                                    <motion.div
                                         key={i}
+                                        variants={{
+                                            hidden: { opacity: 0, y: 40 },
+                                            visible: {
+                                                opacity: 1,
+                                                y: 0,
+                                                transition: {
+                                                    duration: 0.6,
+                                                    ease: 'easeOut',
+                                                },
+                                            },
+                                        }}
                                         className="bg-white rounded-3xl shadow-lg overflow-hidden animate-pulse"
                                     >
                                         <div className="h-64 bg-gray-200"></div>
@@ -414,17 +453,41 @@ export default function Home() {
                                             <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                                             <div className="h-8 bg-gray-200 rounded w-1/2"></div>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
                         ) : Array.isArray(properties) &&
                           properties.length > 0 ? (
                             <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                                <motion.div
+                                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    viewport={{ once: true, amount: 0.2 }}
+                                    variants={{
+                                        visible: {
+                                            transition: {
+                                                staggerChildren: 0.15,
+                                            },
+                                        },
+                                        hidden: {},
+                                    }}
+                                >
                                     {properties.map((property, index) => (
                                         // @ts-ignore
-                                        <div
+                                        <motion.div
                                             key={property?.id}
+                                            variants={{
+                                                hidden: { opacity: 0, y: 40 },
+                                                visible: {
+                                                    opacity: 1,
+                                                    y: 0,
+                                                    transition: {
+                                                        duration: 0.6,
+                                                        ease: 'easeOut',
+                                                    },
+                                                },
+                                            }}
                                             className="group relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden border border-gray-100"
                                             style={{
                                                 animationDelay: `${
@@ -463,9 +526,9 @@ export default function Home() {
                                             <PropertyListingCard
                                                 property={property}
                                             />
-                                        </div>
+                                        </motion.div>
                                     ))}
-                                </div>
+                                </motion.div>
 
                                 {/* View More Button */}
                                 <div className="text-center">
@@ -525,12 +588,18 @@ export default function Home() {
                                 </div>
                             </div>
                         )}
-                    </div>
+                    </motion.div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* Services Section */}
-            <section className="py-24 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+            <motion.section
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.3 }}
+                className="py-24 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden"
+            >
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-50/20 to-transparent"></div>
 
                 <div className="max-w-7xl mx-auto px-6 relative">
@@ -546,10 +615,30 @@ export default function Home() {
                         <div className="w-24 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto mt-6"></div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <motion.div
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.2 }}
+                        variants={{
+                            visible: { transition: { staggerChildren: 0.15 } },
+                            hidden: {},
+                        }}
+                    >
                         {SERVICES.map((service, i) => (
-                            <div
+                            <motion.div
                                 key={i}
+                                variants={{
+                                    hidden: { opacity: 0, y: 40 },
+                                    visible: {
+                                        opacity: 1,
+                                        y: 0,
+                                        transition: {
+                                            duration: 0.6,
+                                            ease: 'easeOut',
+                                        },
+                                    },
+                                }}
                                 className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl text-center transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
                             >
                                 <div className="w-20 h-20 mx-auto mb-6 relative group-hover:scale-110 transition-transform duration-300">
@@ -566,14 +655,18 @@ export default function Home() {
                                 <p className="text-gray-600 leading-relaxed text-lg">
                                     {service.content}
                                 </p>
-                            </div>
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* About Us Section */}
-            <section
+            <motion.section
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.4 }}
                 id="aboutus"
                 className="py-24 bg-white relative overflow-hidden"
             >
@@ -653,10 +746,14 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* FAQ Section */}
-            <section
+            <motion.section
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.5 }}
                 id="faq"
                 className="py-24 bg-gradient-to-br from-gray-100 to-gray-50 relative overflow-hidden"
             >
@@ -674,8 +771,31 @@ export default function Home() {
                         <div className="w-24 h-1 bg-gradient-to-r from-primary-500 to-primary-700 mx-auto mt-6"></div>
                     </div>
 
-                    <div className="space-y-6">
-                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                    <motion.div
+                        className="space-y-6"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.2 }}
+                        variants={{
+                            visible: { transition: { staggerChildren: 0.12 } },
+                            hidden: {},
+                        }}
+                    >
+                        {/* FAQ cards */}
+                        <motion.div
+                            variants={{
+                                hidden: { opacity: 0, y: 40 },
+                                visible: {
+                                    opacity: 1,
+                                    y: 0,
+                                    transition: {
+                                        duration: 0.6,
+                                        ease: 'easeOut',
+                                    },
+                                },
+                            }}
+                            className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+                        >
                             <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-start">
                                 <span className="text-primary-600 mr-3 text-2xl">
                                     Q:
@@ -691,9 +811,22 @@ export default function Home() {
                                 property management solutions to streamline your
                                 real estate experience.
                             </p>
-                        </div>
+                        </motion.div>
 
-                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                        <motion.div
+                            variants={{
+                                hidden: { opacity: 0, y: 40 },
+                                visible: {
+                                    opacity: 1,
+                                    y: 0,
+                                    transition: {
+                                        duration: 0.6,
+                                        ease: 'easeOut',
+                                    },
+                                },
+                            }}
+                            className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+                        >
                             <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-start">
                                 <span className="text-primary-600 mr-3 text-2xl">
                                     Q:
@@ -709,9 +842,22 @@ export default function Home() {
                                 reliable and accurate information for making
                                 confident real estate decisions.
                             </p>
-                        </div>
+                        </motion.div>
 
-                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                        <motion.div
+                            variants={{
+                                hidden: { opacity: 0, y: 40 },
+                                visible: {
+                                    opacity: 1,
+                                    y: 0,
+                                    transition: {
+                                        duration: 0.6,
+                                        ease: 'easeOut',
+                                    },
+                                },
+                            }}
+                            className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+                        >
                             <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-start">
                                 <span className="text-primary-600 mr-3 text-2xl">
                                     Q:
@@ -726,9 +872,22 @@ export default function Home() {
                                 comprehensive services tailored to meet your
                                 specific real estate needs and goals.
                             </p>
-                        </div>
+                        </motion.div>
 
-                        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+                        <motion.div
+                            variants={{
+                                hidden: { opacity: 0, y: 40 },
+                                visible: {
+                                    opacity: 1,
+                                    y: 0,
+                                    transition: {
+                                        duration: 0.6,
+                                        ease: 'easeOut',
+                                    },
+                                },
+                            }}
+                            className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+                        >
                             <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-start">
                                 <span className="text-primary-600 mr-3 text-2xl">
                                     Q:
@@ -744,13 +903,17 @@ export default function Home() {
                                 channels that allow tenants to chat seamlessly
                                 with landlords and property managers.
                             </p>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 </div>
-            </section>
+            </motion.section>
 
             {/* Contact Section */}
-            <section
+            <motion.section
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.7, ease: 'easeOut', delay: 0.6 }}
                 id="contactus"
                 className="py-32 bg-gradient-to-br from-gray-50 via-white to-primary-50 relative overflow-hidden"
             >
@@ -826,7 +989,7 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </motion.section>
         </>
     );
 }

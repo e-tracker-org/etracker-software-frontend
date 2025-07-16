@@ -262,7 +262,14 @@ function SignUp() {
                                 <p>
                                     By clicking register, you agreed to the{' '}
                                     <span className="text-[#2F42EDD9] text-xs md:text-sm">
-                                        Terms and Conditions.
+                                        <Link
+                                            href="/terms"
+                                            className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            Terms and Conditions
+                                        </Link>
                                     </span>
                                 </p>
                             }
