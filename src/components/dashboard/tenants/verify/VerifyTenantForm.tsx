@@ -247,7 +247,10 @@ export default function VerifyForm() {
                 checked={formData.agreed}
                 // @ts-ignore
                 onChange={(e) =>
-                    setFormData({ ...formData, agreed: e.target.checked })
+                    setFormData({
+                        ...formData,
+                        agreed: (e.target as HTMLInputElement).checked,
+                    })
                 }
                 error={errors.agreed}
             />
