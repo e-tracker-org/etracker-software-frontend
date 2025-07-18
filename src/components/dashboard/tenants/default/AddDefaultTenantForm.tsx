@@ -23,6 +23,7 @@ import { fetchAndFilterUsersByAccountType } from 'services/newServices/user';
 import { getAllGeneralProperties } from 'services/newServices/properties';
 import { getSubscriptionStatus } from 'utils/subscriptionUtils';
 import Link from 'next/link';
+import ReactSelect from 'react-select';
 
 export default function VerifyForm() {
     const [tenants, setTenants] = useState([] as any); // State to store the list of tenants
@@ -52,6 +53,7 @@ export default function VerifyForm() {
         setUploadFileAsync,
         uploadProfileLoading,
     } = useFileUploadHandler('DEFAULT', 'default_image');
+    const [tenantSearch, setTenantSearch] = useState(''); // State for search input
 
     // Fetch tenants on component mount
     useEffect(() => {
@@ -79,6 +81,16 @@ export default function VerifyForm() {
         }
         fetchData();
     }, []);
+
+    // Filter tenants based on search input
+    const filteredTenants = tenants.filter((tenant: any) => {
+        const search = tenantSearch.toLowerCase();
+        return (
+            tenant.firstname?.toLowerCase().includes(search) ||
+            tenant.lastname?.toLowerCase().includes(search) ||
+            tenant.email?.toLowerCase().includes(search)
+        );
+    });
 
     // Handle tenant selection
     const handleTenantSelect = (tenantId: string) => {
@@ -230,21 +242,43 @@ export default function VerifyForm() {
     return (
         <form className="bg-white p-10">
             <section className="grid grid-cols-2 gap-6">
-                <Select
-                    label="Select Tenant"
-                    // required
-                    value={selectedTenant?.id || ''}
-                    onChange={(e) => handleTenantSelect(e.target.value)}
-                    className="bg-white"
-                >
-                    <option value="">Select a tenant</option>
-                    {/* @ts-ignore */}
-                    {tenants.map((tenant) => (
-                        <option key={tenant.id} value={tenant.id}>
-                            {tenant.firstname} {tenant.lastname}
-                        </option>
-                    ))}
-                </Select>
+                {/* Searchable dropdown for tenants */}
+                <div className="col-span-2 mb-2">
+                    <ReactSelect
+                        options={tenants.map((tenant: any) => ({
+                            value: tenant.id,
+                            label: `${tenant.firstname} ${tenant.lastname} (${tenant.email})`,
+                            tenant: tenant,
+                        }))}
+                        value={
+                            selectedTenant?.id
+                                ? {
+                                      value: selectedTenant.id,
+                                      label: `${selectedTenant.firstname} ${selectedTenant.lastname} (${selectedTenant.email})`,
+                                      tenant: selectedTenant,
+                                  }
+                                : null
+                        }
+                        onChange={(option: any) => {
+                            if (option) {
+                                handleTenantSelect(option.value);
+                            } else {
+                                setSelectedTenant({});
+                                setFormState({
+                                    ...formState,
+                                    tenantName: '',
+                                    tenantPhone: '',
+                                    tenantEmail: '',
+                                    tenantNIN: '',
+                                    tenantGender: '',
+                                });
+                            }
+                        }}
+                        placeholder="Search and select a tenant..."
+                        isClearable
+                        classNamePrefix="react-select"
+                    />
+                </div>
 
                 <Input
                     label="Tenant Name"
