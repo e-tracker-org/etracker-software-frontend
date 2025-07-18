@@ -532,7 +532,7 @@ export default function Home() {
 
                                 {/* View More Button */}
                                 <div className="text-center">
-                                    <Link href="/properties">
+                                    <Link href="/dashboard/properties">
                                         <span className="inline-flex items-center bg-gradient-to-r from-primary-600 to-blue-600 hover:from-primary-700 hover:to-blue-700 text-white px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
                                             View All Properties
                                             <svg

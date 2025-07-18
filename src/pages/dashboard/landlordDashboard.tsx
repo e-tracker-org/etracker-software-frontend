@@ -81,21 +81,22 @@ const LandlordDash: FC = () => {
     const {
         getMyProperties,
         getMyPropertiesLoading,
+        getMyPropertiesError,
         getProperties,
         getPropertiesLoading,
     } = useProperty();
 
-    const properties =
-        Number(acctType?.typeID) === 1
-            ? getMyProperties?.data?.data
-            : 'No property record found';
-    const propertiesLoading =
-        Number(acctType?.typeID) === 1
-            ? getPropertiesLoading
-            : getMyPropertiesLoading;
+    const properties = getMyProperties?.data?.data || [];
+    const propertiesLoading = getMyPropertiesLoading;
+
+    // Debug logging
+    console.log('getMyProperties:', getMyProperties);
+    console.log('getMyPropertiesLoading:', getMyPropertiesLoading);
+    console.log('getMyPropertiesError:', getMyPropertiesError);
 
     useEffect(() => {
-        const allProperties = getMyProperties?.data.data;
+        if (!getMyProperties?.data?.data) return;
+        const allProperties = getMyProperties.data.data;
 
         let occupied = 0;
         let vacant = 0;
@@ -145,7 +146,22 @@ const LandlordDash: FC = () => {
             <header className="flex justify-between items-center mb-8">
                 <DashboardHeader title="Dashboard Overview" />
             </header>
-            {propertiesLoading ? (
+            {getMyPropertiesError ? (
+                <div className="text-red-500 text-center py-8">
+                    Failed to load properties. Please try again later.
+                    <br />
+                    {(() => {
+                        if (
+                            typeof getMyPropertiesError === 'object' &&
+                            getMyPropertiesError !== null &&
+                            'message' in getMyPropertiesError
+                        ) {
+                            return String(getMyPropertiesError.message);
+                        }
+                        return String(getMyPropertiesError);
+                    })()}
+                </div>
+            ) : propertiesLoading ? (
                 <Loader loading={propertiesLoading} />
             ) : (
                 <section>

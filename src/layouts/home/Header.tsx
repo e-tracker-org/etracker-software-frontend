@@ -2,14 +2,20 @@ import Link from 'next/link';
 import MobileNav from './mobile-nav';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 import Dropdown from 'components/base/Dropdown';
 import { FiLogOut } from 'react-icons/fi';
 import { useAppStore } from 'hooks/useAppStore';
 
 const Header = () => {
+    const [isClient, setIsClient] = useState(false);
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
     const router = useRouter();
     const states = useAppStore();
+    if (!isClient) return null;
 
     return (
         <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">

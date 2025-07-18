@@ -111,8 +111,10 @@ export const userSlice: StateCreator<UserState, [], [], UserAction> = (
     },
 
     signout: () => {
-        localStorage.clear();
-        localStorage.removeItem('bound-store');
+        if (typeof window !== 'undefined') {
+            localStorage.clear();
+            localStorage.removeItem('bound-store');
+        }
         set(initialState);
     },
 });

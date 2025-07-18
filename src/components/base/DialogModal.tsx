@@ -1,8 +1,5 @@
-import React from 'react';
-
-import { FC, ReactNode, HTMLAttributes } from 'react';
+import React, { FC, ReactNode, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import Button from './Button';
 
 interface DialogModalProps {
     openModal: boolean | undefined;
@@ -17,93 +14,110 @@ interface DialogModalProps {
     alternative?: string | undefined;
 }
 
-const customStyles = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    borderRadius: '10px',
-    zIndex: 10000,
-};
-
 export const DialogModal: FC<DialogModalProps> = ({
     openModal,
     closeModal,
-    className,
+    className = '',
     title,
     children,
-    showClose,
-    contentClass,
+    showClose = true,
+    contentClass = '',
     subTitle,
     icon,
     alternative,
 }) => {
-    return openModal ? (
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    // Trap focus inside modal and allow Escape to close
+    useEffect(() => {
+        if (!openModal) return;
+        const focusableEls = modalRef.current?.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstEl = focusableEls?.[0];
+        const lastEl = focusableEls?.[focusableEls.length - 1];
+
+        function handleTab(e: KeyboardEvent) {
+            if (!focusableEls || focusableEls.length === 0) return;
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === firstEl) {
+                        e.preventDefault();
+                        lastEl?.focus();
+                    }
+                } else {
+                    if (document.activeElement === lastEl) {
+                        e.preventDefault();
+                        firstEl?.focus();
+                    }
+                }
+            }
+            if (e.key === 'Escape' && closeModal) {
+                closeModal();
+            }
+        }
+
+        document.addEventListener('keydown', handleTab);
+        return () => document.removeEventListener('keydown', handleTab);
+    }, [openModal, closeModal]);
+
+    if (!openModal) return null;
+
+    return (
         <div
-            id="defaultModal"
-            aria-hidden="true"
-            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 touch-none`}
+            className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto"
+            aria-modal="true"
+            role="dialog"
+            tabIndex={-1}
             onClick={closeModal}
         >
             <div
-                className={`bg-white  rounded-lg overflow-hidden ${className} max-h-screen overflow-y-auto w-full sm:w-auto`}
+                ref={modalRef}
+                className={`relative bg-white rounded-2xl shadow-xl w-[95%] sm:w-full max-w-[500px] transform transition-all duration-300 ease-in-out ${className}`}
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Modal content */}
-                <div className="p-4">
-                    {/* Modal header */}
-                    {showClose && (
-                        <button
-                            type="button"
-                            className="absolute top-[20%] lg:top-[15%] lg:right-[10%] right-2 text-black-400 hover:bg-gray-200 hover:text-gray-900 rounded-full p-1"
-                            onClick={closeModal}
-                        >
-                            <Image
-                                src="/close.svg"
-                                alt="Modal Close"
-                                width={20}
-                                height={20}
-                            />
-                        </button>
-                    )}
-                    {/* Modal body */}
-                    <div
-                        className={`py-4 ${contentClass}`}
-                        style={{ textAlign: 'center' }}
+                {showClose && (
+                    <button
+                        type="button"
+                        className="absolute top-4 right-4 text-black-400 hover:bg-gray-200 hover:text-gray-900 rounded-full p-1 z-10"
+                        onClick={closeModal}
+                        aria-label="Close modal"
                     >
-                        <div
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                            }}
-                        >
-                            {icon && (
-                                <Image
-                                    src={icon}
-                                    alt={alternative ?? ''}
-                                    width={200}
-                                    height={200}
-                                />
-                            )}
-                            {title && (
-                                <h2 className="text-lg  font-bold mb-4">
-                                    {title}
-                                </h2>
-                            )}
-                            {subTitle && (
-                                <h3 className="text-sm  mb-4 w-[120px]">
-                                    {subTitle}
-                                </h3>
-                            )}
+                        <Image
+                            src="/close.svg"
+                            alt="Modal Close"
+                            width={20}
+                            height={20}
+                        />
+                    </button>
+                )}
+                <div className={`p-8 ${contentClass}`}>
+                    {icon && (
+                        <div className="flex justify-center mb-6">
+                            <Image
+                                src={icon}
+                                alt={alternative ?? ''}
+                                width={80}
+                                height={80}
+                                className="object-contain"
+                            />
                         </div>
-                        {children}
-                    </div>
+                    )}
+                    {title && (
+                        <h2 className="text-2xl font-bold mb-3 text-center text-gray-900">
+                            {title}
+                        </h2>
+                    )}
+                    {subTitle && (
+                        <h3 className="text-sm mb-6 text-center text-gray-600">
+                            {subTitle}
+                        </h3>
+                    )}
+                    <div className="space-y-4">{children}</div>
                 </div>
             </div>
         </div>
-    ) : null;
+    );
 };
+
+export default DialogModal;

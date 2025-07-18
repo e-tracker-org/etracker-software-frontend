@@ -12,6 +12,10 @@ import ModalContent from 'components/dashboard/ModalContent';
 import useAccountType from 'hooks/useAccountType';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+    const [isClient, setIsClient] = useState(false);
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
     const [role, setRole] = useState<Role>(Role.Landlord);
     const states = useAppStore();
     const [isSidenavOpen, setSidenavOpen] = useState(false);
@@ -128,6 +132,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             }
         }
     }, [acctType]);
+
+    if (!isClient) return null;
 
     return isLoading ? (
         <Loader loading={isLoading} />

@@ -18,6 +18,7 @@ import { checkSubscription } from 'services/newServices/user';
 import { toast } from 'react-hot-toast';
 import SwitchAccountCard from 'components/dashboard/SwitchAccountCard';
 import { getSubscriptionStatus } from 'utils/subscriptionUtils';
+import useAccountType from 'hooks/useAccountType';
 
 type HeaderProps = {
     variant?: 'onboarding' | 'default';
@@ -32,6 +33,10 @@ export default function Header({
     isSidenavOpen,
     toggleSidenav,
 }: HeaderProps) {
+    const [isClient, setIsClient] = useState(false);
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
     const [isOpen, setIsOpen] = useState(false);
     const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -126,6 +131,22 @@ export default function Header({
     };
 
     const hasActiveSubscription = subscriptionStatus == 'active';
+    const { acctType } = useAccountType();
+    // Determine if user is a tenant (matches dashboard role logic)
+    const isTenant =
+        acctType && acctType.accountType
+            ? ['tenant', 'landlord tenant', 'property agent tenant'].includes(
+                  acctType.accountType.toLowerCase()
+              )
+            : Array.isArray(states?.user?.accountTypes)
+            ? states.user.accountTypes.some(
+                  (type: any) =>
+                      typeof type === 'string' &&
+                      type.toLowerCase().includes('tenant')
+              )
+            : false;
+
+    if (!isClient) return null;
 
     if (variant === 'onboarding') {
         return (
@@ -148,7 +169,7 @@ export default function Header({
     return (
         <>
             <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
-                {!loading && !hasActiveSubscription && (
+                {!loading && !hasActiveSubscription && !isTenant && (
                     <div className="bg-gradient-to-r from-red-50 to-orange-50 border-b border-red-200 px-4 py-3">
                         <div className="max-w-7xl mx-auto flex items-center justify-between">
                             <div className="flex items-center gap-3">
