@@ -22,7 +22,7 @@ export default function LogoutBanner({ open, onClose }: BannerProps) {
         }
 
         return () => clearTimeout(timerID);
-    }, [countDown]);
+    }, [countDown, onClose]);
 
     return (
         <BaseModal open={open} onCancel={onClose}>

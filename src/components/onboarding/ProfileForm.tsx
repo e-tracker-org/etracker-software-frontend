@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    useCallback,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from 'react-query';
 import * as yup from 'yup';
@@ -65,6 +71,19 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
+        defaultValues: {
+            firstname: '',
+            lastname: '',
+            email: '',
+            phone: '',
+            fullAddress: '',
+            state: '',
+            area: '',
+            landmark: '',
+            dob: '',
+            gender: '',
+            country: '',
+        },
     });
 
     const editorRef = useRef<AvatarEditor>(null);
@@ -167,7 +186,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
             createKycProfileAsync(formDataObj)
                 .then((res) => {
                     const newKycStage =
-                        res?.data?.currentKyc?.kycStage + 1 ?? 1;
+                        (res?.data?.currentKyc?.kycStage ?? 0) + 1;
                     states?.setActiveKyc(res?.data?.currentKyc);
                     states?.setStep(newKycStage);
                     states?.setScreen('');
@@ -193,7 +212,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
         }
     };
 
-    const setImgProfile = async () => {
+    const setImgProfile = useCallback(async () => {
         if (uploadedFiles?.data?.data[0]?.urls.length) {
             const dataUrl = uploadedFiles?.data?.data[0]?.urls[0];
             console.log(dataUrl, 'dataUrl');
@@ -202,7 +221,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
             // const profileImg = await base64ToURL(dataUrl);
             setProfileImage(dataUrl);
         }
-    };
+    }, [uploadedFiles?.data?.data]);
 
     useEffect(() => {
         const defaultValues = {
@@ -220,13 +239,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
         };
 
         Object.entries(defaultValues).forEach(([key, value]) => {
-            setValue(key, value);
+            if (value !== undefined && value !== null) {
+                setValue(key as keyof typeof defaultValues, value);
+            }
         });
-    }, [states?.user]);
+    }, [states?.user, setValue]);
 
     useEffect(() => {
         setImgProfile();
-    }, [uploadedFiles?.data.data[0]?.urls[0]]);
+    }, [setImgProfile]);
 
     return (
         <form
@@ -258,7 +279,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ page }) => {
                                 onClick={onCrop}
                                 className="bg-white px-4 py-2 rounded-2xl inline-block mt-2"
                             >
-                                Crop
+                                Save
                             </button>
                             <div className="w-[80px]">
                                 <h4 className="text-white font-medium">

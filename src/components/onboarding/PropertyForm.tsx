@@ -2,9 +2,9 @@ import { useAppStore } from 'hooks/useAppStore';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 // import NigeriaStates from 'nigeria-states-lgas';
-import statesAndLgas from "../../libs/nigerian-states.json"; 
+import statesAndLgas from '../../libs/nigerian-states.json';
 import Dropzone from 'react-dropzone';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Button from 'components/base/Button';
 import Input from 'components/base/form/Input';
@@ -70,14 +70,14 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
         resolver: yupResolver(schema),
     });
 
-    const [selectedState, setSelectedState] = useState("");
+    const [selectedState, setSelectedState] = useState('');
     const [lgas, setLgas] = useState<string[]>([]);
 
-    const handleStateChange = (event: { target: { value: any; }; }) => {
+    const handleStateChange = (event: { target: { value: any } }) => {
         const state = event.target.value;
         setSelectedState(state);
 
-        setLgas(statesAndLgas[state as keyof typeof statesAndLgas] || []); 
+        setLgas(statesAndLgas[state as keyof typeof statesAndLgas] || []);
     };
 
     const onSubmit = async (data: any) => {
@@ -210,28 +210,34 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
         }
     };
 
-    const handleDrop = async (dropped: File[], id?: string | null) => {
-        const ls = dropped.map(async (el) => {
-            const imageId: any = {};
-            if (id) {
-                imageId.id = id;
-            }
-            return {
-                ...imageId,
-                base64: await getBase64Async(el),
-                preview: URL.createObjectURL(el),
-                blobURL: URL.createObjectURL(el), // Use blobURL instead of blob
-            };
-        });
+    const handleDrop = useCallback(
+        async (dropped: File[], id?: string | null) => {
+            const ls = dropped.map(async (el) => {
+                const imageId: any = {};
+                if (id) {
+                    imageId.id = id;
+                }
+                return {
+                    ...imageId,
+                    base64: await getBase64Async(el),
+                    preview: URL.createObjectURL(el),
+                    blobURL: URL.createObjectURL(el), // Use blobURL instead of blob
+                };
+            });
 
-        const imgPromises = (await Promise.all(ls)).filter(
-            (el) => el.base64
-        ) as ImageList;
+            const imgPromises = (await Promise.all(ls)).filter(
+                (el) => el.base64
+            ) as ImageList;
 
-        // Set images
-        setImages((prev) => [...prev, ...imgPromises]);
-        register('images', { value: imgPromises, validate: validateImages });
-    };
+            // Set images
+            setImages((prev) => [...prev, ...imgPromises]);
+            register('images', {
+                value: imgPromises,
+                validate: validateImages,
+            });
+        },
+        [register]
+    );
 
     const removeImage = (i: number) => {
         const updatedImages = [...images];
@@ -309,7 +315,7 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
                 setValue(key, value);
             });
         }
-    }, [getMyProperties?.data?.data]);
+    }, [getMyProperties?.data?.data, handleDrop, page, setValue]);
 
     return getPropertyLoading ? (
         <Loader loading={getPropertyLoading} />
@@ -341,7 +347,7 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
                         placeholder="Select a State"
                         selectDivClassName="bg-white"
                         required
-                        register={{ ...register("state") }}
+                        register={{ ...register('state') }}
                         error={errors.state}
                         onChange={handleStateChange}
                     >
@@ -361,9 +367,9 @@ const PropertyForm: FC<PropertyProps> = ({ page }) => {
                         placeholder="Select a City"
                         selectDivClassName="bg-white"
                         required
-                        register={{ ...register("city") }}
+                        register={{ ...register('city') }}
                         error={errors.city}
-                        // disabled={!selectedState} 
+                        // disabled={!selectedState}
                     >
                         <option disabled value="">
                             Select City

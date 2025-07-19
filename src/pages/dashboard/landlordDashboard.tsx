@@ -81,21 +81,22 @@ const LandlordDash: FC = () => {
     const {
         getMyProperties,
         getMyPropertiesLoading,
+        getMyPropertiesError,
         getProperties,
         getPropertiesLoading,
     } = useProperty();
 
-    const properties =
-        Number(acctType?.typeID) === 1
-            ? getMyProperties?.data?.data
-            : 'No property record found';
-    const propertiesLoading =
-        Number(acctType?.typeID) === 1
-            ? getPropertiesLoading
-            : getMyPropertiesLoading;
+    const properties = getMyProperties?.data?.data || [];
+    const propertiesLoading = getMyPropertiesLoading;
+
+    // Debug logging
+    console.log('getMyProperties:', getMyProperties);
+    console.log('getMyPropertiesLoading:', getMyPropertiesLoading);
+    console.log('getMyPropertiesError:', getMyPropertiesError);
 
     useEffect(() => {
-        const allProperties = getMyProperties?.data.data;
+        if (!getMyProperties?.data?.data) return;
+        const allProperties = getMyProperties.data.data;
 
         let occupied = 0;
         let vacant = 0;
@@ -113,7 +114,7 @@ const LandlordDash: FC = () => {
 
         setOccupiedCount(occupied);
         setVacantCount(vacant);
-    }, [getProperties]);
+    }, [getMyProperties?.data.data]);
 
     const totalProperties = occupiedCount + vacantCount;
     const occupiedPercentage = (occupiedCount / totalProperties) * 100;
@@ -135,137 +136,144 @@ const LandlordDash: FC = () => {
         if (states?.user?.id) {
             fetchData();
         }
-    }, [states]);
+    }, [states, getMyProperties?.data.data]);
 
     const handleNavigate = (route: string) => {
         router.push(route);
     };
     return (
-        <div>
-            <header className="flex justify-between items-center mb-5">
-                <DashboardHeader title="Overview" />
+        <div className="max-w-7xl mx-auto">
+            <header className="flex justify-between items-center mb-8">
+                <DashboardHeader title="Dashboard Overview" />
             </header>
-            {propertiesLoading ? (
+            {getMyPropertiesError ? (
+                <div className="text-red-500 text-center py-8">
+                    Failed to load properties. Please try again later.
+                    <br />
+                    {(() => {
+                        if (
+                            typeof getMyPropertiesError === 'object' &&
+                            getMyPropertiesError !== null &&
+                            'message' in getMyPropertiesError
+                        ) {
+                            return String(getMyPropertiesError.message);
+                        }
+                        return String(getMyPropertiesError);
+                    })()}
+                </div>
+            ) : propertiesLoading ? (
                 <Loader loading={propertiesLoading} />
             ) : (
-                <section className="py-10 lg:px-8">
-                    <div className="flex flex-col lg:flex-row lg:mb-5">
-                        <div className="lg:w-1/2 lg:mr-5 mb-5 lg:mb-0">
-                            <div
-                                style={{ backgroundColor: '#1F32EB' }}
-                                className=" rounded-md pt-5 "
-                            >
-                                <DetailsRowCard title="Property Management">
-                                    <div className="flex gap-3">
-                                        <Box
-                                            onClick={handleNavigate}
-                                            route="dashboard/tenants"
-                                            title="Issue Recipt"
-                                            icon={<ReceiptSvg />}
-                                        />
-                                        {/* <Box
-                                            onClick={handleNavigate}
-                                            route="dashboard/tenants"
-                                            title="Utility Bill"
-                                            icon={<MoneySvg />}
-                                        /> */}
-                                        <Box
-                                            onClick={handleNavigate}
-                                            route="dashboard/tenants/verify"
-                                            title="Verify Tenant"
-                                            icon={<VerifySvg />}
-                                        />
-                                    </div>
-                                </DetailsRowCard>
+                <section>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        {/* Property Management Section */}
+                        <div className="rounded-xl overflow-hidden shadow-sm">
+                            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 rounded-t-xl">
+                                <h2 className="text-white text-xl font-semibold mb-6">
+                                    Property Management
+                                </h2>
+                                <div className="flex gap-4 overflow-x-auto pb-4">
+                                    <Box
+                                        onClick={() =>
+                                            handleNavigate('dashboard/tenants')
+                                        }
+                                        route="dashboard/tenants"
+                                        title="Issue Receipt"
+                                        icon={<ReceiptSvg />}
+                                        className="bg-white/10 hover:bg-white/20 transition-colors"
+                                    />
+                                    <Box
+                                        onClick={() =>
+                                            handleNavigate(
+                                                'dashboard/tenants/verify'
+                                            )
+                                        }
+                                        route="dashboard/tenants/verify"
+                                        title="Verify Tenant"
+                                        icon={<VerifySvg />}
+                                        className="bg-white/10 hover:bg-white/20 transition-colors"
+                                    />
+                                </div>
                             </div>
-                            <div className="px-8 bg-white rounded-md pt-4">
+                            <div className="bg-white p-6">
                                 <Image
                                     src="/house.png"
                                     width={579}
                                     height={350}
                                     alt="e-tracka"
+                                    className="w-full h-auto rounded-lg"
                                 />
                             </div>
                         </div>
-                        <div className="lg:w-1/2 lg:ml-5">
-                            <div className="lg:px-8 bg-white rounded-md pt-5">
-                                <DetailsRowCard
-                                    title="Properties"
-                                    linkText="View Properties"
-                                    Route="/dashboard/properties"
-                                    titleColor="black"
+
+                        {/* Properties Overview Section */}
+                        <div className="bg-white rounded-xl p-6 shadow-sm">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-xl font-semibold">
+                                    Properties Overview
+                                </h2>
+                                <button
+                                    onClick={() =>
+                                        handleNavigate('/dashboard/properties')
+                                    }
+                                    className="text-blue-600 hover:text-blue-700 font-medium"
                                 >
-                                    {/* <div className="flex flex-col lg:flex-row justify-between lg:mb-5"> */}
-                                    {/* <div className="flex items-center"> */}
+                                    View Properties
+                                </button>
+                            </div>
+                            <div className="flex items-center justify-center gap-8">
+                                <div className="w-40">
                                     <CircularProgressbar
                                         value={occupiedPercentage}
-                                        // @ts-ignore
-                                        text={totalProperties}
-                                        className="mb-4 lg:mb-0"
+                                        text={`${totalProperties}`}
                                         styles={buildStyles({
                                             rotation: 0.25,
-                                            // strokeLinecap: 'butt',
-                                            textSize: '14px',
-                                            pathTransitionDuration: 0.5,
-                                            pathColor: `rgba(222, 80, 0, 1), ${
-                                                occupiedPercentage / 100
-                                            })`,
-
+                                            textSize: '20px',
+                                            pathColor: `rgba(222, 80, 0, 1)`,
+                                            textColor: '#1a1a1a',
                                             trailColor: '#8D03CE',
                                         })}
                                     />
-                                    {/* </div> */}
-                                    <div className="flex flex-col justify-center mt-2">
-                                        <div className="mb-4 lg:mb-0 flex gap-2 ">
-                                            <div
-                                                className="w-4 h-4"
-                                                style={{
-                                                    backgroundColor: '#8D03CE',
-                                                }}
-                                            ></div>
-                                            <p className="text-sm">
-                                                {vacantCount} Vacant
-                                            </p>
-                                        </div>
-                                        <div className="mb-4 lg:mb-0 flex gap-2 ">
-                                            <div
-                                                className="w-4 h-4"
-                                                style={{
-                                                    backgroundColor:
-                                                        'rgba(222, 80, 0, 1)',
-                                                }}
-                                            ></div>
-                                            <p className="text-sm">
-                                                {occupiedCount} Occupied
-                                            </p>
-                                        </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-4 h-4 bg-[#8D03CE] rounded"></div>
+                                        <p className="text-sm font-medium">
+                                            {vacantCount} Vacant Properties
+                                        </p>
                                     </div>
-                                    {/* </div> */}
-                                </DetailsRowCard>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-4 h-4 bg-[rgba(222,80,0,1)] rounded"></div>
+                                        <p className="text-sm font-medium">
+                                            {occupiedCount} Occupied Properties
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div
-                        style={{
-                            borderLeftColor: '#1F32EB',
-                            borderLeftWidth: 5,
-                        }}
-                        className="mt-5 bg-white rounded-md pt-5 lg:px-8"
-                    >
-                        <DetailsRowCard
-                            title="Tenants"
-                            subheader="List of your tenants"
-                            titleColor="black"
-                            dropdown={
+
+                    {/* Tenants Section */}
+                    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div className="p-6 border-l-4 border-blue-600">
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 className="text-xl font-semibold">
+                                        Tenants
+                                    </h2>
+                                    <p className="text-gray-600 text-sm mt-1">
+                                        List of your tenants
+                                    </p>
+                                </div>
                                 <Dropdown
                                     title={
                                         getPropertyName(
                                             states?.propertyId as string
                                         ) || 'All Properties'
                                     }
-                                    className="border border-[#BEBCBC] rounded-lg text-[18px] text-black"
-                                    ulClassName="bg-white drop-shadow-t-xs"
-                                    btnClasssName="py-4 px-3"
+                                    className="border border-gray-200 rounded-lg"
+                                    ulClassName="bg-white shadow-lg rounded-lg mt-2"
+                                    btnClasssName="py-2 px-4 text-sm font-medium"
                                 >
                                     <li
                                         key="all"
@@ -306,36 +314,39 @@ const LandlordDash: FC = () => {
                                         </li>
                                     ))}
                                 </Dropdown>
-                            }
-                        >
+                            </div>
                             <TenantTable tenants={tenants} />
-                        </DetailsRowCard>
+                        </div>
                     </div>
-                    <div
-                        style={{
-                            borderLeftColor: '#1F32EB',
-                            borderLeftWidth: 5,
-                        }}
-                        className="mt-5 bg-white rounded-md pt-5 lg:px-8"
-                    >
-                        <DetailsRowCard title="My Units" titleColor="black">
-                            {Array.isArray(properties) && properties.length ? (
-                                properties.map((property) => (
-                                    <div
-                                        key={property?.id}
-                                        className="flex-none"
-                                    >
-                                        <PropertyListingCard
-                                            property={property}
-                                        />
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="flex justify-center items-center text-center text-xl w-full">
-                                    No property record found
-                                </p>
-                            )}
-                        </DetailsRowCard>
+
+                    {/* My Units Section */}
+                    <div className="mt-6 bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div className="p-6 border-l-4 border-blue-600">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-xl font-semibold">
+                                    My Units
+                                </h2>
+                            </div>
+                            <div className="flex gap-6 overflow-x-auto pb-4">
+                                {Array.isArray(properties) &&
+                                properties.length ? (
+                                    properties.map((property) => (
+                                        <div
+                                            key={property?.id}
+                                            className="flex-none"
+                                        >
+                                            <PropertyListingCard
+                                                property={property}
+                                            />
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 text-center py-8 w-full">
+                                        No property record found
+                                    </p>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </section>
             )}

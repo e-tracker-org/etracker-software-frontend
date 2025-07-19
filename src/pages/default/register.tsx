@@ -21,14 +21,14 @@ import {
     generateRandomAlphanumeric,
 } from 'utils/helper';
 import HomeLayout from 'layouts/home';
-
+import Link from 'next/link';
 
 function Default() {
     const [images, setImages] = useState<File[]>([]);
     const [imageList, setImageList] = useState<string[]>([]);
     const imageRef = useRef<HTMLInputElement>(null);
     const states = useAppStore();
-    // generate id 
+    // generate id
     const id = generateRandomAlphanumeric(10);
     const landlordId = states?.user?.id || id;
     const [formState, setFormState] = useState({
@@ -161,194 +161,202 @@ function Default() {
 
     return (
         <>
-            <form className="bg-white p-10" style={{margin: '10px'}}>
-            <section className="grid grid-cols-2 gap-6">
-                <Input
-                    label="Tenant Name"
-                    required
-                    placeholder="Enter name "
-                    asterisk
-                    value={formState.tenantName}
-                    onChange={(e) =>
-                        updateFormState('tenantName', e.target.value)
-                    }
-                    // register={{ ...register('name') }}
-                    // error={errors.name}
-                    inputClassName="bg-white"
-                />
-
-                <Input
-                    label="Tenant Phone number"
-                    type="number"
-                    required
-                    placeholder="Enter phone number"
-                    asterisk
-                    value={formState.tenantPhone}
-                    minLength={11}
-                    onChange={(e) =>
-                        updateFormState('tenantPhone', e.target.value)
-                    }
-                    // register={{ ...register('numberOfBath') }}
-                    // error={errors.numberOfBath}
-                    inputClassName="bg-white"
-                />
-                <Input
-                    label="Your National identificaton number"
-                    type="number"
-                    required
-                    minLength={11}
-                    placeholder="Enter NIN number"
-                    asterisk
-                    value={formState.landlordNIN}
-                    onChange={(e) =>
-                        updateFormState('landlordNIN', e.target.value)
-                    }
-                    // register={{ ...register('numberOfRooms') }}
-                    // error={errors.numberOfRooms}
-                    inputClassName="bg-white"
-                />
-
-                <Input
-                    label="Tenant National identificaton number"
-                    type="number"
-                    required
-                    minLength={11}
-                    placeholder="Enter NIN number"
-                    asterisk
-                    value={formState.tenantNIN}
-                    onChange={(e) =>
-                        updateFormState('tenantNIN', e.target.value)
-                    }
-                    // register={{ ...register('numberOfRooms') }}
-                    // error={errors.numberOfRooms}
-                    inputClassName="bg-white"
-                />
-                <Input
-                    label="Tenant Email address"
-                    type="email"
-                    required
-                    placeholder="Enter email address"
-                    asterisk
-                    value={formState.tenantEmail}
-                    onChange={(e) =>
-                        updateFormState('tenantEmail', e.target.value)
-                    }
-                    // register={{ ...register('numberOfBath') }}
-                    // error={errors.numberOfBath}
-                    inputClassName="bg-white"
-                />
-
-                {/* gender */}
-                <Select
-                    label="Gender"
-                    required
-                    value={formState.tenantGender}
-                    onChange={(e) =>
-                        updateFormState('tenantGender', e.target.value)
-                    }
-                    // register={{ ...register('gender') }}
-                    // error={errors.gender}
-                    className="bg-white"
-                >
-                    <option value="">Select gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </Select>
-
-                <Input
-                    label="Property Address"
-                    type="text"
-                    required
-                    placeholder="Enter property address"
-                    asterisk
-                    value={formState.propertyAddress}
-                    onChange={(e) =>
-                        updateFormState('propertyAddress', e.target.value)
-                    }
-                    // register={{ ...register('numberOfBath') }}
-                    // error={errors.numberOfBath}
-                    inputClassName="bg-white col-span-2"
-                />
-
-                <textarea
-                    className="bg-white border border-gray-300 rounded-md p-2 col-span-2"
-                    required
-                    value={formState.complaints}
-                    placeholder="Enter your complaints"
-                    onChange={(e) =>
-                        updateFormState('complaints', e.target.value)
-                    }
-                />
-            </section>
-
-            <div className="mt-20 mb-28">
-                <div className="border border-dashed bg-white border-gray-400 text-gray-500 rounded-lg lg:w-7/12 h-[130px]">
-                    <input
-                        ref={imageRef}
-                        type="file"
-                        accept=".jpg, .jpeg, .png, .gif"
-                        multiple
-                        className="opacity-0 invisible w-1"
-                        onChange={handleFileChange}
+            <form className="bg-white p-10" style={{ margin: '10px' }}>
+                <section className="grid grid-cols-2 gap-6">
+                    <Input
+                        label="Tenant Name"
+                        required
+                        placeholder="Enter name "
+                        asterisk
+                        value={formState.tenantName}
+                        onChange={(e) =>
+                            updateFormState('tenantName', e.target.value)
+                        }
+                        // register={{ ...register('name') }}
+                        // error={errors.name}
+                        inputClassName="bg-white"
                     />
-                    <Button
-                        type="button"
-                        className="mt-3 disabled:bg-blue-500"
-                        onClick={() => imageRef.current?.click()}
+
+                    <Input
+                        label="Tenant Phone number"
+                        type="number"
+                        required
+                        placeholder="Enter phone number"
+                        asterisk
+                        value={formState.tenantPhone}
+                        minLength={11}
+                        onChange={(e) =>
+                            updateFormState('tenantPhone', e.target.value)
+                        }
+                        // register={{ ...register('numberOfBath') }}
+                        // error={errors.numberOfBath}
+                        inputClassName="bg-white"
+                    />
+                    <Input
+                        label="Your National identificaton number"
+                        type="number"
+                        required
+                        minLength={11}
+                        placeholder="Enter NIN number"
+                        asterisk
+                        value={formState.landlordNIN}
+                        onChange={(e) =>
+                            updateFormState('landlordNIN', e.target.value)
+                        }
+                        // register={{ ...register('numberOfRooms') }}
+                        // error={errors.numberOfRooms}
+                        inputClassName="bg-white"
+                    />
+
+                    <Input
+                        label="Tenant National identificaton number"
+                        type="number"
+                        required
+                        minLength={11}
+                        placeholder="Enter NIN number"
+                        asterisk
+                        value={formState.tenantNIN}
+                        onChange={(e) =>
+                            updateFormState('tenantNIN', e.target.value)
+                        }
+                        // register={{ ...register('numberOfRooms') }}
+                        // error={errors.numberOfRooms}
+                        inputClassName="bg-white"
+                    />
+                    <Input
+                        label="Tenant Email address"
+                        type="email"
+                        required
+                        placeholder="Enter email address"
+                        asterisk
+                        value={formState.tenantEmail}
+                        onChange={(e) =>
+                            updateFormState('tenantEmail', e.target.value)
+                        }
+                        // register={{ ...register('numberOfBath') }}
+                        // error={errors.numberOfBath}
+                        inputClassName="bg-white"
+                    />
+
+                    {/* gender */}
+                    <Select
+                        label="Gender"
+                        required
+                        value={formState.tenantGender}
+                        onChange={(e) =>
+                            updateFormState('tenantGender', e.target.value)
+                        }
+                        // register={{ ...register('gender') }}
+                        // error={errors.gender}
+                        className="bg-white"
                     >
-                        Upload Image
-                    </Button>
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </Select>
+
+                    <Input
+                        label="Property Address"
+                        type="text"
+                        required
+                        placeholder="Enter property address"
+                        asterisk
+                        value={formState.propertyAddress}
+                        onChange={(e) =>
+                            updateFormState('propertyAddress', e.target.value)
+                        }
+                        // register={{ ...register('numberOfBath') }}
+                        // error={errors.numberOfBath}
+                        inputClassName="bg-white col-span-2"
+                    />
+
+                    <textarea
+                        className="bg-white border border-gray-300 rounded-md p-2 col-span-2"
+                        required
+                        value={formState.complaints}
+                        placeholder="Enter your complaints"
+                        onChange={(e) =>
+                            updateFormState('complaints', e.target.value)
+                        }
+                    />
+                </section>
+
+                <div className="mt-20 mb-28">
+                    <div className="border border-dashed bg-white border-gray-400 text-gray-500 rounded-lg lg:w-7/12 h-[130px]">
+                        <input
+                            ref={imageRef}
+                            type="file"
+                            accept=".jpg, .jpeg, .png, .gif"
+                            multiple
+                            className="opacity-0 invisible w-1"
+                            onChange={handleFileChange}
+                        />
+                        <Button
+                            type="button"
+                            className="mt-3 disabled:bg-blue-500"
+                            onClick={() => imageRef.current?.click()}
+                        >
+                            Upload Image
+                        </Button>
+                    </div>
+
+                    {images?.length > 0 && (
+                        <div className="grid grid-cols-4 gap-5 mt-10">
+                            {images?.map((img, i) => (
+                                <div
+                                    key={i}
+                                    className="relative flex justify-center border-2 border-white h-72 rounded-3xl"
+                                >
+                                    <Image
+                                        alt=""
+                                        fill
+                                        className="inline-block object-cover rounded-3xl"
+                                        src={URL.createObjectURL(img)}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImage(i)}
+                                        className="absolute p-1 bg-white top-[-4px] right-[-7px] rounded-full text-xl"
+                                    >
+                                        <MdOutlineCancel />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {images?.length > 0 && (
-                    <div className="grid grid-cols-4 gap-5 mt-10">
-                        {images?.map((img, i) => (
-                            <div
-                                key={i}
-                                className="relative flex justify-center border-2 border-white h-72 rounded-3xl"
-                            >
-                                <Image
-                                    alt=""
-                                    fill
-                                    className="inline-block object-cover rounded-3xl"
-                                    src={URL.createObjectURL(img)}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => removeImage(i)}
-                                    className="absolute p-1 bg-white top-[-4px] right-[-7px] rounded-full text-xl"
+                <Checkbox
+                    className="mt-8"
+                    label={
+                        <p>
+                            By submitting this tenant default request, You agree
+                            with our{' '}
+                            <span className="text-[#2F42EDD9] text-xs md:text-sm">
+                                <Link
+                                    href="/terms"
+                                    className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                 >
-                                    <MdOutlineCancel />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+                                    Terms and Conditions
+                                </Link>
+                            </span>
+                        </p>
+                    }
+                    checked={formState.agreed}
+                    onChange={() =>
+                        updateFormState('agreed', !formState.agreed)
+                    }
+                />
 
-            <Checkbox
-                className="mt-8"
-                label={
-                    <p>
-                        By submitting this tenant default request, You agree
-                        with our{' '}
-                        <span className="text-[#2F42EDD9] text-xs md:text-sm">
-                            Terms and Conditions.
-                        </span>
-                    </p>
-                }
-                checked={formState.agreed}
-                onChange={() => updateFormState('agreed', !formState.agreed)}
-
-            />
-
-            <div className="w-1/2  mx-auto mb-10 mt-16">
-                {/* @ts-ignore */}
-                <Button onClick={onSubmit} className="w-full py-4">
-                    Submit Request
-                </Button>
-            </div>
-        </form>
+                <div className="w-1/2  mx-auto mb-10 mt-16">
+                    {/* @ts-ignore */}
+                    <Button onClick={onSubmit} className="w-full py-4">
+                        Submit Request
+                    </Button>
+                </div>
+            </form>
         </>
     );
 }

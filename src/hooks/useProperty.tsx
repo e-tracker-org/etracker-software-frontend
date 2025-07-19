@@ -35,16 +35,20 @@ const useProperty = (
             },
         });
 
-    const { data: getMyProperties, isLoading: getMyPropertiesLoading } =
-        useQuery(
-            ['getMyProperties', category],
-            PropertyService.getMyProperties
-        );
-
-    const { data: getProperties, isLoading: getPropertiesLoading } = useQuery(
-        ['getProperties', category],
-        PropertyService.getProperties
+    const {
+        data: getMyProperties,
+        isLoading: getMyPropertiesLoading,
+        error: getMyPropertiesError,
+    } = useQuery(
+        ['getMyProperties', category],
+        PropertyService.getMyProperties
     );
+
+    const {
+        data: getProperties,
+        isLoading: getPropertiesLoading,
+        error: getPropertiesError,
+    } = useQuery(['getProperties', category], PropertyService.getProperties);
 
     const { data: getProperty, isLoading: getPropertyLoading } = useQuery(
         ['getProperty', id],
@@ -62,6 +66,7 @@ const useProperty = (
         createPropertyLoading, // Api to get all  property for an approved users loading
         getMyProperties, // Api to get all  properties by a user
         getMyPropertiesLoading, // Api to get all  properties by a user loading state
+        getMyPropertiesError,
         propertyKycDocument, // Api to create kyc property
         propertyKycLoading, // Api to create kyc property loading state
         getProperty, // Api to get a single property by id
@@ -70,6 +75,7 @@ const useProperty = (
         updatePropertyLoading, // Api to update property loading state
         getProperties, // Api to get all properties
         getPropertiesLoading, // Api to get all properties loading state
+        getPropertiesError,
     };
 };
 

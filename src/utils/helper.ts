@@ -30,7 +30,7 @@ export const goBackToKyc = (
             if (router) {
                 if (screen !== 'kyc') {
                     states?.setScreen('');
-                    return router.replace(`/dashboard/${screen}`);
+                    return router.push(`/dashboard/${screen}`);
                 }
                 router.push(`/onboarding/${screen}`);
                 // if (states?.activeKyc?.status === KycStatus.COMPLETE) {
@@ -45,7 +45,7 @@ export const goBackToKyc = (
             if (router) {
                 // states?.setScreen(screen as OpenScreen);
                 states?.setScreen('kyc');
-                return router.replace('/onboarding/kyc');
+                return router.push('/onboarding/kyc');
             }
         }
     } else if (
@@ -56,7 +56,7 @@ export const goBackToKyc = (
             if (isOpenScreen) {
                 if (screen !== 'kyc') {
                     states?.setScreen('');
-                    return router.replace(`/dashboard/${screen}`);
+                    return router.push(`/dashboard/${screen}`);
                 }
                 states?.setActiveKyc(states?.user?.currentKyc);
                 states?.setStep(states?.user?.currentKyc?.nextStage);
@@ -71,7 +71,7 @@ export const goBackToKyc = (
     } else {
         if (router) {
             states?.setScreen('');
-            return router.replace(`/dashboard/${screen}`);
+            return router.push(`/dashboard/${screen}`);
         }
     }
 };
@@ -84,7 +84,7 @@ export const goBackToKyc2 = (states: any, router?: NextRouter) => {
         if (router) {
             // states?.setScreen(screen as OpenScreen);
             states?.setScreen('kyc');
-            router.replace('/onboarding/kyc');
+            router.push('/onboarding/kyc');
             return false;
         }
     } else if (

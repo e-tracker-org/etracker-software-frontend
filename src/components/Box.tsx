@@ -5,9 +5,10 @@ interface BoxProps {
     icon: ReactNode;
     onClick: (route: string) => void;
     route: string;
+    className?: string;
 }
 
-const Box: FC<BoxProps> = ({ title, icon, onClick, route }) => {
+const Box: FC<BoxProps> = ({ title, icon, onClick, route, className = '' }) => {
     const handleClick = () => {
         onClick(route);
     };
@@ -15,7 +16,7 @@ const Box: FC<BoxProps> = ({ title, icon, onClick, route }) => {
     return (
         <div
             style={{ cursor: 'pointer', minWidth: 130 }}
-            className="bg-[#F3F4FD] rounded-lg p-4"
+            className={`bg-[#F3F4FD] rounded-lg p-4 ${className}`}
         >
             <a className="flex flex-col items-center" onClick={handleClick}>
                 {/* Render the icon directly */}

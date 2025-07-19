@@ -12,6 +12,10 @@ import ModalContent from 'components/dashboard/ModalContent';
 import useAccountType from 'hooks/useAccountType';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+    const [isClient, setIsClient] = useState(false);
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
     const [role, setRole] = useState<Role>(Role.Landlord);
     const states = useAppStore();
     const [isSidenavOpen, setSidenavOpen] = useState(false);
@@ -46,41 +50,63 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         setIsOpen(false);
     };
 
-    const toggleSidenav = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+    const toggleSidenav = (
+        e: React.MouseEvent<HTMLButtonElement | SVGElement, MouseEvent>
+    ) => {
         e.preventDefault();
         setSidenavOpen((isSidenavOpen) => !isSidenavOpen);
     };
 
-    // const closeSidenav = () => {
-    //     setSidenavOpen(false);
-    // };
-
     useEffect(() => {
-        if (userProfile) {
-            const userData = userProfile;
-            states?.setUser({ user: userData });
-            if (userData?.currentKyc) {
-                states?.setActiveKyc(userData?.currentKyc);
-                states?.setStep(userData?.currentKyc?.nextStage);
-            } else {
-                if (
-                    !states?.activeKyc &&
-                    userData?.accountTypes.includes(states?.activeAccount)
-                ) {
-                    states?.setActiveKyc(undefined);
-                    states?.setStep(1);
-                    // router.push('/dashboard');
-                    if (router.asPath.split('/')[1] === 'onboarding') {
-                        router.push('/dashboard');
+        let mounted = true;
+
+        const initializeUser = async () => {
+            if (!isLoading && mounted) {
+                if (userProfile) {
+                    // Check if user data actually changed to prevent unnecessary updates
+                    const currentUser = states?.user;
+                    const userChanged =
+                        JSON.stringify(currentUser) !==
+                        JSON.stringify(userProfile);
+
+                    if (userChanged) {
+                        states?.setUser({ user: userProfile });
+                    }
+
+                    // Handle KYC status only if needed
+                    const hasCurrentKyc = !!userProfile?.currentKyc;
+                    const hasActiveKyc = !!states?.activeKyc;
+
+                    if (hasCurrentKyc && !hasActiveKyc) {
+                        states?.setActiveKyc(userProfile.currentKyc);
+                        states?.setStep(userProfile.currentKyc.nextStage);
+                    } else if (
+                        !hasCurrentKyc &&
+                        !hasActiveKyc &&
+                        userProfile?.accountTypes?.includes(
+                            states?.activeAccount
+                        )
+                    ) {
+                        states?.setActiveKyc(undefined);
+                        states?.setStep(1);
+                    }
+                } else {
+                    // Only redirect if we're not already on the signin page
+                    if (router.pathname !== '/auth/signin') {
+                        states?.signout();
+                        states?.resetTenantState();
+                        router.replace('/auth/signin');
                     }
                 }
             }
-        } else if (!isLoading) {
-            states?.signout();
-            states?.resetTenantState();
-            router.push('/auth/signin');
-        }
-    }, [userProfile, isLoading, states?.activeKyc]);
+        };
+
+        initializeUser();
+
+        return () => {
+            mounted = false;
+        };
+    }, [userProfile, isLoading, router, states]);
 
     useEffect(() => {
         if (acctType && acctType.accountType) {
@@ -107,10 +133,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         }
     }, [acctType]);
 
+    if (!isClient) return null;
+
     return isLoading ? (
         <Loader loading={isLoading} />
     ) : (
-        <section>
+        <section className="min-h-screen bg-gray-50">
             <DialogModal
                 openModal={isOpen}
                 showClose={false}
@@ -123,17 +151,26 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     />
                 </div>
             </DialogModal>
+
+            {/* Mobile backdrop overlay */}
+            {isSidenavOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-[99] md:hidden"
+                    onClick={() => setSidenavOpen(false)}
+                />
+            )}
+
             <Sidebar
                 role={role}
                 isSidenavOpen={isSidenavOpen}
                 setSidenavOpen={setSidenavOpen}
             />
-            <section className="ml-0 md:ml-[234px] w-full md:w-[calc(100%-234px)]">
+            <section className="ml-0 md:ml-[234px] min-h-screen transition-all duration-300">
                 <Header
                     isSidenavOpen={isSidenavOpen}
                     toggleSidenav={toggleSidenav}
                 />
-                <main className="bg-white md:bg-[#F5F5F5] min-h-[calc(100vh-96px)] pt-4 pb-16 px-[3.5%]">
+                <main className="bg-gray-50 pt-6 pb-16 px-4 md:px-8 min-h-[calc(100vh-80px)]">
                     {children}
                 </main>
             </section>

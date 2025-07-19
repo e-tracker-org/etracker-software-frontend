@@ -1,5 +1,5 @@
 import Dashboard from '..';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Button from 'components/base/Button';
 import { useRouter } from 'next/router';
 import Dropdown from 'components/base/Dropdown';
@@ -21,7 +21,7 @@ export default function VeriifyTenants() {
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState('all');
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const tenantData = await getLandlordTenant(states?.user?.id);
@@ -31,11 +31,11 @@ export default function VeriifyTenants() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [states?.user?.id]);
 
     useEffect(() => {
         fetchData();
-    }, [states]);
+    }, [fetchData, states]);
 
     const handleRemount = async () => {
         setShouldRemount((prevState) => !prevState);
@@ -47,13 +47,15 @@ export default function VeriifyTenants() {
             <DashboardHeader title="Verify Tenants">
                 <div className="flex justify-between">
                     <p className="pt-4 w-2/5 text-[18px] font-medium">
-                        Review tenants profile before lease approval.<br />
+                        Review tenants profile before lease approval.
+                        <br />
                         <small className="text-[12px] text-[red]">
                             {' '}
-                            Note: You will be required to pay the sum of N1,000 for each verification request
+                            Note: You will be required to pay the sum of N1,000
+                            for each verification request
                         </small>
                     </p>
-{/* 
+                    {/* 
                     <Button
                         className="bg-[#2F42ED] text-white"
                         onClick={() => router.push('/dashboard/tenants/verify/request')}

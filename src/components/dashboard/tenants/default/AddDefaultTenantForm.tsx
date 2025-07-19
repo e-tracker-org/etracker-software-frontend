@@ -22,6 +22,8 @@ import {
 import { fetchAndFilterUsersByAccountType } from 'services/newServices/user';
 import { getAllGeneralProperties } from 'services/newServices/properties';
 import { getSubscriptionStatus } from 'utils/subscriptionUtils';
+import Link from 'next/link';
+import ReactSelect from 'react-select';
 
 export default function VerifyForm() {
     const [tenants, setTenants] = useState([] as any); // State to store the list of tenants
@@ -51,7 +53,7 @@ export default function VerifyForm() {
         setUploadFileAsync,
         uploadProfileLoading,
     } = useFileUploadHandler('DEFAULT', 'default_image');
-
+    const [tenantSearch, setTenantSearch] = useState(''); // State for search input
 
     // Fetch tenants on component mount
     useEffect(() => {
@@ -80,6 +82,16 @@ export default function VerifyForm() {
         fetchData();
     }, []);
 
+    // Filter tenants based on search input
+    const filteredTenants = tenants.filter((tenant: any) => {
+        const search = tenantSearch.toLowerCase();
+        return (
+            tenant.firstname?.toLowerCase().includes(search) ||
+            tenant.lastname?.toLowerCase().includes(search) ||
+            tenant.email?.toLowerCase().includes(search)
+        );
+    });
+
     // Handle tenant selection
     const handleTenantSelect = (tenantId: string) => {
         setTenantProperty([]);
@@ -90,8 +102,8 @@ export default function VerifyForm() {
             tenantEmail: '',
             tenantNIN: '',
             tenantGender: '',
-        })
-        const tenant = tenants.find((t: { id: string; }) => t.id === tenantId);
+        });
+        const tenant = tenants.find((t: { id: string }) => t.id === tenantId);
         const filteredProperties = properties.filter((property: any) =>
             property.tenant.some((t: any) => t.tenantId === tenantId)
         );
@@ -117,9 +129,13 @@ export default function VerifyForm() {
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const subscriptionStatus = await getSubscriptionStatus(states?.user?.email || '');
+        const subscriptionStatus = await getSubscriptionStatus(
+            states?.user?.email || ''
+        );
         if (subscriptionStatus !== 'active') {
-            toast.error('You need an active subscription to perform this action.');
+            toast.error(
+                'You need an active subscription to perform this action.'
+            );
             return;
         }
 
@@ -226,21 +242,43 @@ export default function VerifyForm() {
     return (
         <form className="bg-white p-10">
             <section className="grid grid-cols-2 gap-6">
-                <Select
-                    label="Select Tenant"
-                    // required
-                    value={selectedTenant?.id || ''}
-                    onChange={(e) => handleTenantSelect(e.target.value)}
-                    className="bg-white"
-                >
-                    <option value="">Select a tenant</option>
-                    {/* @ts-ignore */}
-                    {tenants.map(tenant => (
-                        <option key={tenant.id} value={tenant.id}>
-                            {tenant.firstname} {tenant.lastname}
-                        </option>
-                    ))}
-                </Select>
+                {/* Searchable dropdown for tenants */}
+                <div className="col-span-2 mb-2">
+                    <ReactSelect
+                        options={tenants.map((tenant: any) => ({
+                            value: tenant.id,
+                            label: `${tenant.firstname} ${tenant.lastname} (${tenant.email})`,
+                            tenant: tenant,
+                        }))}
+                        value={
+                            selectedTenant?.id
+                                ? {
+                                      value: selectedTenant.id,
+                                      label: `${selectedTenant.firstname} ${selectedTenant.lastname} (${selectedTenant.email})`,
+                                      tenant: selectedTenant,
+                                  }
+                                : null
+                        }
+                        onChange={(option: any) => {
+                            if (option) {
+                                handleTenantSelect(option.value);
+                            } else {
+                                setSelectedTenant({});
+                                setFormState({
+                                    ...formState,
+                                    tenantName: '',
+                                    tenantPhone: '',
+                                    tenantEmail: '',
+                                    tenantNIN: '',
+                                    tenantGender: '',
+                                });
+                            }
+                        }}
+                        placeholder="Search and select a tenant..."
+                        isClearable
+                        classNamePrefix="react-select"
+                    />
+                </div>
 
                 <Input
                     label="Tenant Name"
@@ -329,28 +367,32 @@ export default function VerifyForm() {
                     // error={errors.gender}
                     className="bg-white"
                 >
-                    <option value="">{formState.tenantGender || 'Select gender'}</option>
+                    <option value="">
+                        {formState.tenantGender || 'Select gender'}
+                    </option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                 </Select>
 
                 <section className="grid grid-cols-1 gap-6">
-                <Select
-                    label="Select Available Tenant Property"
-                    required
-                    value={formState.propertyAddress}
-                    onChange={(e) => updateFormState('propertyAddress', e.target.value)}
-                    className="bg-white col-span-2"
-                >
-                    <option value="">Select a property</option>
-                    {tenantProperty.map((property: any) => (
-                        <option key={property.id} value={property.address}>
-                            {property.name} - {property.address}
-                        </option>
-                    ))}
-                </Select>
+                    <Select
+                        label="Select Available Tenant Property"
+                        required
+                        value={formState.propertyAddress}
+                        onChange={(e) =>
+                            updateFormState('propertyAddress', e.target.value)
+                        }
+                        className="bg-white col-span-2"
+                    >
+                        <option value="">Select a property</option>
+                        {tenantProperty.map((property: any) => (
+                            <option key={property.id} value={property.address}>
+                                {property.name} - {property.address}
+                            </option>
+                        ))}
+                    </Select>
                 </section>
-                
+
                 <Input
                     label="Property Address"
                     type="text"
@@ -429,7 +471,14 @@ export default function VerifyForm() {
                         By submitting this tenant default request, You agree
                         with our{' '}
                         <span className="text-[#2F42EDD9] text-xs md:text-sm">
-                            Terms and Conditions.
+                            <Link
+                                href="/terms"
+                                className="text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Terms and Conditions
+                            </Link>
                         </span>
                     </p>
                 }

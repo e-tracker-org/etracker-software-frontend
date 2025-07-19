@@ -1,40 +1,71 @@
-//@ts-ignore
 import { Property } from 'interfaces';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useMemo, useState, useEffect } from 'react';
 import Header from './Header';
 import PropertyListingCard from './PropertyListingCard';
 import { useAppStore } from 'hooks/useAppStore';
-import Loader from 'components/base/Loader';
 
 interface PropertyProp {
     properties: Property[] | undefined;
 }
 
 const Property: FC<PropertyProp> = ({ properties }) => {
-    const states = useAppStore();
+    const searchParam = useAppStore<string>((state) => state.searchParam || '');
+    interface FilterDetails {
+        state?: string;
+        propertyActive?: 'Active' | 'Off Market' | '';
+        apartmentType?: string;
+    }
 
-    const getFilterDetailsFromLocalStorage = () => {
-        const filterDetailsString = localStorage.getItem('filterDetails');
-        if (filterDetailsString) {
-            return JSON.parse(filterDetailsString);
-        }
-        return null;
-    };
+    const [filterDetails, setFilterDetails] = useState<FilterDetails | null>(
+        null
+    );
 
-    const applyFilter = (properties: Property[]) => {
-        const filterDetailsFromLocalStorage =
-            getFilterDetailsFromLocalStorage();
+    // Move localStorage access to useEffect
+    useEffect(() => {
+        const readFilterDetails = () => {
+            const filterDetailsString = localStorage.getItem('filterDetails');
+            if (filterDetailsString) {
+                try {
+                    const parsed = JSON.parse(filterDetailsString);
+                    setFilterDetails(parsed);
+                } catch (e) {
+                    console.error('Error parsing filter details:', e);
+                }
+            } else {
+                setFilterDetails(null);
+            }
+        };
+        readFilterDetails();
+        // Listen for filterChanged event
+        window.addEventListener('filterChanged', readFilterDetails);
+        return () => {
+            window.removeEventListener('filterChanged', readFilterDetails);
+        };
+    }, []);
 
-        const filteredProperties = properties.filter((property: Property) => {
-            if (filterDetailsFromLocalStorage) {
-                const { state, propertyActive, apartmentType } =
-                    filterDetailsFromLocalStorage;
+    const filteredProperties = useMemo(() => {
+        if (!properties) return [];
 
+        // First apply search filter
+        let filtered = searchParam
+            ? properties.filter((property: Property) =>
+                  property.name
+                      .toLowerCase()
+                      .includes(searchParam.toLowerCase())
+              )
+            : properties;
+
+        // Then apply other filters
+        if (filterDetails) {
+            // @ts-ignore
+            const { state, propertyActive, apartmentType } = filterDetails;
+
+            filtered = filtered.filter((property: Property) => {
                 if (
                     state &&
                     !property.location.state
                         .toLowerCase()
-                        .includes(state.toLowerCase())
+                        .includes((state as string).toLowerCase())
                 ) {
                     return false;
                 }
@@ -52,54 +83,43 @@ const Property: FC<PropertyProp> = ({ properties }) => {
 
                 if (
                     apartmentType &&
+                    property.apartmentType &&
                     !property.apartmentType
                         .toLowerCase()
                         .includes(apartmentType.toLowerCase())
                 ) {
                     return false;
                 }
-            }
 
-            return true;
-        });
+                return true;
+            });
+        }
 
-        return filteredProperties;
-    };
+        return filtered;
+    }, [properties, searchParam, filterDetails]);
 
-    const searchedProperty = properties?.filter((property: any) =>
-        property.name.toLowerCase().includes(states?.searchParam.toLowerCase())
-    );
-
-    const displayProperties = states?.searchParam
-        ? searchedProperty
-        : properties;
-
-    const filteredProperties = applyFilter(displayProperties || []);
+    // Add a loading state for initial render
+    if (typeof window === 'undefined') {
+        return <div className="w-full" />;
+    }
 
     return (
-        <>
-            <div className="w-full">
-                <Header
-                    propertyCount={
-                        filteredProperties ? filteredProperties.length : 0
-                    }
-                />
-                <section className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 w-full mb-10 min-h-[300px] ">
-                    {Array.isArray(filteredProperties) &&
-                    filteredProperties.length ? (
-                        filteredProperties.map((property) => (
-                            <div key={property?.id} className="w-full">
-                                <PropertyListingCard property={property} />
-                            </div>
-                        ))
-                    ) : (
-                        <p className="flex justify-center items-center text-center text-xl w-full">
-                            No property record found
-                        </p>
-                    )}
-                </section>
-            </div>
-        </>
+        <div className="w-full">
+            <Header propertyCount={filteredProperties.length} />
+            <section className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 w-full mb-10 min-h-[300px] ">
+                {filteredProperties.length > 0 ? (
+                    filteredProperties.map((property) => (
+                        <div key={property?.id} className="w-full">
+                            <PropertyListingCard property={property} />
+                        </div>
+                    ))
+                ) : (
+                    <p className="flex justify-center items-center text-center text-xl w-full">
+                        No property record found
+                    </p>
+                )}
+            </section>
+        </div>
     );
 };
 

@@ -16,7 +16,6 @@ import { useRouter } from 'next/router';
 import { urlSegment, roleMenus, goBackToKyc, goBackToKyc2 } from 'utils/helper';
 import { Role } from 'utils/enums';
 import SideBarIcon from './SideBarIcon';
-import Link from 'next/link';
 import Dropdown from 'components/base/Dropdown';
 import { KycStatus } from 'interfaces';
 
@@ -31,271 +30,273 @@ const Sidebar: React.FC<SidebarProps> = ({
     isSidenavOpen,
     setSidenavOpen,
 }) => {
-    const [open, setOpen] = useState(true);
     const [tenantTabOpen, setTenantTabOpen] = useState(false);
     const [activeMenu, setActiveMenu] = useState('dashboard');
-    const [urlParam, setUrlParam] = useState<string | undefined>();
+    const [urlParam, setUrlParam] = useState<string>('dashboard');
     const states = useAppStore();
     const router = useRouter();
     const { asPath } = router;
     const menus = roleMenus[role];
 
-    const toggleSideBar = () => setOpen((prev) => !prev);
-
     useEffect(() => {
-        setUrlParam(urlSegment(asPath));
-    }, [asPath]);
+        const path = router.asPath;
+        const segment = path.split('/')[2] || 'dashboard';
+        setActiveMenu(segment.toLowerCase());
+        setUrlParam(segment.toLowerCase());
+    }, [router.asPath]);
 
-    // useEffect(() => {
-    //     console.log(!activeMenu, 'jhdhhwe', activeMenu);
-    //     !activeMenu && setActiveMenu('dashboard/properties');
-    // }, [activeMenu]);
-
-    useEffect(() => {
-        if (urlParam !== undefined) {
-            // console.log(urlParam.toLowerCase(), 'pafgfsghhsdj');
-            setActiveMenu(urlParam.toLowerCase());
+    const handleNavigation = (path: string, menu: string) => {
+        if (menu.toLowerCase() === 'tenants') {
+            states?.resetTenantState();
         }
-    }, [urlParam]);
 
-    // console.log('states', states);
+        setSidenavOpen(false);
+        setActiveMenu(menu.toLowerCase());
+        setUrlParam(menu.toLowerCase());
+
+        // Don't navigate if we're already on this path
+        if (router.asPath !== path) {
+            router.push(path);
+        }
+    };
 
     return (
         <aside
             className={`${
-                isSidenavOpen ? 'translate-x-0' : '-translate-x-[234px]'
-            } md:translate-x-0  min-w-100% md:min-w-[234px] pl-3 pr-1 h-screen border-r-[2px] border-[#E9E4E4] pt-[24px] pb-[44px] md:py-[44px] hidden-scrollbar fixed bg-white transition-all duration-500 ease-in-out z-[100]`}
+                isSidenavOpen ? 'translate-x-0' : '-translate-x-full'
+            } md:translate-x-0 w-80 md:min-w-[234px] md:w-[234px] h-screen border-r border-gray-200 bg-white transition-all duration-300 ease-in-out fixed z-[100] shadow-xl md:shadow-none flex flex-col`}
         >
-            <div className="mb-6">
-                <Link href="/">
-                    <Image
-                        src="/logo.svg"
-                        alt="e-tracka logo"
-                        width={144}
-                        height={34}
-                        // className={`${open ? 'block' : 'hidden'}`}
-                    />
-                </Link>
-
-                {/* <button onClick={toggleSideBar}>
-                    {!open ? (
-                        <HiChevronDoubleRight className="w-5 h-5" />
-                    ) : (
-                        <HiChevronDoubleLeft className="w-5 h-5" />
-                    )}
-                </button> */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 md:hidden">
+                <button
+                    onClick={() => setSidenavOpen(false)}
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                    <svg
+                        className="w-5 h-5 text-gray-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
+                </button>
             </div>
 
-            <ul className="grid gap-y-[60px] mt-[60px] ">
-                {states?.activeKyc?.status === KycStatus.INCOMPLETE &&
-                urlParam !== 'kyc' ? (
-                    // states?.activeKyc?.status === KycStatus.INCOMPLETE
-                    <li className="mb-[-15px] mt-[-36px]">
-                        <ActiveLink
-                            href="/onboarding/kyc"
-                            Classname="!bg-primary-100 text-white rounded-lg !text-blue-600"
-                            onClick={() => goBackToKyc('kyc', states, router)}
-                        >
-                            Continue KYC
-                        </ActiveLink>
-                    </li>
-                ) : null}
-                {menus.map((menu) => (
-                    <li key={menu}>
-                        <ActiveLink
-                            onClick={() => {
-                                setActiveMenu(menu.toLowerCase());
-                                if (menu.toLowerCase() === 'dashboard') {
-                                    router.replace(`/dashboard`);
-                                } else {
-                                    menu.toLowerCase() === 'tenants' &&
-                                        states?.resetTenantState();
-                                    router.replace(
-                                        `/dashboard/${menu.toLowerCase()}`
-                                    );
+            <div className="hidden md:block p-6 pb-4">
+                <Image
+                    src="/logo.svg"
+                    alt="e-tracka logo"
+                    width={144}
+                    height={34}
+                />
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 md:py-2">
+                <nav className="space-y-2">
+                    {states?.activeKyc?.status === KycStatus.INCOMPLETE &&
+                    urlParam !== 'kyc' ? (
+                        <div className="mb-4">
+                            <ActiveLink
+                                Classname="!bg-blue-50 !text-blue-600 border border-blue-200 rounded-lg"
+                                onClick={() =>
+                                    goBackToKyc('kyc', states, router)
                                 }
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <span className="font-medium">
+                                        Continue KYC
+                                    </span>
+                                </div>
+                            </ActiveLink>
+                        </div>
+                    ) : null}
 
-                                setSidenavOpen(false);
-                            }}
-                            Classname={`${
-                                activeMenu === menu.toLowerCase()
-                                    ? 'bg-primary-600 text-white rounded-lg'
-                                    : ''
-                            }`}
-                        >
-                            <SideBarIcon screen={menu?.toLowerCase()} />
+                    {menus.map((menu) => (
+                        <div key={menu} className="space-y-1">
+                            <ActiveLink
+                                onClick={() => {
+                                    if (menu.toLowerCase() === 'dashboard') {
+                                        handleNavigation('/dashboard', menu);
+                                    } else {
+                                        handleNavigation(
+                                            `/dashboard/${menu.toLowerCase()}`,
+                                            menu
+                                        );
+                                    }
+                                }}
+                                Classname={`${
+                                    activeMenu === menu.toLowerCase()
+                                        ? 'bg-primary-600 text-white shadow-sm'
+                                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                                } transition-colors duration-200 rounded-lg`}
+                            >
+                                <SideBarIcon screen={menu?.toLowerCase()} />
+                                <span className="font-medium">{menu}</span>
 
-                            <span>{menu}</span>
+                                {menu?.toLowerCase() === 'tenants' && (
+                                    <span
+                                        role="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setTenantTabOpen((prev) => !prev);
+                                        }}
+                                        className={`${
+                                            tenantTabOpen ? 'rotate-180' : ''
+                                        } transition-transform duration-200 ml-auto`}
+                                    >
+                                        <svg
+                                            className="w-4 h-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M19 9l-7 7-7-7"
+                                            />
+                                        </svg>
+                                    </span>
+                                )}
+                            </ActiveLink>
 
                             {menu?.toLowerCase() === 'tenants' && (
-                                <span
-                                    role="button"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setTenantTabOpen((prev) => !prev);
-                                    }}
+                                <div
                                     className={`${
-                                        tenantTabOpen ? '-rotate-180' : ''
-                                    } transition-all`}
+                                        tenantTabOpen ? 'block' : 'hidden'
+                                    } ml-6 space-y-1 border-l-2 border-gray-100 pl-4`}
                                 >
-                                    <svg
-                                        className="fill-current h-6 w-6"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                                    </svg>
-                                </span>
-                            )}
-                        </ActiveLink>
-                        {menu?.toLowerCase() === 'tenants' && (
-                            <ul
-                                className={`${
-                                    tenantTabOpen ? 'block' : 'hidden'
-                                }`}
-                            >
-                                <li className="w-full text-brand-inactive hover:text-black text-center text-lg font-semibold px-8 py-3">
-                                    <button
-                                        onClick={(
-                                            e: React.MouseEvent<
-                                                HTMLButtonElement,
-                                                MouseEvent
-                                            >
-                                        ) => {
-                                            e.preventDefault();
+                                    <SubMenuItem
+                                        onClick={() => {
                                             setTenantTabOpen(false);
                                             states?.resetTenantState();
-                                            router.push('/dashboard/tenants');
+                                            handleNavigation(
+                                                '/dashboard/tenants',
+                                                'tenants'
+                                            );
                                         }}
                                     >
                                         View Tenants
-                                    </button>
-                                </li>
-                                <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
-                                    <button
-                                        onClick={(
-                                            e: React.MouseEvent<
-                                                HTMLButtonElement,
-                                                MouseEvent
-                                            >
-                                        ) => {
-                                            e.preventDefault();
+                                    </SubMenuItem>
+                                    <SubMenuItem
+                                        onClick={() => {
                                             setTenantTabOpen(false);
-                                            router.push(
-                                                '/dashboard/tenants/find'
+                                            handleNavigation(
+                                                '/dashboard/tenants/find',
+                                                'tenants'
                                             );
                                         }}
                                     >
                                         Tenant Credit Check
-                                    </button>
-                                </li>
-                                {/* <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
-                                    <button
-                                        onClick={(
-                                            e: React.MouseEvent<
-                                                HTMLButtonElement,
-                                                MouseEvent
-                                            >
-                                        ) => {
-                                            e.preventDefault();
+                                    </SubMenuItem>
+                                    <SubMenuItem
+                                        onClick={() => {
                                             setTenantTabOpen(false);
-                                            router.push(
-                                                '/dashboard/tenants/verify'
-                                            );
-                                        }}
-                                    >
-                                        Tenant Credit Check
-                                    </button>
-                                </li> */}
-                                <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
-                                    <button
-                                        onClick={(
-                                            e: React.MouseEvent<
-                                                HTMLButtonElement,
-                                                MouseEvent
-                                            >
-                                        ) => {
-                                            e.preventDefault();
-                                            setTenantTabOpen(false);
-                                            router.push(
-                                                '/dashboard/tenants/default'
+                                            handleNavigation(
+                                                '/dashboard/tenants/default',
+                                                'tenants'
                                             );
                                         }}
                                     >
                                         Default Tenants
-                                    </button>
-                                </li>
-                                <li className="w-full text-center text-brand-inactive hover:text-black  text-lg font-semibold px-8 py-3">
-                                    <button
-                                        onClick={(
-                                            e: React.MouseEvent<
-                                                HTMLButtonElement,
-                                                MouseEvent
-                                            >
-                                        ) => {
-                                            e.preventDefault();
+                                    </SubMenuItem>
+                                    <SubMenuItem
+                                        onClick={() => {
                                             setTenantTabOpen(false);
-                                            router.push(
-                                                '/dashboard/tenants/registered-default'
+                                            handleNavigation(
+                                                '/dashboard/tenants/registered-default',
+                                                'tenants'
                                             );
                                         }}
                                     >
                                         Registered Defaults
-                                    </button>
-                                </li>
-                            </ul>
-                        )}
-                    </li>
-                ))}
-                {/* <li className="pb-10">
-              
-                </li> */}
-            </ul>
-            <button
-                onClick={() => {
-                    states?.signout();
-                    states?.resetTenantState();
-                    // router.push('/');
-                }}
-                className="text-brand-red px-8 w-full text-lg flex font-semibold items-center gap-[15px] mt-[130px] mb-[90px]"
-            >
-                <svg
-                    className="w-5 h-5"
-                    viewBox="0 0 26 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M7.00012 9.13636H17.0003V1.36364C17.0003 1.13459 16.8949 0.914917 16.7074 0.752953C16.5199 0.59099 16.2655 0.5 16.0003 0.5H1.00002C0.734797 0.5 0.480438 0.59099 0.292898 0.752953C0.105359 0.914917 0 1.13459 0 1.36364V18.6364C0 18.8654 0.105359 19.0851 0.292898 19.247C0.480438 19.409 0.734797 19.5 1.00002 19.5H16.0003C16.2655 19.5 16.5199 19.409 16.7074 19.247C16.8949 19.0851 17.0003 18.8654 17.0003 18.6364V10.8636H7.00012V9.13636ZM25.7073 9.38952L20.0004 4.46031L18.586 5.68182L22.586 9.13636H17.0003V10.8636H22.586L18.586 14.3182L20.0004 15.5397L25.7073 10.6105C25.8947 10.4485 26 10.229 26 10C26 9.77105 25.8947 9.55146 25.7073 9.38952Z"
-                        fill="#E80404"
-                        fillOpacity="0.75"
-                    />
-                </svg>
-                <span>Log out</span>
-            </button>
+                                    </SubMenuItem>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </nav>
+
+                <div className="mt-8 pt-6 border-t border-gray-100">
+                    <button
+                        onClick={() => {
+                            states?.signout();
+                            states?.resetTenantState();
+                            setSidenavOpen(false);
+                        }}
+                        className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200 font-medium"
+                    >
+                        <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                            />
+                        </svg>
+                        <span>Log out</span>
+                    </button>
+                </div>
+            </div>
         </aside>
     );
 };
 
 const ActiveLink = ({
     children,
-    href,
     onClick,
     Classname,
 }: {
     children: ReactNode;
-    href?: string;
     onClick?: () => void;
     Classname?: string;
 }) => {
-    const router = useRouter();
-
     return (
         <button
-            className={`flex gap-[15px] text-lg font-semibold px-8 py-3 w-full items-center text-brand-inactive ${Classname}`}
+            type="button"
+            className={`flex items-center gap-3 text-sm md:text-base font-medium px-4 py-3 w-full transition-colors duration-200 ${Classname}`}
             onClick={onClick}
         >
             {children}
+        </button>
+    );
+};
+
+const SubMenuItem = ({
+    children,
+    onClick,
+}: {
+    children: ReactNode;
+    onClick?: () => void;
+}) => {
+    const handleClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (onClick) {
+            onClick();
+        }
+    };
+
+    return (
+        <button
+            type="button"
+            className="flex items-center gap-3 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 w-full rounded-md transition-colors duration-200"
+            onClick={handleClick}
+        >
+            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+            <span>{children}</span>
         </button>
     );
 };
